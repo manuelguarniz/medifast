@@ -273,6 +273,10 @@ erDiagram
 | cita | `uq_cita_paciente_activo` | `paciente_activo AS (IF(estado IN ('PENDIENTE_PAGO','PROGRAMADA'), id_paciente, NULL)) STORED UNIQUE` | **Una cita activa por paciente (RN-09)** |
 | cita_horario | `uq_cita_horario_activo` | `horario_activo AS (IF(activo, id_horario, NULL)) STORED UNIQUE` | **Un bloque, una cita activa (RN-01)** |
 | pago | `uq_pago_cita`, `ck_pago_monto` | `UNIQUE (id_cita)`, `monto > 0` | Un pago por cita |
+| usuario | `ck_usuario_documento` | DNI `^[0-9]{8}$`; CE `^[0-9A-Z]{9,12}$` | Formato del documento (RF02) |
+| paciente | `ck_paciente_celular` | `celular` `^9[0-9]{8}$` | Celular de 9 dígitos que empieza en 9 (RF02) |
+| cita | `ck_cita_cancelacion` | `estado <> 'CANCELADA' OR (observacion IS NOT NULL AND cancelada_por IS NOT NULL)` | Toda cancelación lleva observación (RN-13) |
+| pago | `ck_pago_tipo` | `comprobante_tipo IN ('image/jpeg','image/png','application/pdf')` | Tipos de constancia (RN-11) |
 | cita | `idx_cita_medico_estado` | `INDEX (id_medico, estado)` | Agenda y reporte 1 |
 | cita | `idx_cita_paciente_creado` | `INDEX (id_paciente, creado_en)` | Historial del paciente |
 | cita | `idx_cita_estado_expira` | `INDEX (estado, expira_en)` | Tarea de vencimiento (RN-04) |

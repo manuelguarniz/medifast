@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: medifast
+  datasource:
+    # Usuario con privilegios mínimos creado en docs/sql/01_schema.sql
+    url: ${MEDIFAST_DB_URL:jdbc:mysql://localhost:3306/medifast?serverTimezone=America/Lima}
+    username: ${MEDIFAST_DB_USER:medifast_app}
+    password: ${MEDIFAST_DB_PASSWORD:medifast_app}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # El esquema lo definen los scripts de docs/sql; Hibernate no lo modifica
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: America/Lima
+  servlet:
+    multipart:
+      # RN-11: constancias de hasta 5 MB
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+server:
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+  error:
+    whitelabel:
+      enabled: false
+
+medifast:
+  # Constancias fuera de static/ (RNF06)
+  uploads-dir: ${MEDIFAST_UPLOADS_DIR:uploads/comprobantes}

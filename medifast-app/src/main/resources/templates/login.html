@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Iniciar sesión')}"></head>
+<body class="bg-light">
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 col-md-5">
+            <h1 class="h3 text-center mb-1">MEDIFAST</h1>
+            <p class="text-center text-muted mb-4">Reserva de citas · Consultorio Medifast</p>
+
+            <div class="alert alert-danger" th:if="${param.error}">N.º de documento o contraseña incorrectos.</div>
+            <div class="alert alert-success" th:if="${param.salir}">Sesión cerrada.</div>
+
+            <form th:action="@{/login}" method="post" class="card card-body shadow-sm">
+                <div class="mb-3">
+                    <label for="numeroDocumento" class="form-label">N.º de documento (DNI o CE)</label>
+                    <input type="text" id="numeroDocumento" name="numeroDocumento" class="form-control"
+                           maxlength="12" autocomplete="username" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="contrasena" class="form-label">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" class="form-control"
+                           autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                <p class="text-center mt-3 mb-0">¿No tienes cuenta? <a th:href="@{/registro}">Regístrate</a></p>
+            </form>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

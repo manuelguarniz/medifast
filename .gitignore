@@ -1,0 +1,16 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Configuración local y secretos
+.env
+*.local.yml
+
+# Datos generados por la aplicación (RNF06: las constancias no van al repo)
+uploads/
+logs/

@@ -616,7 +616,57 @@ Se utilizarán únicamente los siguientes estados:
 | `docs/`, Javadoc, manual de usuario | | ✔ | ⬜ |
 | Informe final y sustentación | | ✔ | ⬜ |
 
----
+### 14.3 Evidencias mínimas antes de entregar el APF3
+
+⬜ Antes de considerar el APF3 como terminado se debe comprobar lo siguiente:
+
+⬜ El proyecto compila y ejecuta desde una instalación limpia.
+
+⬜ MySQL 8.4 inicia correctamente y ejecuta 01_schema.sql.
+
+⬜ 02_datos_prueba.sql carga los datos sin errores.
+
+⬜ Las consultas de 03_consultas.sql funcionan correctamente.
+
+⬜ Las restricciones RN-01 y RN-09 impiden registros inválidos.
+
+⬜ La aplicación utiliza arquitectura MVC.
+
+⬜ Los controladores delegan la lógica en servicios.
+
+⬜ Los servicios acceden a la persistencia mediante DAO / Spring Data JPA.
+
+⬜ Existen interfaces e implementaciones que permitan demostrar SOLID.
+
+⬜ Existen pruebas unitarias JUnit 5 + Mockito.
+
+⬜ Las reglas de negocio implementadas cuentan con sus pruebas.
+
+⬜ Spring Security controla el acceso por roles PACIENTE y MEDICO.
+
+⬜ Las contraseñas se almacenan utilizando BCrypt.
+
+⬜ Google Guava tiene un uso real dentro de la aplicación.
+
+⬜ Apache Commons tiene un uso real dentro de la aplicación.
+
+⬜ Apache POI genera los archivos .xlsx de los reportes.
+
+⬜ Logback registra los eventos administrativos definidos.
+
+⬜ Las pantallas P0–P10 existen y funcionan.
+
+⬜ El flujo principal del paciente puede completarse.
+
+⬜ El flujo principal del médico puede completarse.
+
+⬜ El enlace público de Figma está agregado al README.
+
+⬜ README, código, SQL, diagramas e informe utilizan la misma versión del alcance.
+
+⬜ Todos los avances relevantes están registrados mediante commits en GitHub.
+
+### 
 
 ## 15. Estructura del repositorio
 

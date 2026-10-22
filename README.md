@@ -589,6 +589,14 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 Importante: un criterio solo debe cambiarse a ✅ Completo cuando exista evidencia verificable dentro del repositorio o durante la demostración.
 
 ### 14.2 Checklist de entregables
+Se utilizarán únicamente los siguientes estados:
+
+✅ Completo: el entregable existe, está actualizado y puede demostrarse.
+
+🟡 Pendiente / en progreso: existe parcialmente o todavía requiere implementación, evidencia o revisión.
+
+❌ No incluido: no forma parte del alcance o se decidió no desarrollarlo.
+
 
 | Entregable | APF3 (24-oct) | Final (24-nov) | Estado |
 | --- | --- | --- | --- |

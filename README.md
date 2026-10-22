@@ -634,25 +634,6 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 
 ---
 
-
-| Entregable | APF3 (24-oct) | Final (24-nov) | Estado |
-| --- | --- | --- | --- |
-| README (planificación consolidada) | ✔ | ✔ | ✅ sin preguntas abiertas |
-| Repositorio GitHub con historial de avances | ✔ | ✔ | ⬜ |
-| Scripts SQL: esquema, datos, consultas | ✔ | | ⬜ |
-| Diagramas de base de datos: conceptual, lógico, físico + restricciones | ✔ | | ✅ (BD-01 a BD-03) |
-| Diccionario de datos | ✔ | | ✅ borrador |
-| Aplicación: 11 pantallas, 16 RF | ✔ | | ⬜ |
-| Pruebas unitarias (TDD) de RN-01 a RN-14 | ✔ | ✔ (cobertura ≥ 60 %) | ⬜ |
-| Informe APF3 (arquitectura, principios, librerías, seguridad, capturas) | ✔ | | ⬜ |
-| Correcciones a APF1, APF2 y Charter | ✔ | | ⬜ |
-| Diagramas funcionales: casos de uso, AS-IS, TO-BE, estados, navegación, cronograma | ✔ | ✔ | ✅ borrador (F-01 a F-07) |
-| Diagramas técnicos: arquitectura MVC, clases, secuencia | ✔ | ✔ | ✅ borrador (T-01 a T-05) |
-| Prototipo Figma actualizado (P0–P10) | Deseable | ✔ | 🟡 |
-| Prueba de usabilidad y validación del doctor | | ✔ | ⬜ |
-| `docs/`, Javadoc, manual de usuario | | ✔ | ⬜ |
-| Informe final y sustentación | | ✔ | ⬜ |
-
 ### 14.3 Evidencias mínimas antes de entregar el APF3
 
 Antes de considerar el APF3 como terminado se debe comprobar lo siguiente:

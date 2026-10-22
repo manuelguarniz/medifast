@@ -513,17 +513,17 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 ### 12.4 Stack
 
 | Componente | Tecnología |
-| --- | --- |
+|---|---|
 | Lenguaje | Java 21 (LTS) |
-| Framework | Spring Boot 4.1 (Web MVC, Thymeleaf, Data JPA, Security, Validation). La línea 3.x ya no tiene soporte libre ni está disponible en Spring Initializr |
-| BD | MySQL 8.4 LTS (scripts en [`docs/sql/`](docs/sql/); `docker-compose.yml` para desarrollo) |
-| Librerías de apoyo | Guava, Apache Commons Lang3 e IO, Apache POI, Logback |
+| Framework | Spring Boot 4.1 (Web MVC, Thymeleaf, Data JPA, Security, Validation) |
+| BD | MySQL 8.4 LTS (`docs/sql/`; `docker-compose.yml` para desarrollo) |
+| Librerías de apoyo | Google Guava, Apache Commons Lang3 e IO, Apache POI, Logback |
 | PDF | OpenPDF (confirmación de cita, RF15) |
 | Build | Maven |
 | Pruebas | JUnit 5, Mockito, Spring Boot Test, JaCoCo |
 | Versionado | Git + GitHub |
-| Prototipo |  Figma — prototipo P0–P10 (🟡 pendiente de agregar enlace público) |
-| Diagramas | **Mermaid** en `docs/diagramas/` (funcionales, técnicos, base de datos); exportación a PNG con mermaid.live o mermaid-cli; Bizagi solo si se exige notación BPMN formal |
+| Prototipo | Figma — prototipo P0–P10 (🟡 pendiente de agregar enlace público) |
+| Diagramas | Mermaid en `docs/diagramas/` (funcionales, técnicos y base de datos); exportación a PNG con Mermaid Live o Mermaid CLI; Bizagi solo si se exige notación BPMN formal |
 
 ---
 

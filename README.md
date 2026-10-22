@@ -578,24 +578,61 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 
 ### 14.1 Cobertura de la rúbrica
 
-| Criterio de la rúbrica |	Cómo se aborda en MEDIFAST |	Evidencia esperada |	Estado |
-| Arquitectura inicial con MVC, TDD, DAO, SOLID y seguridad	| El proyecto se organiza mediante Spring MVC, servicios, DAO con Spring Data JPA, interfaces e implementaciones de servicio, pruebas unitarias y Spring Security. |	Código en medifast-app/, paquetes controller/, service/, dao/, model/, security/ y src/test/. |	🟡 Pendiente de verificación completa |
-| Uso de Google Guava, Apache Commons, Apache POI y Logback	| Cada librería tiene un uso concreto dentro del sistema y no se incorpora únicamente como dependencia.	| pom.xml y clases donde se utilicen realmente las librerías. | 🟡 Pendiente de verificación completa |
-| Git y GitHub con evidencia de los avances	Los avances del proyecto se versionan mediante commits descriptivos en la rama principal del repositorio.	| Historial de commits y archivos versionados en GitHub. |	🟡 En progreso |
-| Interfaces UI que cubren el 100 % del alcance comprometido |	El inventario P0–P10 contempla las pantallas relacionadas con los requerimientos funcionales definidos para el APF3. |	Código Thymeleaf, capturas y demostración funcional de P0–P10.	| 🟡 En desarrollo |
-| Solución completa, coherente, con buenas prácticas y autoría | README, código, scripts SQL, diagramas e informe deben permanecer alineados durante el desarrollo. |	Repositorio, informe APF3 y sustentación.	| 🟡 En progreso |
-| Sustentación oral organizada y coherente | La exposición seguirá la secuencia problema → alcance → arquitectura → implementación → pruebas → control de versiones → demostración → próximos pasos. |	Presentación y demostración del sistema. |	🟡 Pendiente |
+> Esta sección resume cómo MEDIFAST cubre los criterios del APF3.  
+> Un criterio solo debe marcarse como `✅ Completo` cuando exista evidencia verificable en el repositorio o durante la demostración.
 
-Importante: un criterio solo debe cambiarse a ✅ Completo cuando exista evidencia verificable dentro del repositorio o durante la demostración.
+| Criterio de la rúbrica | Cómo se aborda en MEDIFAST | Evidencia | Estado |
+|---|---|---|---|
+| Arquitectura inicial aplicando MVC, TDD, DAO, SOLID y seguridad | El proyecto se estructura con Spring MVC, servicios, DAO mediante Spring Data JPA, interfaces e implementaciones de servicio, pruebas JUnit/Mockito y Spring Security. | `medifast-app/src/main/java/`, `controller/`, `service/`, `dao/`, `model/`, `security/`, `src/test/java/`, diagramas técnicos. | 🟡 En desarrollo |
+| Uso de Google Guava, Apache Commons, Apache POI y Logback | Cada librería tiene un uso funcional definido: Guava para control de intentos/caché, Commons para cadenas y archivos, POI para exportación Excel y Logback para auditoría. | `pom.xml` + clases concretas donde se utilicen + archivos `.xlsx` + logs. | 🟡 Pendiente de evidencia completa |
+| Uso de control de versiones Git + GitHub | El repositorio contiene documentación, scripts, diagramas y aplicación. Los avances deben quedar registrados mediante commits descriptivos. | Historial de commits, archivos versionados y entregables en GitHub. | 🟡 En progreso |
+| Interfaces gráficas que cubren el 100 % del alcance comprometido | El inventario P0–P10 define 11 pantallas que cubren RF01–RF16. | Plantillas Thymeleaf P0–P10, capturas y demo funcional. | 🟡 En desarrollo |
+| Construcción del producto final: completo, coherente, con buenas prácticas y autoría | README, código, BD, diagramas e informe deben mantenerse alineados. Se aplican capas, librerías, seguridad, pruebas y versionado. | Repositorio + informe APF3 + demostración + sustentación. | 🟡 En progreso |
+| Sustentación oral organizada y con dominio técnico | La exposición seguirá la secuencia: problema → alcance → arquitectura → implementación → pruebas → Git/GitHub → demo → próximos pasos. | Presentación, demo y respuestas del equipo. | 🟡 Pendiente |
+
+---
 
 ### 14.2 Checklist de entregables
-Se utilizarán únicamente los siguientes estados:
 
-✅ Completo: el entregable existe, está actualizado y puede demostrarse.
+#### Estados utilizados
 
-🟡 Pendiente / en progreso: existe parcialmente o todavía requiere implementación, evidencia o revisión.
+- ✅ **Completo:** existe, está actualizado, funciona y puede demostrarse.
+- 🟡 **Pendiente / en progreso:** existe parcialmente o requiere implementación, evidencia o revisión.
+- ❌ **No incluido:** no forma parte del alcance vigente.
 
-❌ No incluido: no forma parte del alcance o se decidió no desarrollarlo.
+| Entregable | APF3 | Final | Estado actual |
+|---|---:|---:|---|
+| README con definición, alcance, RF, RN, RNF y planificación | ✔ | ✔ | ✅ Completo |
+| Repositorio GitHub con historial de avances | ✔ | ✔ | 🟡 En progreso |
+| Scripts SQL: esquema, datos de prueba y consultas | ✔ | ✔ | ✅ Completo |
+| Modelo conceptual, lógico y físico de BD | ✔ | ✔ | ✅ Completo |
+| Restricciones e índices de BD | ✔ | ✔ | ✅ Completo |
+| Diccionario de datos | ✔ | ✔ | 🟡 Borrador / revisar versión final |
+| Aplicación Spring Boot + Thymeleaf | ✔ | ✔ | 🟡 En desarrollo |
+| Arquitectura MVC | ✔ | ✔ | 🟡 En desarrollo |
+| Patrón DAO con Spring Data JPA | ✔ | ✔ | 🟡 En desarrollo |
+| Aplicación de SOLID | ✔ | ✔ | 🟡 En desarrollo |
+| Pruebas TDD de RN-01 a RN-14 | ✔ | ✔ | 🟡 En desarrollo |
+| Spring Security + BCrypt + roles + CSRF | ✔ | ✔ | 🟡 En desarrollo |
+| Uso real de Google Guava | ✔ | ✔ | 🟡 Pendiente de evidencia completa |
+| Uso real de Apache Commons Lang3 / IO | ✔ | ✔ | 🟡 Pendiente de evidencia completa |
+| Uso real de Apache POI | ✔ | ✔ | 🟡 Pendiente de evidencia completa |
+| Uso real de Logback | ✔ | ✔ | 🟡 Pendiente de evidencia completa |
+| Confirmación PDF con OpenPDF | ✔ | ✔ | 🟡 En desarrollo |
+| Interfaces P0–P10 | ✔ | ✔ | 🟡 En desarrollo |
+| Reporte de citas exportable a Excel | ✔ | ✔ | 🟡 En desarrollo |
+| Reporte de pagos exportable a Excel | ✔ | ✔ | 🟡 En desarrollo |
+| Diagramas funcionales F-01 a F-07 | ✔ | ✔ | ✅ Borrador disponible / revisar |
+| Diagramas técnicos T-01 a T-05 | ✔ | ✔ | ✅ Borrador disponible / revisar |
+| Prototipo Figma P0–P10 | Deseable | ✔ | 🟡 Falta agregar/verificar enlace público |
+| Informe APF3 | ✔ |  | 🟡 En desarrollo |
+| Javadoc |  | ✔ | 🟡 Pendiente |
+| Manual de usuario |  | ✔ | 🟡 Pendiente |
+| Prueba de usabilidad con usuarios |  | ✔ | 🟡 Pendiente |
+| Validación del Dr. Moisés Barrantes Cabrera |  | ✔ | 🟡 Pendiente |
+| Informe final y sustentación |  | ✔ | 🟡 Pendiente |
+
+---
 
 
 | Entregable | APF3 (24-oct) | Final (24-nov) | Estado |

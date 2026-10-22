@@ -406,7 +406,33 @@ Diagramas: [F-01 Casos de uso](docs/diagramas/funcionales.md#f-01--casos-de-uso)
 Flujo del paciente: `P0/P1 → P2 → P3 (15 min) → P4 (PDF) → P5 → P6`
 Flujo del médico: `P0 → P7 → P8 (constancia → validar/rechazar → atendida / no asistió / cancelar) → P9 / P10`
 
----
+### 10.3 Prototipo UX/UI
+
+El prototipo de MEDIFAST se elaboró en Figma y representa las pantallas
+P0–P10 definidas en el inventario de interfaces.
+
+**Prototipo Figma:** [MEDIFAST — Prototipo P0–P10](PEGAR_AQUI_EL_ENLACE_PUBLICO_DE_FIGMA)
+
+El prototipo mantiene trazabilidad con los requerimientos funcionales y los
+casos de uso descritos anteriormente.
+
+Las pantallas contempladas son:
+
+- **P0:** Login.
+- **P1:** Registro.
+- **P2:** Reservar cita / horarios disponibles.
+- **P3:** Pago Yape simulado.
+- **P4:** Confirmación de cita.
+- **P5:** Mis citas.
+- **P6:** Mi perfil.
+- **P7:** Agenda del médico.
+- **P8:** Detalle de cita.
+- **P9:** Reporte de citas.
+- **P10:** Reporte de pagos.
+
+Para el APF3, las interfaces implementadas en Thymeleaf deben conservar
+coherencia funcional y visual con este prototipo y cubrir el alcance
+comprometido del proyecto.
 
 ## 11. Modelo de datos
 

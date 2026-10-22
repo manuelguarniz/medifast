@@ -730,6 +730,262 @@ MEDIFAST se considerará conforme al APF3 cuando:
 
 8. El equipo pueda explicar y demostrar el funcionamiento del código durante la sustentación.
 
+### 14.6 Correcciones obligatorias antes de considerar conforme el APF3
+
+Aunque el README documenta la arquitectura, el alcance y los criterios de la rúbrica, el cumplimiento del APF3 debe estar respaldado por **evidencia real y verificable dentro del repositorio**.
+
+#### 1. Agregar el enlace público del prototipo Figma
+
+El prototipo debe incluir las pantallas P0–P10 definidas en el inventario de interfaces.
+
+**Estado actual:** 🟡 Pendiente de agregar/verificar el enlace público.
+
+**Acción requerida:**
+
+Reemplazar cualquier texto como:
+
+```text
+Figma (falta el enlace)
+```
+
+por:
+
+```markdown
+[Figma — Prototipo MEDIFAST P0–P10](PEGAR_AQUI_EL_ENLACE_PUBLICO_DE_FIGMA)
+```
+
+El enlace debe permitir visualizar el prototipo sin solicitar permisos adicionales.
+
+---
+
+#### 2. No utilizar estados ambiguos en los entregables
+
+Todos los elementos documentados deben utilizar únicamente los siguientes estados:
+
+- ✅ **Completo:** existe, está actualizado y puede demostrarse.
+- 🟡 **Pendiente / en progreso:** existe parcialmente o todavía necesita implementación, evidencia o revisión.
+- ❌ **No incluido:** no forma parte del alcance definido.
+
+No deben dejarse casillas vacías cuando el README afirme que un elemento está completo.
+
+---
+
+#### 3. Respaldar cada criterio de la rúbrica con evidencia real
+
+No es suficiente mencionar MVC, DAO, SOLID, TDD, seguridad o librerías en el README.
+
+Cada criterio debe contar con evidencia verificable dentro del repositorio.
+
+| Criterio | Evidencia esperada |
+|---|---|
+| MVC | `controller/`, `model/`, `templates/` y servicios |
+| DAO | Interfaces en `dao/` que extiendan `JpaRepository` |
+| SOLID | Interfaces de servicio, implementaciones separadas e inyección por constructor |
+| TDD | Pruebas en `src/test/java/` |
+| Seguridad | Spring Security, BCrypt, roles, CSRF y validaciones |
+| Guava | Uso real dentro de una clase del proyecto |
+| Apache Commons | Uso real en validación, cadenas o manejo de archivos |
+| Apache POI | Generación real de archivos `.xlsx` |
+| Logback | Configuración y generación de logs |
+| Interfaces | P0–P10 implementadas en Thymeleaf |
+| GitHub | Historial de commits con evolución real del proyecto |
+
+---
+
+#### 4. Mantener alineados README, código, SQL, diagramas e informes
+
+Toda la documentación debe utilizar las mismas decisiones vigentes del proyecto.
+
+Actualmente se debe mantener:
+
+- **Nombre:** Consultorio Medifast.
+- **Base de datos:** MySQL 8.4.
+- **Lenguaje:** Java 21.
+- **Framework:** Spring Boot.
+- **Frontend:** Thymeleaf + HTML + CSS + JavaScript.
+- **Arquitectura:** MVC + DAO + servicios.
+- **Metodología:** XP adaptada al proyecto.
+- **Interfaz:** un médico y un consultorio.
+- **Base de datos:** preparada para varios médicos y consultorios.
+- **Pantallas:** P0–P10.
+- **Requerimientos funcionales:** RF01–RF16.
+- **Reglas de negocio:** RN-01–RN-14.
+- **Yape:** simulación; no se realizan transacciones monetarias reales.
+
+Si un informe anterior contiene PostgreSQL, un alcance diferente, entidades clínicas o requerimientos anteriores, deberá actualizarse antes de utilizarlo como evidencia del APF3.
+
+---
+
+#### 5. Mantener evidencia del 100 % de los avances en GitHub
+
+La rúbrica exige que los avances y actualizaciones del proyecto queden registrados en GitHub.
+
+Cada funcionalidad desarrollada debe registrarse mediante commits reales y descriptivos.
+
+Ejemplos:
+
+```text
+feat: implementar registro de pacientes
+test: agregar pruebas de RN-12 para usuarios
+feat: implementar login y seguridad por roles
+feat: implementar reserva de citas y apartado de 15 minutos
+test: validar RN-01 y RN-09 en reservas
+feat: implementar pago simulado y carga de constancia
+feat: implementar agenda del medico
+feat: generar reportes Excel con Apache POI
+docs: actualizar diagramas y documentación APF3
+```
+
+El historial debe reflejar la evolución real del proyecto.
+
+No se debe crear un único commit final con todos los cambios.
+
+Los GitHub Issues pueden utilizarse como apoyo para organizar historias o tareas, pero la evidencia principal será el historial de commits y los archivos versionados.
+
+---
+
+#### 6. Publicar evidencia de las pruebas TDD
+
+Las pruebas deberán encontrarse en:
+
+```text
+medifast-app/src/test/java/
+```
+
+Las reglas de negocio RN-01–RN-14 deben contar progresivamente con pruebas automatizadas.
+
+Como mínimo, para el APF3 se debe poder demostrar que:
+
+- las pruebas JUnit 5 se ejecutan;
+- se utiliza Mockito cuando corresponde;
+- las reglas críticas tienen pruebas;
+- las pruebas pasan correctamente;
+- el reporte JaCoCo puede generarse.
+
+Ejecución:
+
+```bash
+cd medifast-app
+./mvnw test
+```
+
+En Windows:
+
+```powershell
+cd medifast-app
+.\mvnw.cmd test
+```
+
+Cuando JaCoCo esté configurado, el reporte deberá encontrarse en:
+
+```text
+medifast-app/target/site/jacoco/index.html
+```
+
+El porcentaje de cobertura deberá informarse únicamente cuando exista un reporte real generado por JaCoCo.
+
+---
+
+#### 7. Agregar evidencia visual de las interfaces P0–P10
+
+Para demostrar que la implementación gráfica cubre el alcance comprometido, se recomienda crear:
+
+```text
+docs/capturas/
+```
+
+con una captura de cada pantalla implementada:
+
+```text
+docs/capturas/
+├── P0-login.png
+├── P1-registro.png
+├── P2-reserva.png
+├── P3-pago-yape.png
+├── P4-confirmacion.png
+├── P5-mis-citas.png
+├── P6-mi-perfil.png
+├── P7-agenda.png
+├── P8-detalle-cita.png
+├── P9-reporte-citas.png
+└── P10-reporte-pagos.png
+```
+
+Estas capturas deben corresponder a la aplicación Spring Boot + Thymeleaf funcionando y no únicamente al prototipo de Figma.
+
+La evidencia ideal para la sustentación será demostrar directamente los principales flujos de la aplicación.
+
+---
+
+#### 8. Utilizar redacción verificable en el README
+
+El README debe distinguir claramente entre lo que ya existe y lo que todavía está en desarrollo.
+
+Ejemplos:
+
+**Incorrecto si aún no está implementado:**
+
+```text
+El sistema utiliza Apache POI para exportar los reportes.
+```
+
+**Correcto mientras esté pendiente:**
+
+```text
+🟡 Se implementará Apache POI para la exportación de los reportes P9 y P10.
+```
+
+Cuando exista código funcional y verificable:
+
+```text
+✅ Apache POI se utiliza para exportar los reportes de citas y pagos en formato .xlsx.
+```
+
+La misma regla se aplica a:
+
+- MVC.
+- DAO.
+- SOLID.
+- TDD.
+- Spring Security.
+- Guava.
+- Apache Commons.
+- Apache POI.
+- Logback.
+- OpenPDF.
+- interfaces P0–P10.
+- reportes.
+- pruebas.
+- cobertura.
+- documentación.
+
+---
+
+### 14.7 Checklist de correcciones críticas
+
+Antes de declarar el APF3 como terminado:
+
+- [ ] Agregar el enlace público de Figma.
+- [ ] Verificar que P0–P10 estén implementadas.
+- [ ] Crear evidencia visual de las pantallas implementadas.
+- [ ] Confirmar que MVC esté presente en el código.
+- [ ] Confirmar el uso de DAO mediante Spring Data JPA.
+- [ ] Evidenciar SOLID mediante interfaces e implementaciones.
+- [ ] Subir pruebas TDD a `src/test/java/`.
+- [ ] Ejecutar correctamente las pruebas JUnit 5.
+- [ ] Generar el reporte JaCoCo.
+- [ ] Implementar Spring Security y BCrypt.
+- [ ] Demostrar el uso real de Guava.
+- [ ] Demostrar el uso real de Apache Commons.
+- [ ] Demostrar el uso real de Apache POI.
+- [ ] Demostrar el uso real de Logback.
+- [ ] Comprobar los scripts de MySQL 8.4.
+- [ ] Verificar que README, código, SQL, diagramas e informe coincidan.
+- [ ] Mantener el historial de avances mediante commits descriptivos.
+- [ ] Preparar una demostración funcional para la sustentación.
+
+> **Criterio general:** ningún elemento debe marcarse como `✅ Completo` únicamente porque aparezca descrito en el README. Debe existir una implementación, archivo, prueba, captura o evidencia que permita demostrar su cumplimiento.
+
 ## 15. Estructura del repositorio
 
 Monorepo: documentación, scripts de BD y aplicación en un solo repositorio.

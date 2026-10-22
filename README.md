@@ -496,7 +496,7 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 | Build | Maven |
 | Pruebas | JUnit 5, Mockito, Spring Boot Test, JaCoCo |
 | Versionado | Git + GitHub |
-| Prototipo | Figma (falta el enlace) |
+| Prototipo |  Figma — prototipo P0–P10 (🟡 pendiente de agregar enlace público) |
 | Diagramas | **Mermaid** en `docs/diagramas/` (funcionales, técnicos, base de datos); exportación a PNG con mermaid.live o mermaid-cli; Bizagi solo si se exige notación BPMN formal |
 
 ---

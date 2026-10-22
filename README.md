@@ -578,14 +578,63 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 
 ### 14.1 Cobertura de la rúbrica
 
-| Criterio de la rúbrica | Cómo se cumple | Evidencia | Estado |
-| --- | --- | --- | --- |
-| Arquitectura inicial con ≥ 3 de MVC, TDD, DAO, SOLID + seguridad | Se aplican los 4 (§12.2) y las medidas de seguridad de §12.2 | Paquetes, pruebas, diagrama de clases, informe | ⬜ |
-| Librerías Guava, Apache POI, Apache Commons, Logback | Uso real de cada una (§12.3) | `pom.xml`, código, logs, .xlsx | ⬜ |
-| Git con el 100 % de los avances en GitHub | Repositorio desde el día 1, con código, SQL, diagramas e informes | Historial de commits, enlace en el informe | ⬜ |
-| Interfaces UI que cubren el 100 % del alcance comprometido | Las 11 pantallas (P0–P10) cubren los 16 RF (§10.1) | Capturas + demo | ⬜ |
-| Solución completa, coherente, con buenas prácticas y autoría | README = código = informe; patrones; control de versiones; dominio del código | Informe + sustentación | ⬜ |
-| Exposición fluida y coherente | Guion: problema → alcance → arquitectura → demo → pruebas → próximos pasos | Ensayo del sábado | ⬜ |
+Criterio de la rúbrica
+
+Cómo se aborda en MEDIFAST
+
+Evidencia esperada
+
+Estado
+
+Arquitectura inicial con MVC, TDD, DAO, SOLID y seguridad
+
+El proyecto se organiza mediante Spring MVC, servicios, DAO con Spring Data JPA, interfaces e implementaciones de servicio, pruebas unitarias y Spring Security.
+
+Código en medifast-app/, paquetes controller/, service/, dao/, model/, security/ y src/test/.
+
+🟡 Pendiente de verificación completa
+
+Uso de Google Guava, Apache Commons, Apache POI y Logback
+
+Cada librería tiene un uso concreto dentro del sistema y no se incorpora únicamente como dependencia.
+
+pom.xml y clases donde se utilicen realmente las librerías.
+
+🟡 Pendiente de verificación completa
+
+Git y GitHub con evidencia de los avances
+
+Los avances del proyecto se versionan mediante commits descriptivos en la rama principal del repositorio.
+
+Historial de commits y archivos versionados en GitHub.
+
+🟡 En progreso
+
+Interfaces UI que cubren el 100 % del alcance comprometido
+
+El inventario P0–P10 contempla las pantallas relacionadas con los requerimientos funcionales definidos para el APF3.
+
+Código Thymeleaf, capturas y demostración funcional de P0–P10.
+
+🟡 En desarrollo
+
+Solución completa, coherente, con buenas prácticas y autoría
+
+README, código, scripts SQL, diagramas e informe deben permanecer alineados durante el desarrollo.
+
+Repositorio, informe APF3 y sustentación.
+
+🟡 En progreso
+
+Sustentación oral organizada y coherente
+
+La exposición seguirá la secuencia problema → alcance → arquitectura → implementación → pruebas → control de versiones → demostración → próximos pasos.
+
+Presentación y demostración del sistema.
+
+🟡 Pendiente
+
+Importante: un criterio solo debe cambiarse a ✅ Completo cuando exista evidencia verificable dentro del repositorio o durante la demostración.
 
 ### 14.2 Checklist de entregables
 

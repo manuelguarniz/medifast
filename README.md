@@ -692,6 +692,26 @@ docs: actualizar diagramas y documentación APF3
 
 No se considera suficiente subir todo el proyecto en un único commit final. El historial debe evidenciar la evolución real del desarrollo.
 
+### 14.5 Criterio para considerar MEDIFAST conforme al APF3
+
+MEDIFAST se considerará conforme al APF3 cuando:
+
+1. La arquitectura implementada evidencie MVC, DAO, SOLID y TDD.
+
+2. Se encuentren implementadas las medidas básicas de seguridad definidas.
+
+3. Google Guava, Apache Commons, Apache POI y Logback tengan uso funcional dentro del código.
+
+4. Las interfaces comprometidas P0–P10 estén implementadas y puedan demostrarse.
+
+5. Los requerimientos funcionales comprometidos para el APF3 estén cubiertos por la aplicación.
+
+6. El código, el README, los scripts SQL, los diagramas y el informe sean coherentes entre sí.
+
+7. El historial de GitHub permita identificar los avances realizados durante el desarrollo.
+
+8. El equipo pueda explicar y demostrar el funcionamiento del código durante la sustentación.
+
 ## 15. Estructura del repositorio
 
 Monorepo: documentación, scripts de BD y aplicación en un solo repositorio.

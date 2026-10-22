@@ -666,7 +666,23 @@ Se utilizarán únicamente los siguientes estados:
 
 ⬜ Todos los avances relevantes están registrados mediante commits en GitHub.
 
-### 
+### 14.4 Evidencia de control de versiones
+
+Para cumplir con el criterio de Git y GitHub, los cambios deben registrarse mediante commits pequeños y descriptivos.
+
+Ejemplos:
+
+feat: implementar registro y login de paciente
+test: agregar pruebas de RN-12 para registro de usuarios
+feat: implementar disponibilidad y reserva de citas
+test: validar RN-01 y RN-09 en servicio de reservas
+feat: implementar pago simulado y carga de constancia
+feat: implementar agenda y gestión de citas del médico
+feat: agregar reportes Excel con Apache POI
+security: configurar roles y bloqueo de intentos
+docs: actualizar diagramas y documentación APF3
+
+No se considera suficiente subir todo el proyecto en un único commit final. El historial debe evidenciar la evolución real del desarrollo.
 
 ## 15. Estructura del repositorio
 

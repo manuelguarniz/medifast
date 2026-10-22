@@ -618,7 +618,7 @@ Se utilizarán únicamente los siguientes estados:
 
 ### 14.3 Evidencias mínimas antes de entregar el APF3
 
-⬜ Antes de considerar el APF3 como terminado se debe comprobar lo siguiente:
+Antes de considerar el APF3 como terminado se debe comprobar lo siguiente:
 
 ⬜ El proyecto compila y ejecuta desde una instalación limpia.
 

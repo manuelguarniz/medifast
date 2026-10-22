@@ -578,13 +578,13 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 
 ### 14.1 Cobertura de la rúbrica
 
-Criterio de la rúbrica	Cómo se aborda en MEDIFAST	Evidencia esperada	Estado
-Arquitectura inicial con MVC, TDD, DAO, SOLID y seguridad	El proyecto se organiza mediante Spring MVC, servicios, DAO con Spring Data JPA, interfaces e implementaciones de servicio, pruebas unitarias y Spring Security.	Código en medifast-app/, paquetes controller/, service/, dao/, model/, security/ y src/test/.	🟡 Pendiente de verificación completa
-Uso de Google Guava, Apache Commons, Apache POI y Logback	Cada librería tiene un uso concreto dentro del sistema y no se incorpora únicamente como dependencia.	pom.xml y clases donde se utilicen realmente las librerías.	🟡 Pendiente de verificación completa
-Git y GitHub con evidencia de los avances	Los avances del proyecto se versionan mediante commits descriptivos en la rama principal del repositorio.	Historial de commits y archivos versionados en GitHub.	🟡 En progreso
-Interfaces UI que cubren el 100 % del alcance comprometido	El inventario P0–P10 contempla las pantallas relacionadas con los requerimientos funcionales definidos para el APF3.	Código Thymeleaf, capturas y demostración funcional de P0–P10.	🟡 En desarrollo
-Solución completa, coherente, con buenas prácticas y autoría	README, código, scripts SQL, diagramas e informe deben permanecer alineados durante el desarrollo.	Repositorio, informe APF3 y sustentación.	🟡 En progreso
-Sustentación oral organizada y coherente	La exposición seguirá la secuencia problema → alcance → arquitectura → implementación → pruebas → control de versiones → demostración → próximos pasos.	Presentación y demostración del sistema.	🟡 Pendiente
+| Criterio de la rúbrica |	Cómo se aborda en MEDIFAST |	Evidencia esperada |	Estado |
+| Arquitectura inicial con MVC, TDD, DAO, SOLID y seguridad	| El proyecto se organiza mediante Spring MVC, servicios, DAO con Spring Data JPA, interfaces e implementaciones de servicio, pruebas unitarias y Spring Security. |	Código en medifast-app/, paquetes controller/, service/, dao/, model/, security/ y src/test/. |	🟡 Pendiente de verificación completa |
+| Uso de Google Guava, Apache Commons, Apache POI y Logback	| Cada librería tiene un uso concreto dentro del sistema y no se incorpora únicamente como dependencia.	| pom.xml y clases donde se utilicen realmente las librerías. | 🟡 Pendiente de verificación completa |
+| Git y GitHub con evidencia de los avances	Los avances del proyecto se versionan mediante commits descriptivos en la rama principal del repositorio.	| Historial de commits y archivos versionados en GitHub. |	🟡 En progreso |
+| Interfaces UI que cubren el 100 % del alcance comprometido |	El inventario P0–P10 contempla las pantallas relacionadas con los requerimientos funcionales definidos para el APF3. |	Código Thymeleaf, capturas y demostración funcional de P0–P10.	| 🟡 En desarrollo |
+| Solución completa, coherente, con buenas prácticas y autoría | README, código, scripts SQL, diagramas e informe deben permanecer alineados durante el desarrollo. |	Repositorio, informe APF3 y sustentación.	| 🟡 En progreso |
+| Sustentación oral organizada y coherente | La exposición seguirá la secuencia problema → alcance → arquitectura → implementación → pruebas → control de versiones → demostración → próximos pasos. |	Presentación y demostración del sistema. |	🟡 Pendiente |
 
 Importante: un criterio solo debe cambiarse a ✅ Completo cuando exista evidencia verificable dentro del repositorio o durante la demostración.
 

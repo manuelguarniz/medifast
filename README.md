@@ -1355,6 +1355,337 @@ Antes de declarar el APF3 como terminado:
 
 > **Criterio general:** ningún elemento debe marcarse como `✅ Completo` únicamente porque aparezca descrito en el README. Debe existir una implementación, archivo, prueba, captura o evidencia que permita demostrar su cumplimiento.
 
+### 14.8 Interfaces gráficas — cobertura del 100 % del alcance comprometido
+
+La rúbrica del APF3 asigna **6 puntos** al criterio de implementación de interfaces gráficas. Para alcanzar el estándar esperado, las interfaces deben cubrir el **100 % del alcance comprometido** y funcionar realmente dentro de la aplicación.
+
+El prototipo de Figma sirve como referencia de diseño, pero la evidencia principal para este criterio será la implementación funcional en **Spring Boot + Thymeleaf**.
+
+#### 14.8.1 Inventario de interfaces P0–P10
+
+| Código | Pantalla | Actor | RF relacionados | Funcionalidad esperada | Estado |
+|---|---|---|---|---|---|
+| P0 | Login | Paciente / Médico | RF07 | Iniciar sesión con número de documento y contraseña; redirigir según rol; mostrar mensajes de error o bloqueo. | 🟡 En desarrollo |
+| P1 | Registro | Paciente | RF02 | Registrar tipo y número de documento, nombres, apellidos, fecha de nacimiento, celular, correo y contraseña con validaciones. | 🟡 En desarrollo |
+| P2 | Reservar cita / horarios | Paciente | RF01, RF05, RF06 | Mostrar horarios disponibles, detectar tipo de cita, mostrar tarifa y permitir seleccionar un bloque válido. | 🟡 En desarrollo |
+| P3 | Pago Yape simulado | Paciente | RF03 | Mostrar monto, QR o número de Yape de ejemplo, contador de 15 minutos y permitir adjuntar la constancia. | 🟡 En desarrollo |
+| P4 | Confirmación | Paciente | RF15 | Mostrar los datos principales de la cita confirmada y permitir descargar la confirmación en PDF. | 🟡 En desarrollo |
+| P5 | Mis citas | Paciente | RF03, RF10, RF15 | Mostrar historial de citas, permitir retomar el pago cuando corresponda y descargar confirmaciones PDF. | 🟡 En desarrollo |
+| P6 | Mi perfil | Paciente | RF11 | Consultar y actualizar los datos personales permitidos y cambiar la contraseña. | 🟡 En desarrollo |
+| P7 | Agenda | Médico | RF04 | Mostrar la agenda con filtros por día, semana y estado. | 🟡 En desarrollo |
+| P8 | Detalle de cita | Médico | RF08, RF12, RF13, RF14 | Ver datos y constancia; validar o rechazar pago; marcar atendida / no asistió; cancelar con observación. | 🟡 En desarrollo |
+| P9 | Reporte de citas | Médico | RF09 | Mostrar reporte de citas con filtros por día, semana o estado y exportación a Excel. | 🟡 En desarrollo |
+| P10 | Reporte de pagos | Médico | RF09 | Mostrar reporte de pagos por período, cantidad y total; exportar a Excel. | 🟡 En desarrollo |
+
+> **Criterio:** una pantalla solo debe cambiarse a `✅ Completa` cuando esté implementada en Thymeleaf, conectada con la lógica de negocio y pueda demostrarse funcionando.
+
+---
+
+#### 14.8.2 Cobertura funcional
+
+La implementación gráfica debe permitir demostrar, como mínimo, los siguientes flujos completos.
+
+##### Flujo del paciente
+
+```text
+P0 / P1
+   ↓
+P2
+   ↓
+P3
+   ↓
+P4
+   ↓
+P5
+   ↓
+P6
+```
+
+El paciente debe poder:
+
+- registrarse;
+- iniciar sesión;
+- consultar horarios disponibles;
+- reservar una cita;
+- realizar la simulación de pago;
+- adjuntar una constancia;
+- recibir la confirmación;
+- descargar el PDF;
+- consultar su historial de citas;
+- retomar un pago pendiente dentro del plazo permitido;
+- actualizar sus datos personales.
+
+##### Flujo del médico
+
+```text
+P0
+   ↓
+P7
+   ↓
+P8
+   ↓
+P9 / P10
+```
+
+El médico debe poder:
+
+- iniciar sesión;
+- consultar su agenda;
+- abrir el detalle de una cita;
+- revisar la constancia;
+- validar o rechazar el pago;
+- cancelar una cita con observación;
+- marcar una cita como atendida o no asistió;
+- consultar los reportes;
+- exportar los reportes a Excel.
+
+---
+
+#### 14.8.3 Evidencia visual
+
+Para demostrar el cumplimiento del criterio de interfaces gráficas se debe crear la carpeta:
+
+```text
+docs/capturas/
+```
+
+con una captura de cada pantalla implementada:
+
+```text
+docs/capturas/
+├── P0-login.png
+├── P1-registro.png
+├── P2-reserva.png
+├── P3-pago-yape.png
+├── P4-confirmacion.png
+├── P5-mis-citas.png
+├── P6-mi-perfil.png
+├── P7-agenda.png
+├── P8-detalle-cita.png
+├── P9-reporte-citas.png
+└── P10-reporte-pagos.png
+```
+
+Las capturas deben corresponder a la **aplicación ejecutándose**, no únicamente al diseño de Figma.
+
+---
+
+#### 14.8.4 Evidencia en el código
+
+Las vistas deben encontrarse en una estructura equivalente a:
+
+```text
+medifast-app/
+└── src/
+    └── main/
+        └── resources/
+            └── templates/
+                ├── login.html
+                ├── registro.html
+                ├── reserva.html
+                ├── pago.html
+                ├── confirmacion.html
+                ├── mis-citas.html
+                ├── perfil.html
+                ├── medico/
+                │   ├── agenda.html
+                │   ├── detalle-cita.html
+                │   ├── reporte-citas.html
+                │   └── reporte-pagos.html
+                └── fragments/
+```
+
+La nomenclatura exacta puede variar, pero debe existir una correspondencia clara entre P0–P10 y las plantillas implementadas.
+
+---
+
+#### 14.8.5 Criterios mínimos de funcionamiento por pantalla
+
+##### P0 — Login
+
+Debe comprobarse que:
+
+- el paciente y el médico pueden iniciar sesión;
+- el rol determina la pantalla de destino;
+- las credenciales incorrectas producen un mensaje de error;
+- el bloqueo temporal definido por seguridad funciona cuando corresponda.
+
+##### P1 — Registro
+
+Debe comprobarse que:
+
+- se validan los campos obligatorios;
+- el número de documento no se duplica;
+- el correo no se duplica;
+- la contraseña cumple la longitud mínima;
+- los datos inválidos generan mensajes comprensibles.
+
+##### P2 — Reserva / horarios
+
+Debe comprobarse que:
+
+- solo se muestran horarios disponibles;
+- no se permite reservar para el mismo día;
+- se respeta la ventana definida de reserva;
+- el tipo NUEVO / CONTROL se determina correctamente;
+- el monto y la duración corresponden al tipo de cita;
+- un paciente no puede tener más de una cita activa;
+- un bloque no puede pertenecer a más de una cita activa.
+
+##### P3 — Pago Yape simulado
+
+Debe comprobarse que:
+
+- se muestra el monto correcto;
+- se indica claramente que es una simulación;
+- el contador de 15 minutos es visible;
+- la constancia es obligatoria;
+- solo se aceptan los formatos definidos;
+- el tamaño máximo del archivo se valida;
+- el paciente puede retomar el proceso mientras la reserva siga vigente.
+
+##### P4 — Confirmación
+
+Debe comprobarse que:
+
+- se muestran los datos principales de la cita;
+- se muestra el médico, fecha, hora, tipo y monto;
+- se muestra el estado del pago;
+- el botón para descargar PDF funciona.
+
+##### P5 — Mis citas
+
+Debe comprobarse que:
+
+- las citas se ordenan de la más reciente a la más antigua;
+- se muestra el estado de la cita;
+- se muestra el estado del pago;
+- puede retomarse el pago pendiente cuando corresponda;
+- puede descargarse el PDF en las citas permitidas.
+
+##### P6 — Mi perfil
+
+Debe comprobarse que:
+
+- pueden editarse los datos permitidos;
+- el tipo y número de documento no se pueden modificar;
+- el cambio de contraseña solicita la contraseña actual;
+- se aplican las mismas validaciones definidas para el registro.
+
+##### P7 — Agenda
+
+Debe comprobarse que:
+
+- las citas se muestran ordenadas por fecha y hora;
+- existen filtros por día;
+- existen filtros por semana;
+- existen filtros por estado.
+
+##### P8 — Detalle de cita
+
+Debe comprobarse que:
+
+- el médico puede visualizar la constancia;
+- puede validar el pago;
+- puede rechazar el pago con observación;
+- el rechazo cancela la cita según la regla definida;
+- puede cancelar una cita con observación;
+- puede marcar atendida o no asistió cuando corresponda;
+- no se permite marcar como atendida una cita cuyo pago no esté validado.
+
+##### P9 — Reporte de citas
+
+Debe comprobarse que:
+
+- puede filtrarse por día;
+- puede filtrarse por semana;
+- puede filtrarse por estado;
+- la tabla muestra los resultados correctos;
+- el archivo `.xlsx` se genera mediante Apache POI.
+
+##### P10 — Reporte de pagos
+
+Debe comprobarse que:
+
+- puede filtrarse por período;
+- solo se consideran los pagos definidos para el reporte;
+- se muestra cantidad de pagos;
+- se muestra el total en soles;
+- el archivo `.xlsx` se genera mediante Apache POI.
+
+---
+
+#### 14.8.6 Evidencia para la sustentación
+
+Durante la demostración del APF3 se debe mostrar, preferentemente, el sistema ejecutándose desde:
+
+```text
+http://localhost:8080
+```
+
+La demostración debe evidenciar al menos:
+
+```text
+PACIENTE:
+Login / Registro
+→ Reserva
+→ Pago simulado
+→ Confirmación
+→ Mis citas
+→ Perfil
+
+MÉDICO:
+Login
+→ Agenda
+→ Detalle de cita
+→ Validación / gestión
+→ Reportes
+```
+
+La demostración funcional tiene mayor valor como evidencia que una secuencia de capturas estáticas.
+
+---
+
+#### 14.8.7 Checklist de interfaces
+
+- [ ] P0 Login implementada y funcional.
+- [ ] P1 Registro implementada y funcional.
+- [ ] P2 Reserva / horarios implementada y funcional.
+- [ ] P3 Pago Yape simulado implementada y funcional.
+- [ ] P4 Confirmación implementada y funcional.
+- [ ] P5 Mis citas implementada y funcional.
+- [ ] P6 Mi perfil implementada y funcional.
+- [ ] P7 Agenda implementada y funcional.
+- [ ] P8 Detalle de cita implementada y funcional.
+- [ ] P9 Reporte de citas implementado y funcional.
+- [ ] P10 Reporte de pagos implementado y funcional.
+- [ ] Las 11 pantallas son responsivas.
+- [ ] El flujo completo del paciente funciona.
+- [ ] El flujo completo del médico funciona.
+- [ ] Las validaciones se realizan también en servidor.
+- [ ] Los mensajes de error son claros.
+- [ ] Los accesos se restringen según el rol.
+- [ ] Existen capturas P0–P10 en `docs/capturas/`.
+- [ ] El prototipo de Figma coincide con la implementación final.
+- [ ] Las pantallas mantienen trazabilidad con RF01–RF16.
+- [ ] La demostración completa fue ensayada antes de la sustentación.
+
+---
+
+#### 14.8.8 Estado actual
+
+**Estado general:** 🟡 En desarrollo.
+
+El inventario P0–P10 ya define la cobertura gráfica del alcance. El criterio podrá marcarse como:
+
+```text
+✅ Completo
+```
+
+únicamente cuando las 11 pantallas estén implementadas, integradas con la lógica del sistema y puedan demostrarse funcionando.
+
+> **Objetivo para el APF3:** alcanzar el 100 % del alcance comprometido en interfaces gráficas, ya que este criterio representa el mayor peso de la rúbrica.
+
 ## 15. Estructura del repositorio
 
 Monorepo: documentación, scripts de BD y aplicación en un solo repositorio.

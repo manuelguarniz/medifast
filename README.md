@@ -489,6 +489,375 @@ Monolito Spring Boot en capas (MVC) en localhost: **Spring Security → Controla
 
 Diagramas: T-01 Arquitectura MVC + DAO + SOLID · T-02 Clases por capas · T-04 y T-05 Diagramas de secuencia.
 
+#### T-01. Arquitectura MVC + DAO + SOLID
+
+El sistema MEDIFAST utiliza una arquitectura monolítica por capas basada en Spring Boot. La estructura permite separar la presentación, el control de solicitudes, la lógica de negocio y el acceso a datos.
+
+La arquitectura aplica **MVC**, el patrón **DAO** mediante Spring Data JPA y principios **SOLID**, principalmente responsabilidad única e inversión de dependencias.
+
+```mermaid
+flowchart TB
+
+    %% =========================
+    %% ACTORES
+    %% =========================
+
+    PAC["👤 Paciente"]
+    MED["👨‍⚕️ Médico"]
+
+    %% =========================
+    %% SEGURIDAD
+    %% =========================
+
+    SEC["🔐 Spring Security
+    Autenticación por documento
+    Roles PACIENTE / MEDICO
+    BCrypt
+    CSRF"]
+
+    PAC --> SEC
+    MED --> SEC
+
+    %% =========================
+    %% MVC - VISTA
+    %% =========================
+
+    subgraph VIEW["VISTA — MVC"]
+        THY["Thymeleaf + HTML + CSS + JavaScript
+        P0–P10"]
+    end
+
+    SEC --> THY
+
+    %% =========================
+    %% MVC - CONTROLADOR
+    %% =========================
+
+    subgraph CONTROLLER["CONTROLADOR — MVC"]
+        PC["PacienteController"]
+        RC["ReservaController"]
+        PGC["PagoController"]
+        MC["MedicoController"]
+        RPC["ReporteController"]
+    end
+
+    THY --> PC
+    THY --> RC
+    THY --> PGC
+    THY --> MC
+    THY --> RPC
+
+    %% =========================
+    %% CAPA DE SERVICIOS
+    %% =========================
+
+    subgraph SERVICE_INTERFACE["INTERFACES DE SERVICIO — SOLID / DIP"]
+        IPS["PacienteService"]
+        IRS["ReservaService"]
+        IPGS["PagoService"]
+        IMS["MedicoService"]
+        IRPS["ReporteService"]
+    end
+
+    PC --> IPS
+    RC --> IRS
+    PGC --> IPGS
+    MC --> IMS
+    RPC --> IRPS
+
+    %% =========================
+    %% IMPLEMENTACIONES
+    %% =========================
+
+    subgraph SERVICE_IMPL["IMPLEMENTACIONES — SOLID / SRP"]
+        PSI["PacienteServiceImpl"]
+        RSI["ReservaServiceImpl"]
+        PGSI["PagoServiceImpl"]
+        MSI["MedicoServiceImpl"]
+        RPSI["ReporteServiceImpl"]
+
+        ALS["AlmacenamientoService"]
+        PDF["ConfirmacionPdfService"]
+    end
+
+    IPS --> PSI
+    IRS --> RSI
+    IPGS --> PGSI
+    IMS --> MSI
+    IRPS --> RPSI
+
+    PGSI --> ALS
+    RSI --> PDF
+
+    %% =========================
+    %% DAO
+    %% =========================
+
+    subgraph DAO["DAO — SPRING DATA JPA"]
+        UDAO["UsuarioDao
+        extends JpaRepository"]
+        PDAO["PacienteDao
+        extends JpaRepository"]
+        MDAO["MedicoDao
+        extends JpaRepository"]
+        HDAO["HorarioDao
+        extends JpaRepository"]
+        CDAO["CitaDao
+        extends JpaRepository"]
+        PGDAO["PagoDao
+        extends JpaRepository"]
+    end
+
+    PSI --> UDAO
+    PSI --> PDAO
+
+    RSI --> PDAO
+    RSI --> MDAO
+    RSI --> HDAO
+    RSI --> CDAO
+
+    PGSI --> PGDAO
+    PGSI --> CDAO
+
+    MSI --> CDAO
+    MSI --> PGDAO
+
+    RPSI --> CDAO
+    RPSI --> PGDAO
+
+    %% =========================
+    %% PERSISTENCIA
+    %% =========================
+
+    DB[("🗄️ MySQL 8.4
+    Base de datos MEDIFAST")]
+
+    UDAO --> DB
+    PDAO --> DB
+    MDAO --> DB
+    HDAO --> DB
+    CDAO --> DB
+    PGDAO --> DB
+
+    %% =========================
+    %% COMPONENTES TRANSVERSALES
+    %% =========================
+
+    GUAVA["Google Guava
+    control de intentos"]
+    COMMONS["Apache Commons
+    validación / archivos"]
+    POI["Apache POI
+    exportación Excel"]
+    LOG["Logback
+    auditoría"]
+    OPENPDF["OpenPDF
+    confirmación PDF"]
+
+    SEC -.-> GUAVA
+    ALS -.-> COMMONS
+    RPSI -.-> POI
+    SERVICE_IMPL -.-> LOG
+    PDF -.-> OPENPDF
+```
+
+### Aplicación de MVC
+
+| Componente | Aplicación en MEDIFAST |
+|---|---|
+| **Modelo** | Entidades JPA, DTO y reglas de negocio relacionadas con pacientes, médicos, horarios, citas y pagos. |
+| **Vista** | Plantillas Thymeleaf P0–P10 con HTML, CSS y JavaScript. |
+| **Controlador** | Clases `@Controller` que reciben las solicitudes HTTP y delegan la lógica a las interfaces de servicio. |
+
+Los controladores no contienen la lógica principal del negocio. Su responsabilidad es recibir la petición, validar la interacción correspondiente y delegar la operación a la capa de servicios.
+
+---
+
+### Aplicación del patrón DAO
+
+MEDIFAST utiliza **Spring Data JPA** para implementar el patrón DAO.
+
+Las interfaces ubicadas en el paquete:
+
+```text
+dao/
+```
+
+extienden `JpaRepository` y encapsulan el acceso a los datos.
+
+Ejemplos:
+
+```text
+UsuarioDao
+PacienteDao
+MedicoDao
+HorarioDao
+CitaDao
+PagoDao
+```
+
+Los servicios no acceden directamente a MySQL. El flujo de persistencia es:
+
+```text
+Controller
+   ↓
+Service
+   ↓
+ServiceImpl
+   ↓
+DAO / JpaRepository
+   ↓
+MySQL
+```
+
+De esta manera se mantiene separada la lógica del negocio de la lógica de persistencia.
+
+---
+
+### Aplicación de SOLID
+
+#### S — Single Responsibility Principle
+
+Cada componente mantiene una responsabilidad específica.
+
+Ejemplos:
+
+```text
+ReservaService          → reglas relacionadas con reservas.
+PagoService             → validación y gestión del pago simulado.
+ReporteService          → generación de reportes.
+AlmacenamientoService   → gestión segura de constancias.
+ConfirmacionPdfService  → generación de confirmaciones PDF.
+```
+
+Esto evita concentrar toda la lógica en una sola clase.
+
+#### O — Open/Closed Principle
+
+Las funcionalidades pueden ampliarse mediante nuevas implementaciones sin modificar las clases que consumen las interfaces.
+
+Por ejemplo, la generación de reportes puede abstraerse mediante:
+
+```text
+ExportadorReporte
+```
+
+y una implementación:
+
+```text
+ExportadorExcel
+```
+
+permitiendo incorporar posteriormente otro formato sin modificar la lógica principal del reporte.
+
+#### I — Interface Segregation Principle
+
+Las interfaces de servicio se mantienen separadas según las responsabilidades del sistema.
+
+Ejemplos:
+
+```text
+PacienteService
+ReservaService
+PagoService
+MedicoService
+ReporteService
+```
+
+Cada controlador depende solamente de las operaciones que necesita.
+
+#### D — Dependency Inversion Principle
+
+Los controladores dependen de interfaces y no directamente de implementaciones concretas.
+
+Ejemplo:
+
+```text
+ReservaController
+        ↓
+ReservaService
+        ↓
+ReservaServiceImpl
+```
+
+La implementación se proporciona mediante inyección de dependencias de Spring.
+
+Asimismo, los servicios dependen de interfaces DAO:
+
+```text
+ReservaServiceImpl
+        ↓
+CitaDao
+HorarioDao
+PacienteDao
+```
+
+y no directamente de MySQL.
+
+---
+
+### Seguridad transversal
+
+La arquitectura incorpora medidas de seguridad en las distintas capas:
+
+- autenticación con Spring Security;
+- autorización mediante roles `PACIENTE` y `MEDICO`;
+- contraseñas protegidas con BCrypt;
+- protección CSRF;
+- Bean Validation en servidor;
+- consultas parametrizadas mediante JPA;
+- validación de tipo y tamaño de archivos;
+- acceso restringido a constancias de pago;
+- bloqueo temporal de intentos fallidos mediante Guava;
+- registros de auditoría mediante Logback;
+- ausencia de contraseñas o documentos completos en los logs.
+
+---
+
+### Flujo general de una operación
+
+Ejemplo: reserva de una cita.
+
+```text
+Paciente
+   ↓
+Vista Thymeleaf
+   ↓
+ReservaController
+   ↓
+ReservaService
+   ↓
+ReservaServiceImpl
+   ↓
+PacienteDao + HorarioDao + CitaDao
+   ↓
+MySQL 8.4
+```
+
+`ReservaServiceImpl` aplica las reglas de negocio antes de guardar la información, por ejemplo:
+
+- verificar que el horario esté disponible;
+- impedir que un paciente tenga más de una cita activa;
+- determinar si la cita es NUEVO o CONTROL;
+- determinar la duración correspondiente;
+- apartar los bloques durante 15 minutos;
+- registrar la reserva dentro de una operación transaccional.
+
+---
+
+### Relación con la rúbrica del APF3
+
+| Criterio | Evidencia en la arquitectura |
+|---|---|
+| MVC | Vista Thymeleaf → Controller → Modelo/Servicios |
+| DAO | Interfaces `*Dao` que extienden `JpaRepository` |
+| SOLID | Separación de responsabilidades, interfaces e inyección por constructor |
+| TDD | Los servicios y reglas de negocio se prueban mediante JUnit 5 y Mockito |
+| Seguridad | Spring Security, BCrypt, CSRF, validaciones y control por roles |
+| Recursos Java | Guava, Commons, POI y Logback integrados en componentes específicos |
+
+> **Nota:** el diagrama representa la arquitectura definida para MEDIFAST. El cumplimiento del APF3 deberá demostrarse además mediante las clases, pruebas y demás archivos realmente versionados en el repositorio.
+
 ### 12.2 Principios exigidos por la rúbrica (≥ 3; se aplican los 4)
 
 | Principio | Cómo se aplica | Evidencia |

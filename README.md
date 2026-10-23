@@ -626,7 +626,7 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 | Diagramas técnicos T-01 a T-05 | ✔ | ✔ | ✅ Borrador disponible / revisar |
 | Prototipo Figma P0–P10 | Deseable | ✔ | 🟡 Falta agregar/verificar enlace público |
 | Informe APF3 | ✔ |  | 🟡 En desarrollo |
-| Javadoc |  | ✔ | 🟡 Pendiente |
+| Javadoc de las principales clases y métodos | ✔ | ✔ | 🟡 Pendiente |
 | Manual de usuario |  | ✔ | 🟡 Pendiente |
 | Prueba de usabilidad con usuarios |  | ✔ | 🟡 Pendiente |
 | Validación del Dr. Moisés Barrantes Cabrera |  | ✔ | 🟡 Pendiente |

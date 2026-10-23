@@ -631,7 +631,7 @@ Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--ar
 | Prueba de usabilidad con usuarios |  | ✔ | 🟡 Pendiente |
 | Validación del Dr. Moisés Barrantes Cabrera |  | ✔ | 🟡 Pendiente |
 | Informe final y sustentación |  | ✔ | 🟡 Pendiente |
-
+| Referencias bibliográficas utilizadas | ✔ | ✔ | 🟡 Pendiente de revisión 
 ---
 
 ### 14.3 Evidencias mínimas antes de entregar el APF3

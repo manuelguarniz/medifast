@@ -487,7 +487,7 @@ Modelo para **MySQL 8.4** (InnoDB, utf8mb4), normalizado hasta 3FN. Reemplaza `s
 
 Monolito Spring Boot en capas (MVC) en localhost: **Spring Security → Controladores (Spring MVC) → Servicios (reglas de negocio) → DAO (Spring Data JPA) → MySQL**, con vistas Thymeleaf, tareas programadas y Logback como componentes transversales.
 
-Diagramas: [T-01 Arquitectura MVC por capas](docs/diagramas/tecnicos.md#t-01--arquitectura-mvc-por-capas) · [T-02 Clases por capas](docs/diagramas/tecnicos.md#t-02--clases-por-capas-mvc-servicios-y-dao) · [T-04](docs/diagramas/tecnicos.md#t-04--secuencia-reservar-y-adjuntar-la-constancia) y [T-05](docs/diagramas/tecnicos.md#t-05--secuencia-validar-pago-y-registrar-la-atención) Secuencias.
+Diagramas: T-01 Arquitectura MVC + DAO + SOLID · T-02 Clases por capas · T-04 y T-05 Diagramas de secuencia.
 
 ### 12.2 Principios exigidos por la rúbrica (≥ 3; se aplican los 4)
 

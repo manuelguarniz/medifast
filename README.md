@@ -805,6 +805,7 @@ Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnico
 ## 12. Estructura del proyecto
 
 El repositorio utiliza una estructura monorepo que integra documentación, scripts de base de datos y la aplicación Spring Boot.
+
 **Nota:** la estructura mostrada a continuación representa la **estructura objetivo de MEDIFAST**. Algunos controladores, servicios, utilidades y plantillas todavía se encuentran en desarrollo y serán incorporados progresivamente durante el APF3. El estado real de implementación de las interfaces se encuentra documentado en la sección 7.3.
 
 ```text

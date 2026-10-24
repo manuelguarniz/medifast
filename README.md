@@ -729,7 +729,13 @@ Modelos conceptual, lógico y físico, restricciones, índices y diccionario de 
 
 ### 11.1 Arquitectura
 
-Monolito Spring Boot en capas (MVC) ejecutado en localhost. Los controladores dependen de interfaces de servicio, los servicios aplican las reglas de negocio y acceden a la BD solo a través de los DAO.
+La arquitectura objetivo de MEDIFAST corresponde a un monolito Spring Boot organizado en capas mediante MVC y ejecutado en localhost.
+
+Los controladores deberán depender de interfaces de servicio; los servicios concentrarán las reglas de negocio y accederán a la base de datos únicamente mediante interfaces DAO implementadas con Spring Data JPA.
+
+Esta separación busca mantener desacopladas las responsabilidades de presentación, control, lógica de negocio y persistencia.
+
+**Diagramas relacionados:** T-01 Arquitectura MVC + DAO + SOLID y T-02 Clases por capas.
 
 ```mermaid
 flowchart TB

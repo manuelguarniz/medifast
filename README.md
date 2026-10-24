@@ -776,7 +776,9 @@ Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnico
 
 **Seguridad:** bcrypt; roles con Spring Security; CSRF; Bean Validation en servidor; consultas parametrizadas; subida de archivos validada por tipo real, tamaño y nombre UUID; bloqueo por intentos fallidos; acceso restringido a constancias y PDF; logs sin datos sensibles; usuario de BD con privilegios mínimos (`medifast_app`).
 
-### 11.3 Librerías obligatorias
+### 11.3 Librerías requeridas y uso definido
+
+> Las siguientes librerías forman parte del diseño técnico comprometido para el APF3. La presencia de una dependencia en `pom.xml` no se considera por sí sola evidencia de cumplimiento; cada librería deberá tener un uso funcional verificable dentro del código antes de marcarse como implementada.
 
 | Librería                      | Uso en MEDIFAST                                                                                                                                                                        |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

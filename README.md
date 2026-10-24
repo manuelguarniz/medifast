@@ -763,7 +763,9 @@ flowchart TB
 
 Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnicos.md#t-01--arquitectura-mvc-por-capas) y [T-02 Clases por capas](docs/diagramas/tecnicos.md#t-02--clases-por-capas-mvc-servicios-y-dao).
 
-### 11.2 Principios
+### 11.2 Principios de arquitectura definidos para la implementación
+
+> Los siguientes principios representan la arquitectura objetivo de MEDIFAST. Se considerarán completamente implementados únicamente cuando las clases, interfaces, pruebas y demás evidencias correspondientes estén versionadas y puedan demostrarse en el repositorio.
 
 | Principio       | Cómo se aplica                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Dónde se ve                                          |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |

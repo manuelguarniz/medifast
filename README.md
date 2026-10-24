@@ -54,7 +54,7 @@ Desarrollar un sistema web en el que los pacientes reserven su cita y adjunten l
 - Las 11 pantallas (P0–P10) y los 16 RF implementados.
 - Ningún bloque de horario asignado a más de una cita activa y ningún paciente con más de una cita activa (garantizado por la BD).
 - Ninguna reserva apartada más de 15 min sin constancia.
-- Pruebas unitarias en verde para todas las reglas de negocio; cobertura ≥ 60 % en la capa `service`.
+- Lograr pruebas unitarias en verde para las reglas de negocio y alcanzar una cobertura objetivo de **≥ 60 % en la capa `service`**, verificada mediante JaCoCo.
 
 ---
 

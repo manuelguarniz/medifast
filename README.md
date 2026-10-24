@@ -221,7 +221,7 @@ Los estados se guardan con los nombres de la BD y se muestran con estas etiqueta
 | RNF08 | Rendimiento    | Disponibilidad y agenda responden en < 2 s con 1 000 citas                                                                                          | Prueba con datos de carga       |
 | RNF09 | Usabilidad     | Reserva en ≤ 4 pantallas desde el login, contador visible de los 15 min y mensajes de error claros                                                 | Prueba de usabilidad            |
 | RNF10 | Mantenibilidad | MVC + DAO + SOLID; Javadoc en los servicios                                                                                                         | Revisión de código            |
-| RNF11 | Calidad        | TDD: las pruebas de cada regla de negocio se escriben antes de implementarla; cobertura ≥ 60 % en `service`                                      | JUnit + JaCoCo                  |
+| RNF11 | Calidad        | Aplicar TDD en las reglas de negocio y alcanzar una cobertura objetivo de ≥ 60 % en la capa `service` | JUnit + JaCoCo |                                     | JUnit + JaCoCo                  |
 | RNF12 | Portabilidad   | Se ejecuta en localhost con Java 21 y MySQL 8.4, en macOS, Linux o Windows, siguiendo este README                                                   | Instalación limpia             |
 | RNF13 | Auditoría     | Columnas `creado_en` / `actualizado_en`; log de login, reserva, validación, rechazo y cancelación                                             | Modelo físico + logs           |
 | RNF14 | Librerías     | Uso real de Guava, Apache Commons, Apache POI y Logback (§11.3)                                                                                    | `pom.xml` + código           |

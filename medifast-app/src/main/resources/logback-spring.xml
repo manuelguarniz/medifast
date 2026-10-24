@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Logback: consola + archivo rotativo + auditoría (README §12.3, RNF07: sin contraseñas ni documentos completos) -->
+<!-- Logback: consola + archivo rotativo + auditoría (README §11.3, RNF07: sin contraseñas ni documentos completos) -->
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>

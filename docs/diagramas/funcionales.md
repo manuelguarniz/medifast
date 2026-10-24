@@ -22,7 +22,7 @@ Describen **qué hace el sistema y para quién**, sin entrar en cómo está cons
 
 ## F-01 — Casos de uso
 
-Actores, casos de uso (CU01–CU10) y la tarea automática del sistema (RF16). Detalle y trazabilidad en el README, §10.2.
+Actores, casos de uso (CU01–CU10) y la tarea automática del sistema (RF16). Detalle y trazabilidad en el README, §8.
 
 ```mermaid
 flowchart LR
@@ -195,7 +195,7 @@ stateDiagram-v2
 
 ## F-06 — Mapa de navegación
 
-Las 11 pantallas comprometidas para el APF3 (README, §10.1) y cómo se llega a cada una según el rol.
+Las 11 pantallas comprometidas para el APF3 (README, §7) y cómo se llega a cada una según el rol.
 
 ```mermaid
 flowchart LR
@@ -241,7 +241,7 @@ flowchart LR
 
 ## F-07 — Cronograma
 
-Plan hasta el APF3 (24-oct) y la sustentación final (24-nov). Detalle en el README, §13.
+Plan hasta el APF3 (24-oct) y la sustentación final (24-nov).
 
 ```mermaid
 gantt

@@ -269,7 +269,7 @@ FROM cita c
          LEFT JOIN pago pg ON pg.id_cita = c.id_cita;
 
 -- -----------------------------------------------------------------------------
--- Usuario de aplicación con privilegios mínimos (README §12.2, seguridad).
+-- Usuario de aplicación con privilegios mínimos (README §11.2, seguridad).
 -- Contraseña solo para desarrollo local: cámbiala fuera de tu máquina.
 -- -----------------------------------------------------------------------------
 CREATE USER IF NOT EXISTS 'medifast_app'@'%' IDENTIFIED BY 'medifast_app';

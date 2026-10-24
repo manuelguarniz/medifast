@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MEDIFAST — 03_consultas.sql
--- Consultas a entregar (README §11). Ejecutar después de 01 y 02.
+-- Consultas a entregar (README §13.1). Ejecutar después de 01 y 02.
 -- La sección 6 contiene INSERT que DEBEN FALLAR: ejecútalo con
 --   mysql --force -u root -p medifast < docs/sql/03_consultas.sql
 -- para que el cliente continúe tras cada error esperado.

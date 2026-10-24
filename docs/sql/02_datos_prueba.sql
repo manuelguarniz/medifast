@@ -1,6 +1,6 @@
 -- =============================================================================
 -- MEDIFAST — 02_datos_prueba.sql
--- Datos de prueba (README §11, "Datos de prueba (seed)"). Ejecutar después de
+-- Datos de prueba (README §13.1). Ejecutar después de
 -- 01_schema.sql. Las fechas son relativas al día de ejecución (CURDATE()).
 --
 -- Credenciales de prueba (todas las cuentas):  contraseña  Medifast2026

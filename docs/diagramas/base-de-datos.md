@@ -4,7 +4,7 @@
 >
 > La fuente de verdad de requerimientos y reglas es el [README del proyecto](../../README.md). Si un diagrama lo contradice, se corrige el diagrama.
 
-Modelo de datos de MEDIFAST para **MySQL 8.4** (InnoDB, utf8mb4), normalizado hasta 3FN. Admite varios consultorios y médicos; esta versión opera con uno. Reemplaza `script.sql` y los diagramas `modelado.drawio` / `modelado_*.png`. Las decisiones de diseño, los datos de prueba y las consultas están en el README, §11.
+Modelo de datos de MEDIFAST para **MySQL 8.4** (InnoDB, utf8mb4), normalizado hasta 3FN. Admite varios consultorios y médicos; esta versión opera con uno. Reemplaza `script.sql` y los diagramas `modelado.drawio` / `modelado_*.png`. Las decisiones de diseño están en el README, §10, y los scripts en §13.1.
 
 | # | Diagrama | Nivel de detalle |
 | --- | --- | --- |

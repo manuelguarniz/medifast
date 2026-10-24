@@ -875,6 +875,8 @@ Todos están en Mermaid; GitHub y VS Code los muestran directamente. El [índice
 | [checklist-apf3.md](docs/entregables/checklist-apf3.md)                                | Cobertura de la rúbrica, estado de los entregables y evidencias que hay que reunir |
 | [rubrica_apf3.txt](docs/entregables/rubrica_apf3.txt)                                  | Rúbrica de evaluación del APF3                                                    |
 | `APF1_Medifast.pdf`, `APF2_Medifast_Grupo2.pdf`, `Project_Charter_Medifast.pdf` | Informes y acta de constitución entregados                                         |
+| `docs/javadoc/` | Documentación técnica generada mediante Javadoc para las principales clases y métodos del sistema. |
+| `docs/entregables/referencias-apf3.md` | Referencias bibliográficas y documentación técnica consultadas durante el desarrollo del APF3. |
 
 ---
 

@@ -291,6 +291,141 @@ Sirve como guía visual de las 11 pantallas. Donde difiere de este README, la im
 
 ---
 
+### 7.3 Estado de implementación de interfaces
+
+La rúbrica del APF3 asigna el mayor peso a la **implementación de las interfaces gráficas**, por lo que no basta con que las pantallas estén definidas en el README o diseñadas en Figma: deben existir realmente en la aplicación Spring Boot + Thymeleaf y funcionar de acuerdo con los requerimientos asociados.
+
+Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero la implementación real todavía se encuentra en progreso.
+
+#### Estado actual de las plantillas
+
+| Código | Pantalla | Plantilla esperada | Estado actual |
+|---|---|---|---|
+| P0 | Login | `login.html` | 🟡 Existe, pero aún requiere completar todo el flujo funcional |
+| P1 | Registro | `registro.html` | ❌ No implementada |
+| P2 | Reservar cita / horarios | `paciente/reservar.html` | ❌ No implementada |
+| P3 | Pago Yape simulado | `paciente/pago.html` | ❌ No implementada |
+| P4 | Confirmación | `paciente/confirmacion.html` | ❌ No implementada |
+| P5 | Mis citas | `paciente/mis-citas.html` | ❌ No implementada |
+| P6 | Mi perfil | `paciente/perfil.html` | ❌ No implementada |
+| P7 | Agenda | `medico/agenda.html` | ❌ No implementada |
+| P8 | Detalle de cita | `medico/detalle-cita.html` | ❌ No implementada |
+| P9 | Reporte de citas | `medico/reporte-citas.html` | ❌ No implementada |
+| P10 | Reporte de pagos | `medico/reporte-pagos.html` | ❌ No implementada |
+
+En el proyecto también existe actualmente:
+
+```text
+templates/
+├── login.html
+├── inicio.html
+├── fragments/
+│   └── layout.html
+└── error/
+    ├── 403.html
+    └── 404.html
+```
+
+`inicio.html` es una vista auxiliar y **no reemplaza ninguna de las pantallas P0–P10 definidas en el alcance**.
+
+---
+
+#### Archivos que deben existir para completar P0–P10
+
+La estructura esperada es:
+
+```text
+medifast-app/
+└── src/
+    └── main/
+        └── resources/
+            └── templates/
+                ├── login.html
+                ├── registro.html
+                ├── paciente/
+                │   ├── reservar.html
+                │   ├── pago.html
+                │   ├── confirmacion.html
+                │   ├── mis-citas.html
+                │   └── perfil.html
+                ├── medico/
+                │   ├── agenda.html
+                │   ├── detalle-cita.html
+                │   ├── reporte-citas.html
+                │   └── reporte-pagos.html
+                ├── fragments/
+                │   └── layout.html
+                └── error/
+                    ├── 403.html
+                    └── 404.html
+```
+
+---
+
+#### Criterio de conformidad
+
+Una pantalla solo debe marcarse como:
+
+```text
+✅ Completa
+```
+
+cuando se cumplan simultáneamente estas condiciones:
+
+1. Existe la plantilla Thymeleaf correspondiente.
+2. Existe el controlador o ruta que permite acceder a ella.
+3. Está conectada con la capa de servicios.
+4. Utiliza datos reales provenientes de la aplicación o de la base de datos.
+5. Cumple los requerimientos funcionales y reglas de negocio asociados.
+6. Las validaciones se realizan también en servidor.
+7. Puede demostrarse funcionando durante la sustentación.
+
+No debe considerarse suficiente:
+
+- que exista únicamente el diseño en Figma;
+- que la pantalla aparezca descrita en el README;
+- que exista solamente un archivo HTML sin lógica ni integración;
+- que una pantalla de inicio genérica sustituya varias pantallas del alcance.
+
+---
+
+#### Prioridad de implementación
+
+Debido a que el criterio de interfaces gráficas tiene el mayor peso en la rúbrica del APF3, la prioridad de desarrollo debe ser:
+
+1. **P1 — Registro**
+2. **P2 — Reserva / horarios**
+3. **P3 — Pago Yape simulado**
+4. **P4 — Confirmación**
+5. **P5 — Mis citas**
+6. **P6 — Mi perfil**
+7. **P7 — Agenda**
+8. **P8 — Detalle de cita**
+9. **P9 — Reporte de citas**
+10. **P10 — Reporte de pagos**
+
+P0 debe mantenerse y completarse en paralelo con el flujo de autenticación.
+
+---
+
+#### Objetivo para el APF3
+
+El objetivo es que las **11 pantallas P0–P10 estén implementadas y funcionales**, de manera que el sistema cubra el 100 % del alcance gráfico comprometido.
+
+Estado actual:
+
+```text
+🟡 En desarrollo
+```
+
+El estado podrá cambiar a:
+
+```text
+✅ Completo
+```
+
+únicamente cuando P0–P10 puedan recorrerse y demostrarse dentro de la aplicación.
+
 ## 8. Casos de uso
 
 | CU   | Nombre                            | Actor    | RF               | RN                         | Pantallas      |

@@ -3,7 +3,7 @@
 > Curso Integrador I: Sistemas Software — UTP, 2026-02
 > Cliente: Dr. Moisés Barrantes Cabrera (Medicina Interna y Reumatología, Trujillo) — **Consultorio Medifast**
 
-MEDIFAST es un sistema web en la que los pacientes del Consultorio Medifast se registran, consultan los horarios libres y reservan una cita adjuntando la constancia de un pago con Yape (simulado). El médico revisa la constancia, valida o rechaza el pago, gestiona su agenda, registra si el paciente asistió y obtiene reportes exportables a Excel.
+MEDIFAST es un sistema web en el que los pacientes del Consultorio Medifast se registran, consultan los horarios libres y reservan una cita adjuntando la constancia de un pago con Yape (simulado). El médico revisa la constancia, valida o rechaza el pago, gestiona su agenda, registra si el paciente asistió y obtiene reportes exportables a Excel.
 
 Este README es la referencia funcional y técnica del proyecto. Si un informe, un diagrama o el prototipo lo contradicen, se corrigen ellos. El seguimiento de la rúbrica y de las evidencias del APF3 está en [docs/entregables/checklist-apf3.md](docs/entregables/checklist-apf3.md).
 

@@ -865,7 +865,7 @@ Todos están en Mermaid; GitHub y VS Code los muestran directamente. El [índice
 | Archivo                                            | Diagramas                                                                                                                                     |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | [funcionales.md](docs/diagramas/funcionales.md)     | F-01 Casos de uso · F-02 Proceso AS-IS · F-03 Proceso TO-BE · F-04 Estados de la cita · F-05 Estados del pago · F-06 Mapa de navegación |
-| [tecnicos.md](docs/diagramas/tecnicos.md)           | T-01 Arquitectura MVC · T-02 Clases por capas · T-03 Clases del dominio · T-04 y T-05 Secuencias detalladas                                |
+| [tecnicos.md](docs/diagramas/tecnicos.md)           | `tecnicos.md` | T-01 Arquitectura MVC + DAO + SOLID · T-02 Clases por capas · T-03 Clases del dominio · T-04 y T-05 Secuencias detalladas |
 | [base-de-datos.md](docs/diagramas/base-de-datos.md) | BD-01 Conceptual · BD-02 Lógico · BD-03 Físico · Restricciones e índices · Diccionario de datos                                        |
 
 ### 13.3 Entregables — [`docs/entregables/`](docs/entregables/)

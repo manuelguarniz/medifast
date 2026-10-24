@@ -804,7 +804,7 @@ Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnico
 
 ## 12. Estructura del proyecto
 
-Monorepo con la documentación, los scripts de la BD y la aplicación.
+El repositorio utiliza una estructura monorepo que integra documentación, scripts de base de datos y la aplicación Spring Boot.
 
 ```text
 medifast/

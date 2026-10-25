@@ -15,9 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import pe.edu.utp.medifast.dao.UsuarioDao;
+import pe.edu.utp.medifast.model.Usuario;
 import pe.edu.utp.medifast.model.enums.RolEnum;
 import pe.edu.utp.medifast.model.enums.TipoDocumentoEnum;
-import pe.edu.utp.medifast.model.Usuario;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioDetailsServiceTest {

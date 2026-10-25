@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Reporte de pagos')}"></head>
+
+<body class="bg-light">
+
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="container py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h1 class="h3 mb-1">Reporte de pagos</h1>
+                <p class="text-muted mb-0">Consulta los pagos validados por período.</p>
+            </div>
+
+            <a class="btn btn-success" th:href="@{/medico/reportes/pagos.xlsx(desde=${desde},hasta=${hasta})}">
+                Exportar Excel
+            </a>
+        </div>
+
+        <section class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <form th:action="@{/medico/reportes/pagos}" method="get" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label for="desde" class="form-label fw-semibold">Desde</label>
+                        <input type="date" class="form-control" id="desde" name="desde" th:value="${desde}" required>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="hasta" class="form-label fw-semibold">Hasta</label>
+                        <input type="date" class="form-control" id="hasta" name="hasta" th:value="${hasta}" required>
+                    </div>
+
+                    <div class="col-12 col-md-4 d-grid">
+                        <button type="submit" class="btn btn-primary">Consultar</button>
+                    </div>
+                </form>
+
+                <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
+                    <a class="btn btn-outline-secondary"
+                        th:href="@{/medico/reportes/pagos(desde=${inicioMesActual},hasta=${finMesActual})}">
+                        Este mes
+                    </a>
+
+                    <a class="btn btn-outline-secondary"
+                        th:href="@{/medico/reportes/pagos(desde=${inicioMesAnterior},hasta=${finMesAnterior})}">
+                        Mes anterior
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted text-uppercase small fw-semibold mb-2">Total validado</p>
+                        <p class="h3 mb-0" th:text="${'S/ ' + #numbers.formatDecimal(resumen.montoTotal, 1, 2)}">
+                            S/ 0.00
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted text-uppercase small fw-semibold mb-2">Cantidad de pagos</p>
+                        <p class="h3 mb-0" th:text="${resumen.cantidadTotal}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="text-muted text-uppercase small fw-semibold mb-2">Ticket promedio</p>
+                        <p class="h3 mb-0" th:text="${'S/ ' + #numbers.formatDecimal(resumen.ticketPromedio, 1, 2)}">
+                            S/ 0.00
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Pagos por día</h2>
+
+                <div th:if="${!#lists.isEmpty(resumen.dias)}" class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="dia : ${resumen.dias}">
+                                <td th:text="${dia.fechaFormateada}">24/10/2026</td>
+                                <td class="text-end" th:text="${dia.cantidad}">0</td>
+                                <td class="text-end" th:text="${'S/ ' + #numbers.formatDecimal(dia.total, 1, 2)}">
+                                    S/ 0.00
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-light fw-semibold">
+                            <tr>
+                                <td>Total</td>
+                                <td class="text-end" th:text="${resumen.cantidadTotal}">0</td>
+                                <td class="text-end"
+                                    th:text="${'S/ ' + #numbers.formatDecimal(resumen.montoTotal, 1, 2)}">
+                                    S/ 0.00
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div th:if="${#lists.isEmpty(resumen.dias)}" class="text-center py-5">
+                    <h3 class="h5">No se encontraron pagos</h3>
+                    <p class="text-muted mb-0">No existen pagos validados para el período seleccionado.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+
+</html>

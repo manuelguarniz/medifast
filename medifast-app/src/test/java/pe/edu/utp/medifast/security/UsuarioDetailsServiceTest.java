@@ -15,8 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import pe.edu.utp.medifast.dao.UsuarioDao;
-import pe.edu.utp.medifast.model.Rol;
-import pe.edu.utp.medifast.model.TipoDocumento;
+import pe.edu.utp.medifast.model.enums.RolEnum;
+import pe.edu.utp.medifast.model.enums.TipoDocumentoEnum;
 import pe.edu.utp.medifast.model.Usuario;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,7 +30,7 @@ class UsuarioDetailsServiceTest {
 
 	@Test
 	void cargaUsuarioPorDocumentoConSuRol() {
-		Usuario medico = new Usuario(TipoDocumento.DNI, "10000001", "$2a$10$hash", Rol.MEDICO);
+		Usuario medico = new Usuario(TipoDocumentoEnum.DNI, "10000001", "$2a$10$hash", RolEnum.MEDICO);
 		when(usuarioDao.findByNumeroDocumento("10000001")).thenReturn(Optional.of(medico));
 
 		UserDetails detalles = service.loadUserByUsername("10000001");
@@ -42,7 +42,7 @@ class UsuarioDetailsServiceTest {
 
 	@Test
 	void usuarioInactivoQuedaDeshabilitado() {
-		Usuario paciente = new Usuario(TipoDocumento.DNI, "70000001", "$2a$10$hash", Rol.PACIENTE);
+		Usuario paciente = new Usuario(TipoDocumentoEnum.DNI, "70000001", "$2a$10$hash", RolEnum.PACIENTE);
 		paciente.setActivo(false);
 		when(usuarioDao.findByNumeroDocumento("70000001")).thenReturn(Optional.of(paciente));
 

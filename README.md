@@ -124,7 +124,7 @@ El rol sale de la cuenta: la pantalla de login no pide elegirlo.
 | RF13 | Validar el pago o rechazarlo (rechazo = cancelación con observación)                                                                           | Médico  | P8                    |
 | RF14 | Cancelar una cita con observación obligatoria                                                                                                   | Médico  | P8                    |
 | RF15 | Mostrar la confirmación de la cita en pantalla y descargarla en PDF                                                                             | Paciente | P4, P5                |
-| RF16 | Cancelar automáticamente las reservas sin constancia a los 15 min y liberar el horario                                                          | Sistema  | — (tarea programada) |
+| RF16 | Cancelar automáticamente las reservas sin constancia a los 15 min y liberar el horario                                                          | Sistema  | — (evento de MySQL)  |
 
 ### 4.1 Criterios de aceptación
 
@@ -139,13 +139,13 @@ El rol sale de la cuenta: la pantalla de login no pide elegirlo.
 - **RF09** — Cada reporte tiene filtros, una tabla, indicadores de resumen, una consulta documentada y exportación a .xlsx.
   - **Citas (P9):** filtros por rango de fechas (día o semana) y estado. Indicadores: total de citas, atendidas, canceladas y no asistieron.
   - **Pagos (P10):** filtro por período (rango de fechas; el mes es un atajo). Solo pagos `VALIDADO`. Indicadores: cantidad, total en S/ y ticket promedio.
-- **RF10** — Cada cita muestra fecha, hora, tipo, monto, estado de la cita y estado del pago. Acciones: "Continuar pago" (si está `PENDIENTE_PAGO`), "Ver detalle" y "Descargar PDF" (si está `PROGRAMADA` o `ATENDIDA`).
+- **RF10** — Cada cita muestra fecha, hora, tipo, monto, estado de la cita y estado del pago. Acciones: "Continuar pago" (si está `PENDIENTE_PAGO` y no venció), "Ver detalle" y "Descargar PDF" (si está `PROGRAMADA` o `ATENDIDA`) y "Ver constancia" (si tiene pago, RF12). Las canceladas muestran su observación. Una cita `PENDIENTE_PAGO` vencida que la tarea de RF16 aún no canceló se muestra como "Vencida", sin acciones.
 - **RF11** — Se pueden editar nombres, apellidos, fecha de nacimiento, celular, correo y contraseña. El cambio de contraseña pide la actual y la confirmación de la nueva. El tipo y el n.º de documento se muestran pero no se editan. Se aplican las validaciones de RF02.
 - **RF12** — La constancia solo la pueden ver el paciente dueño de la cita y el médico que la atiende.
 - **RF13** — Solo sobre pagos `POR_VALIDAR`. "Validar" deja el pago `VALIDADO` con fecha y hora. "Rechazar" pide una observación y, en una sola transacción, deja el pago `RECHAZADO`, la cita `CANCELADA` y libera sus bloques.
 - **RF14** — Solo sobre citas `PENDIENTE_PAGO` o `PROGRAMADA`; la observación es obligatoria; libera los bloques.
 - **RF15** — La confirmación muestra n.º de cita, médico, fecha, hora, tipo, monto y estado del pago, con un botón "Descargar PDF" en P4 y P5. No se envía por correo.
-- **RF16** — Una tarea programada que corre cada minuto cancela las citas `PENDIENTE_PAGO` vencidas con la observación "Tiempo de reserva vencido" y libera sus bloques.
+- **RF16** — Un evento de MySQL que corre cada minuto cancela las citas `PENDIENTE_PAGO` vencidas con la observación "Tiempo de reserva vencido" y libera sus bloques.
 
 ---
 
@@ -238,10 +238,10 @@ Los estados se guardan con los nombres de la BD y se muestran con estas etiqueta
 | P2  | Reservar cita        | Paciente | RF01, RF05             | Tipo de cita detectado y tarifa; calendario de 1 a 30 días; bloques libres; resumen de la cita; aviso si ya tiene una cita activa | `paciente/reservar.html`     |
 | P3  | Pago Yape (simulado) | Paciente | RF03                   | Monto, QR de ejemplo, contador de 15 min, subida de la constancia, n.º de operación                                              | `paciente/pago.html`         |
 | P4  | Confirmación        | Paciente | RF15                   | Datos de la cita y botón "Descargar PDF"                                                                                          | `paciente/confirmacion.html` |
-| P5  | Mis citas            | Paciente | RF10, RF15, RF03       | Historial; acciones "Continuar pago", "Ver detalle" y "Descargar PDF"                                                              | `paciente/mis-citas.html`    |
+| P5  | Mis citas            | Paciente | RF10, RF15, RF03, RF12 | Historial; acciones "Continuar pago", "Ver detalle", "Descargar PDF" y "Ver constancia"                                          | `paciente/citas.html`        |
 | P6  | Mi perfil            | Paciente | RF11                   | Datos editables, documento solo lectura y cambio de contraseña                                                                    | `paciente/perfil.html`       |
 | P7  | Agenda               | Médico  | RF04                   | Lista de citas con filtros por día, semana y estado                                                                               | `medico/agenda.html`         |
-| P8  | Detalle de cita      | Médico  | RF08, RF12, RF13, RF14 | Datos de la cita, constancia y botones Validar / Rechazar / Atendida / No asistió / Cancelar (con modal de observación)          | `medico/detalle-cita.html`   |
+| P8  | Detalle de cita      | Médico  | RF08, RF12, RF13, RF14 | Datos de la cita, constancia y botones Validar / Rechazar / Atendida / No asistió / Cancelar (con modal de observación)          | `medico/cita.html`           |
 | P9  | Reporte de citas     | Médico  | RF09                   | Filtros por día, semana y estado; indicadores; tabla; "Exportar Excel"                                                            | `medico/reporte-citas.html`  |
 | P10 | Reporte de pagos     | Médico  | RF09                   | Filtro por período; indicadores; tabla con total; "Exportar Excel"                                                                | `medico/reporte-pagos.html`  |
 
@@ -321,28 +321,28 @@ sequenceDiagram
     autonumber
     actor U as Paciente / Médico
     participant SEC as Spring Security
-    participant I as IntentosLoginService (Guava)
     participant UDS as UsuarioDetailsService
+    participant I as IntentosLoginService (Guava)
     participant D as UsuarioDao
-    participant DB as MySQL
+    participant EV as EventosAutenticacion
 
-    U->>SEC: POST /login (numeroDocumento, contrasena)
-    SEC->>I: estaBloqueado(documento)
-    alt 5 intentos fallidos en los últimos 15 min
-        I-->>SEC: true
-        SEC-->>U: P0 "Cuenta bloqueada temporalmente"
-    else no bloqueado
-        SEC->>UDS: loadUserByUsername(documento)
-        UDS->>D: buscar por n.º de documento
-        D->>DB: SELECT usuario
-        DB-->>D: usuario + rol
-        UDS-->>SEC: UserDetails
+    U->>SEC: POST /login (numeroDocumento, contrasena, _csrf)
+    SEC->>UDS: loadUserByUsername(documento)
+    UDS->>D: buscar por n.º de documento
+    UDS->>I: estaBloqueado(documento)
+    UDS-->>SEC: UserDetails (accountLocked si hubo 5 fallos en 15 min)
+    alt cuenta bloqueada
+        SEC-->>U: redirect /login?bloqueado
+    else no bloqueada
         SEC->>SEC: comparar contraseña con bcrypt
-        alt contraseña incorrecta
-            SEC->>I: registrarFallo(documento)
-            SEC-->>U: P0 "Documento o contraseña incorrectos"
+        alt contraseña incorrecta o documento inexistente
+            SEC->>EV: AuthenticationFailureBadCredentialsEvent
+            EV->>I: registrarFallo(documento)
+            SEC-->>U: redirect /login?error (mismo mensaje en ambos casos)
         else correcta
-            SEC-->>U: redirige a P2 (PACIENTE) o P7 (MEDICO)
+            SEC->>EV: AuthenticationSuccessEvent
+            EV->>I: reiniciar(documento)
+            SEC-->>U: RedireccionPorRol: /paciente/reservar (P2) o /medico/agenda (P7)
         end
     end
 ```
@@ -427,20 +427,17 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    participant J as VencimientoReservasJob
-    participant S as ReservaService
-    participant D as CitaDao
-    participant DB as MySQL
+    participant EV as Event Scheduler (MySQL)
+    participant DB as Tablas cita / cita_horario
 
-    loop cada minuto (@Scheduled)
-        J->>S: vencerReservas(ahora)
-        S->>D: pendientesVencidas(ahora)
-        D->>DB: SELECT cita PENDIENTE_PAGO con expira_en < ahora
-        DB-->>S: citas vencidas
-        S->>DB: UPDATE cita CANCELADA "Tiempo de reserva vencido" + cita_horario.activo = FALSE
-        S-->>J: cantidad cancelada (log)
+    loop cada minuto (CREATE EVENT … ON SCHEDULE EVERY 1 MINUTE)
+        EV->>DB: buscar citas PENDIENTE_PAGO con expira_en < NOW()
+        EV->>DB: UPDATE cita CANCELADA, cancelada_por = SISTEMA, "Tiempo de reserva vencido"
+        EV->>DB: UPDATE cita_horario.activo = FALSE (libera los bloques)
     end
 ```
+
+La aplicación no participa: el vencimiento corre dentro de MySQL aunque la aplicación esté detenida. Mientras el evento no pase, la aplicación muestra como "Vencida" la cita `PENDIENTE_PAGO` cuyo `expira_en` ya pasó (RF10).
 
 ### SD-05 — Validar o rechazar el pago (RF12, RF13, RN-07, RN-13)
 
@@ -521,11 +518,11 @@ sequenceDiagram
     R->>R: indicadores (total, atendidas, canceladas, no asistieron)
     C-->>Med: P9 con indicadores y tabla
 
-    Med->>C: GET /medico/reportes/citas/excel?...
+    Med->>C: GET /medico/reportes/citas.xlsx?desde&hasta&estado
     C->>R: citas(filtro)
     C->>E: exportar(reporte)
     E-->>C: bytes .xlsx
-    C-->>Med: descarga reporte-citas.xlsx
+    C-->>Med: descarga reporte-citas-<desde>-<hasta>.xlsx
 
     Note over Med,DB: El reporte de pagos (P10) sigue el mismo flujo con pagos(filtro) y PagoDao.resumenValidados (cantidad, total y ticket promedio)
 ```
@@ -549,7 +546,7 @@ sequenceDiagram
         C-->>Pac: 403
     else válido
         P-->>C: bytes PDF
-        C-->>Pac: descarga confirmacion-cita.pdf
+        C-->>Pac: descarga cita-{id}.pdf
     end
 ```
 
@@ -585,6 +582,7 @@ erDiagram
 - **`pago` se crea al adjuntar la constancia**; mientras la cita está `PENDIENTE_PAGO` no existe la fila.
 - **El documento vive en `usuario`** porque es el login y no se edita (RN-12).
 - **Constancias** en la carpeta local `uploads/comprobantes/`; la BD guarda la ruta y el tipo MIME.
+- **Tareas automáticas como eventos de MySQL** (Event Scheduler): el vencimiento de reservas cada minuto (RF16) y la generación diaria de los bloques de `horario` a partir de `horario_semanal` (RN-08). Corren en la BD con su propio horario, sin depender de que la aplicación esté levantada; la aplicación solo lee el resultado.
 
 Modelos conceptual, lógico y físico, restricciones, índices y diccionario de datos: [docs/diagramas/base-de-datos.md](docs/diagramas/base-de-datos.md).
 
@@ -610,17 +608,20 @@ flowchart TB
 
     subgraph SRV["Servicios — interfaces + impl/"]
         PS["PacienteService"] ~~~ RS["ReservaService"] ~~~ GS["GestionCitaService"] ~~~ RPS["ReporteService"]
-        ALS["AlmacenamientoService"] ~~~ PDF["ConfirmacionPdfService"] ~~~ EXP["ExportadorReporte"] ~~~ ILS["IntentosLoginService"]
+        ALS["AlmacenamientoService"] ~~~ CS["ConstanciaService"] ~~~ PDF["ConfirmacionPdfService"]
     end
 
-    JOB["VencimientoReservasJob<br/>(tarea programada cada minuto)"] --> SRV
     SRV --> DAO
+    SRV --> UT["util/<br/>ExcelExportador, AlmacenamientoLocal,<br/>Auditoria, Enmascarador"]
+    SEC -.-> SECC["security/<br/>UsuarioDetailsService, IntentosLoginService,<br/>EventosAutenticacion, RedireccionPorRol, UsuarioActual"]
 
     subgraph DAO["DAO — Spring Data JPA"]
-        D1["UsuarioDao"] ~~~ D2["PacienteDao"] ~~~ D3["TarifaDao"] ~~~ D4["HorarioDao"] ~~~ D5["CitaDao"] ~~~ D6["PagoDao"]
+        D1["UsuarioDao"] ~~~ D2["PacienteDao"] ~~~ D3["MedicoDao"] ~~~ D4["ConsultorioDao"] ~~~ D5["TarifaDao"]
+        D6["HorarioSemanalDao"] ~~~ D7["HorarioDao"] ~~~ D8["CitaDao"] ~~~ D9["PagoDao"] ~~~ D10["VistaCitaDao"]
     end
 
     DAO --> DB[("MySQL 8.4")]
+    EVT["Eventos de MySQL<br/>vencimiento de reservas (cada minuto)<br/>generación de horario (diaria)"] --> DB
     ALS --> FS[("uploads/comprobantes")]
     LOG["Logback"] -.-> CTRL
     LOG -.-> SRV
@@ -658,6 +659,7 @@ Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnico
 | Frontend      | Thymeleaf + HTML + CSS + JavaScript                                  |
 | Base de datos | MySQL 8.4 LTS                                                        |
 | PDF           | OpenPDF                                                              |
+| Boilerplate   | Lombok (getters, setters y constructores en entidades y servicios)   |
 | Build         | Maven (wrapper `./mvnw` incluido)                                  |
 | Pruebas       | JUnit 5, Mockito, Spring Boot Test, JaCoCo                           |
 | Contenedores  | Docker Compose (solo para la BD de desarrollo)                       |
@@ -682,20 +684,23 @@ medifast/
 │   └── entregables/              # APF1, APF2, Project Charter, rúbrica y checklist del APF3
 └── medifast-app/                 # aplicación Spring Boot + Thymeleaf
     ├── pom.xml
+    ├── lombok.config             # marca el código generado por Lombok para que JaCoCo lo excluya
     ├── mvnw, mvnw.cmd
     └── src/
         ├── main/java/pe/edu/utp/medifast/
         │   ├── MedifastAppApplication.java
-        │   ├── config/           # SecurityConfig y demás configuración
-        │   ├── controller/       # AuthController, PerfilController, ReservaController, AgendaController, ReporteController
+        │   ├── config/           # SecurityConfig, TiempoConfig (Clock America/Lima)
+        │   ├── controller/       # AuthController, PerfilController, ReservaController, AgendaController, ReporteController, ManejadorErrores
         │   ├── service/          # interfaces de servicio (reglas de negocio)
         │   │   └── impl/         # implementaciones
-        │   ├── dao/              # interfaces que extienden JpaRepository
-        │   ├── model/            # entidades JPA y enums (Usuario, Rol, TipoDocumento, …)
-        │   ├── dto/              # objetos de formularios y reportes
-        │   ├── security/         # UsuarioDetailsService, IntentosLoginService (Guava)
-        │   ├── job/              # VencimientoReservasJob
-        │   └── util/             # ExcelExportador (POI), PDF (OpenPDF), AlmacenamientoLocal (Commons IO)
+        │   ├── dao/              # interfaces que extienden JpaRepository (incluye VistaCitaDao sobre v_cita)
+        │   ├── model/            # entidades JPA (Lombok) y VistaCita (solo lectura) sobre v_cita
+        │   │   └── enums/        # RolEnum, TipoDocumentoEnum, TipoCitaEnum, EstadoCitaEnum, EstadoPagoEnum, CanceladaPorEnum
+        │   ├── dto/              # objetos de formularios y reportes; validacion/ con las anotaciones propias
+        │   ├── exception/        # NegocioException y sus subclases (CitaActivaException, HorarioNoDisponibleException, …)
+        │   ├── security/         # UsuarioDetailsService, IntentosLoginService (Guava), EventosAutenticacion, RedireccionPorRol, UsuarioActual
+        │   └── util/             # ExportadorReporte + ExcelExportador (POI), PDF (OpenPDF), AlmacenamientoLocal (Commons IO), Auditoria, Enmascarador
+        │       └── converter/    # AttributeConverter de JPA (DiaSemanaConverter: 1–7 ↔ DayOfWeek)
         ├── main/resources/
         │   ├── application.yml
         │   ├── logback-spring.xml

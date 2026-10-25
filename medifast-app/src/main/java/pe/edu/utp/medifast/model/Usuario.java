@@ -1,5 +1,10 @@
 package pe.edu.utp.medifast.model;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,11 +14,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import pe.edu.utp.medifast.model.enums.RolEnum;
+import pe.edu.utp.medifast.model.enums.TipoDocumentoEnum;
+
 /**
  * Credenciales de acceso de pacientes y médicos (tabla {@code usuario}, RN-12).
  */
 @Entity
 @Table(name = "usuario")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Usuario {
 
 	@Id
@@ -23,60 +38,36 @@ public class Usuario {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "tipo_documento", nullable = false)
-	private TipoDocumento tipoDocumento;
+	private TipoDocumentoEnum tipoDocumento;
 
 	@Column(name = "numero_documento", nullable = false, unique = true, updatable = false, length = 12)
 	private String numeroDocumento;
 
 	@Column(name = "contrasena_hash", nullable = false, length = 60)
+	@Setter
 	private String contrasenaHash;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "rol", nullable = false)
-	private Rol rol;
+	private RolEnum rol;
 
 	@Column(name = "activo", nullable = false)
+	@Setter
 	private boolean activo = true;
 
-	protected Usuario() {
-	}
+	// Valores puestos por MySQL (RNF13)
+	@Generated(event = EventType.INSERT)
+	@Column(name = "creado_en", insertable = false, updatable = false)
+	private LocalDateTime creadoEn;
 
-	public Usuario(TipoDocumento tipoDocumento, String numeroDocumento, String contrasenaHash, Rol rol) {
+	@Generated(event = { EventType.INSERT, EventType.UPDATE })
+	@Column(name = "actualizado_en", insertable = false, updatable = false)
+	private LocalDateTime actualizadoEn;
+
+	public Usuario(TipoDocumentoEnum tipoDocumento, String numeroDocumento, String contrasenaHash, RolEnum rol) {
 		this.tipoDocumento = tipoDocumento;
 		this.numeroDocumento = numeroDocumento;
 		this.contrasenaHash = contrasenaHash;
 		this.rol = rol;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public TipoDocumento getTipoDocumento() {
-		return tipoDocumento;
-	}
-
-	public String getNumeroDocumento() {
-		return numeroDocumento;
-	}
-
-	public String getContrasenaHash() {
-		return contrasenaHash;
-	}
-
-	public void setContrasenaHash(String contrasenaHash) {
-		this.contrasenaHash = contrasenaHash;
-	}
-
-	public Rol getRol() {
-		return rol;
-	}
-
-	public boolean isActivo() {
-		return activo;
-	}
-
-	public void setActivo(boolean activo) {
-		this.activo = activo;
 	}
 }

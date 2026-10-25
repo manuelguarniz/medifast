@@ -24,7 +24,7 @@ import lombok.Setter;
 @Table(name = "cita_horario")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CitaHorario {
+public class CitaHorario extends EntidadAuditable {
 
 	@EmbeddedId
 	private CitaHorarioId id = new CitaHorarioId();

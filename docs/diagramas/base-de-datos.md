@@ -171,6 +171,8 @@ erDiagram
         tinyint minutos_bloque "NOT NULL DEFAULT 30"
         tinyint minutos_apartado "NOT NULL DEFAULT 15"
         boolean activo "NOT NULL DEFAULT TRUE"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
     usuario {
         bigint id_usuario PK "AUTO_INCREMENT"
@@ -202,6 +204,8 @@ erDiagram
         varchar(10) cmp UK "NOT NULL"
         varchar(100) especialidad "NOT NULL"
         boolean activo "NOT NULL DEFAULT TRUE"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
     tarifa {
         bigint id_tarifa PK "AUTO_INCREMENT"
@@ -209,6 +213,8 @@ erDiagram
         enum tipo_cita "NUEVO o CONTROL"
         smallint duracion_min "NOT NULL, 60 o 30"
         decimal precio "DECIMAL 10.2, 150.00 o 80.00"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
     horario_semanal {
         bigint id_horario_semanal PK "AUTO_INCREMENT"
@@ -216,6 +222,8 @@ erDiagram
         tinyint dia_semana "1 lunes a 7 domingo"
         time hora_inicio "NOT NULL"
         time hora_fin "CHECK mayor que hora_inicio"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
     horario {
         bigint id_horario PK "AUTO_INCREMENT"
@@ -224,6 +232,8 @@ erDiagram
         time hora_inicio "NOT NULL"
         time hora_fin "CHECK mayor que hora_inicio"
         boolean bloqueado "NOT NULL DEFAULT FALSE"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
     cita {
         bigint id_cita PK "AUTO_INCREMENT"
@@ -243,6 +253,8 @@ erDiagram
         bigint id_horario PK, FK "NOT NULL"
         boolean activo "NOT NULL DEFAULT TRUE"
         bigint horario_activo UK "GENERATED, RN-01"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
     pago {
         bigint id_pago PK "AUTO_INCREMENT"
@@ -255,6 +267,8 @@ erDiagram
         enum estado "POR_VALIDAR VALIDADO RECHAZADO"
         datetime fecha_pago "DEFAULT CURRENT_TIMESTAMP"
         datetime validado_en "NULL"
+        datetime creado_en "DEFAULT CURRENT_TIMESTAMP"
+        datetime actualizado_en "ON UPDATE CURRENT_TIMESTAMP"
     }
 ```
 
@@ -302,6 +316,8 @@ Parámetros del consultorio; permite que el sistema sea reutilizable (multi-cons
 | minutos_bloque | TINYINT | No | — | 30 | Duración de cada bloque de horario |
 | minutos_apartado | TINYINT | No | — | 15 | Minutos que se aparta un horario sin constancia (RN-04) |
 | activo | BOOLEAN | No | — | TRUE | Baja lógica |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |
 
 ### usuario
 
@@ -348,6 +364,8 @@ Datos del médico. Se cargan por script (no hay módulo de administración).
 | cmp | VARCHAR(10) | No | UK | — | N.º de colegiatura (CMP) |
 | especialidad | VARCHAR(100) | No | — | — | Especialidad |
 | activo | BOOLEAN | No | — | TRUE | Baja lógica |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |
 
 ### tarifa
 
@@ -360,6 +378,8 @@ Precio y duración por tipo de cita y médico (RN-03).
 | tipo_cita | ENUM('NUEVO','CONTROL') | No | UK* | — | Tipo de cita |
 | duracion_min | SMALLINT | No | — | — | Duración en minutos (60 / 30) |
 | precio | DECIMAL(10,2) | No | — | — | Precio en soles (150.00 / 80.00) |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |
 
 ### horario_semanal
 
@@ -372,6 +392,8 @@ Plantilla semanal de atención por médico; se configura en la BD (RN-08).
 | dia_semana | TINYINT | No | — | — | 1 = lunes … 7 = domingo (CHECK 1–7) |
 | hora_inicio | TIME | No | — | — | Inicio de la atención |
 | hora_fin | TIME | No | — | — | Fin de la atención (CHECK > hora_inicio) |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |
 
 ### horario
 
@@ -385,6 +407,8 @@ Bloques de 30 min generados a partir de la plantilla semanal.
 | hora_inicio | TIME | No | UK* | — | Inicio del bloque |
 | hora_fin | TIME | No | — | — | Fin del bloque (CHECK > hora_inicio) |
 | bloqueado | BOOLEAN | No | — | FALSE | Bloque no disponible (configurado en BD) |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |
 
 ### cita
 
@@ -414,6 +438,8 @@ Bloques que ocupa cada cita (1 para control, 2 para nuevo).
 | id_horario | BIGINT | No | PK, FK | — | Bloque → `horario` |
 | activo | BOOLEAN | No | — | TRUE | `FALSE` al cancelar (libera el bloque) |
 | horario_activo | BIGINT | Sí | UK | GENERATED STORED | `id_horario` si está activo, si no `NULL` (RN-01) |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |
 
 ### pago
 
@@ -431,3 +457,5 @@ Pago simulado con Yape; se crea al adjuntar la constancia.
 | estado | ENUM('POR_VALIDAR','VALIDADO','RECHAZADO') | No | — | 'POR_VALIDAR' | Estado del pago (RN-07) |
 | fecha_pago | DATETIME | No | — | CURRENT_TIMESTAMP | Momento en que se adjuntó la constancia |
 | validado_en | DATETIME | Sí | — | NULL | Momento de la validación o el rechazo |
+| creado_en | DATETIME | No | — | CURRENT_TIMESTAMP | Auditoría |
+| actualizado_en | DATETIME | No | — | CURRENT_TIMESTAMP ON UPDATE | Auditoría |

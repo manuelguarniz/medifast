@@ -29,7 +29,7 @@ import pe.edu.utp.medifast.model.enums.EstadoPagoEnum;
 @Table(name = "pago")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Pago {
+public class Pago extends EntidadAuditable {
 
 	public static final String METODO_YAPE_SIMULADO = "YAPE_SIMULADO";
 

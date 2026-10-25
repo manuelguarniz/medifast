@@ -23,7 +23,7 @@ import lombok.Setter;
 @Table(name = "medico")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Medico {
+public class Medico extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

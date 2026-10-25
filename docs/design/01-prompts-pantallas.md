@@ -33,17 +33,18 @@ P0 – Login (usa la imagen adjunta como referencia directa):
 ## P1 – Registro de paciente
 
 ```text
-P1 – Registro de paciente:
-- Mismo layout dividido que el login.
-- Formulario en 2 columnas:
+P1 – Registro de paciente (versión completa en P1-registro/iteraciones.md):
+- Mismo estilo que el login aprobado (P0 v3). Card dividida: panel verde con el titular "Crea tu cuenta" y formulario blanco en 2 columnas.
+- Navbar con "Consultorio Medifast" y el enlace "Iniciar sesión".
+- Campos, en orden:
   - Tipo de documento (select DNI/CE) y número de documento
   - Nombres y apellidos
-  - Fecha de nacimiento (date)
-  - Celular (9 dígitos, empieza con 9)
-  - Correo
+  - Fecha de nacimiento (date) y celular (9 dígitos, empieza con 9)
+  - Correo (ancho completo)
   - Contraseña (mín. 8 caracteres) y confirmar contraseña
-- Mostrar ejemplos de errores de validación en línea.
+- Estados: normal (documento en foco) y errores de validación en línea.
 - Botón "Crear cuenta →" y el enlace "¿Ya tienes cuenta? Inicia sesión".
+- Sin checkbox de términos, numeración de pasos ni documentos distintos de DNI/CE.
 ```
 
 ## P2 – Reservar cita (paciente)

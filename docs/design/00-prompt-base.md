@@ -49,6 +49,7 @@ LAYOUT
   - Paciente: "Reservar cita", "Mis citas", "Mi perfil", "Salir"
   - Médico: "Agenda", "Reporte de citas", "Reporte de pagos", "Salir", con el nombre "Dr. Moisés Barrantes" visible
 - En móvil, la navbar colapsa en un botón "Menú".
+- Navbar pública (login y registro): solo el logo a la izquierda y un enlace de texto a la derecha ("Iniciar sesión" o "Crear cuenta"). Sin flecha atrás, título de página ni ícono de usuario.
 - Pie de página discreto: "Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú".
 - Contenido sobre fondo #f8fafc, dentro de cards blancas con un máximo de ~1200px de ancho.
 
@@ -79,3 +80,4 @@ NO INCLUIR (fuera de alcance)
 | --- | --- | --- |
 | 2026-10-25 | Versión inicial | — |
 | 2026-10-25 | Se definen el borde y el foco de los inputs, el estilo único de alertas y el subtítulo del logo; se excluye "Recordarme" | Feedback de [P0 v1](P0-login/iteraciones.md) |
+| 2026-10-25 | Se define la navbar pública de login y registro | Feedback de [P1 v1](P1-registro/iteraciones.md) |

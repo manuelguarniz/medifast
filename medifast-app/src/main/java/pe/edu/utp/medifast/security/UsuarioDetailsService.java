@@ -18,6 +18,7 @@ import pe.edu.utp.medifast.dao.UsuarioDao;
 public class UsuarioDetailsService implements UserDetailsService {
 
 	private final UsuarioDao usuarioDao;
+	private final IntentosLoginService intentosLogin;
 
 	@Override
 	public UserDetails loadUserByUsername(String numeroDocumento) {
@@ -26,6 +27,7 @@ public class UsuarioDetailsService implements UserDetailsService {
 						.password(usuario.getContrasenaHash())
 						.roles(usuario.getRol().name())
 						.disabled(!usuario.isActivo())
+						.accountLocked(intentosLogin.estaBloqueado(numeroDocumento))
 						.build())
 				.orElseThrow(() -> new UsernameNotFoundException("Credenciales inválidas"));
 	}

@@ -6,6 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.authentication.event.LogoutSuccessEvent;
 import org.springframework.security.core.Authentication;
@@ -26,15 +27,20 @@ public class EventosAutenticacion {
 	private static final String PREFIJO_ROL = "ROLE_";
 
 	private final Auditoria auditoria;
+	private final IntentosLoginService intentosLogin;
 
 	@EventListener
 	public void loginCorrecto(AuthenticationSuccessEvent evento) {
 		Authentication autenticacion = evento.getAuthentication();
+		intentosLogin.reiniciar(autenticacion.getName());
 		auditoria.registrar(Evento.LOGIN_OK, autenticacion.getName(), "rol=" + roles(autenticacion));
 	}
 
 	@EventListener
 	public void loginFallido(AbstractAuthenticationFailureEvent evento) {
+		if (evento instanceof AuthenticationFailureBadCredentialsEvent) {
+			intentosLogin.registrarFallo(evento.getAuthentication().getName());
+		}
 		auditoria.registrar(Evento.LOGIN_FALLIDO, evento.getAuthentication().getName(),
 				"motivo=" + motivo(evento.getException()));
 	}

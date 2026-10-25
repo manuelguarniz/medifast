@@ -62,6 +62,14 @@ classDiagram
     direction TB
 
     class AuthController
+    class SecurityConfig
+    class UsuarioDetailsService
+    class EventosAutenticacion
+    class RedireccionPorRol
+    class UsuarioActual {
+        +idPaciente(Authentication) Long
+        +idMedico(Authentication) Long
+    }
     class PerfilController
     class ReservaController
     class AgendaController
@@ -119,6 +127,11 @@ classDiagram
         Guava Cache
         +registrarFallo(String documento)
         +estaBloqueado(String documento) boolean
+        +reiniciar(String documento)
+    }
+    class Auditoria {
+        <<util>>
+        +registrar(Evento evento, String documento, String detalle)
     }
     class VencimientoReservasJob {
         Scheduled cada minuto
@@ -132,6 +145,9 @@ classDiagram
         <<interface>>
     }
     class PacienteDao {
+        <<interface>>
+    }
+    class MedicoDao {
         <<interface>>
     }
     class TarifaDao {
@@ -151,8 +167,15 @@ classDiagram
         +resumenValidados(LocalDate desde, LocalDate hasta) ResumenPagosDto
     }
 
-    AuthController --> PacienteService
-    AuthController --> IntentosLoginService
+    SecurityConfig ..> UsuarioDetailsService
+    SecurityConfig --> RedireccionPorRol
+    SecurityConfig ..> AuthController : rutas /login y /
+    UsuarioDetailsService ..> UsuarioDao
+    UsuarioDetailsService --> IntentosLoginService
+    EventosAutenticacion --> IntentosLoginService
+    EventosAutenticacion --> Auditoria
+    UsuarioActual ..> PacienteDao
+    UsuarioActual ..> MedicoDao
     PerfilController --> PacienteService
     ReservaController --> ReservaService
     ReservaController --> ConfirmacionPdfService
@@ -179,6 +202,7 @@ classDiagram
 
     UsuarioDao --|> JpaRepository
     PacienteDao --|> JpaRepository
+    MedicoDao --|> JpaRepository
     TarifaDao --|> JpaRepository
     HorarioDao --|> JpaRepository
     CitaDao --|> JpaRepository

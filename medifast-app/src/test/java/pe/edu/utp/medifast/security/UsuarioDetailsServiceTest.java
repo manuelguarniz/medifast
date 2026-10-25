@@ -25,6 +25,9 @@ class UsuarioDetailsServiceTest {
 	@Mock
 	private UsuarioDao usuarioDao;
 
+	@Mock
+	private IntentosLoginService intentosLogin;
+
 	@InjectMocks
 	private UsuarioDetailsService service;
 
@@ -47,6 +50,15 @@ class UsuarioDetailsServiceTest {
 		when(usuarioDao.findByNumeroDocumento("70000001")).thenReturn(Optional.of(paciente));
 
 		assertThat(service.loadUserByUsername("70000001").isEnabled()).isFalse();
+	}
+
+	@Test
+	void usuarioBloqueadoQuedaConCuentaNoBloqueadaEnFalse() {
+		Usuario paciente = new Usuario(TipoDocumentoEnum.DNI, "70000001", "$2a$10$hash", RolEnum.PACIENTE);
+		when(usuarioDao.findByNumeroDocumento("70000001")).thenReturn(Optional.of(paciente));
+		when(intentosLogin.estaBloqueado("70000001")).thenReturn(true);
+
+		assertThat(service.loadUserByUsername("70000001").isAccountNonLocked()).isFalse();
 	}
 
 	@Test

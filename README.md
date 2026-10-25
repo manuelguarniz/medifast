@@ -227,6 +227,8 @@ Los estados se guardan con los nombres de la BD y se muestran con estas etiqueta
 | RNF14 | Librerías     | Uso real de Guava, Apache Commons, Apache POI y Logback (§11.3)                                                                                    | `pom.xml` + código           |
 | RNF15 | Versionado     | Todo el código y la documentación versionados en GitHub, con commits pequeños y descriptivos                                                     | Historial de commits            |
 
+La autenticación consulta `usuario` por `numero_documento`, verifica `contrasena_hash` con bcrypt de coste 10 y obtiene `rol` y `activo` de esa misma fila. El esquema no guarda intentos fallidos: `IntentosLoginService` mantiene el bloqueo temporal en una caché Guava en memoria, que expira tras 15 minutos. Por ello, los bloqueos no sobreviven un reinicio ni se comparten entre varias instancias; una futura ejecución distribuida requeriría una caché compartida.
+
 ---
 
 ## 7. Pantallas
@@ -318,15 +320,12 @@ En el proyecto también existe actualmente:
 ```text
 templates/
 ├── login.html
-├── inicio.html
 ├── fragments/
 │   └── layout.html
 └── error/
     ├── 403.html
     └── 404.html
 ```
-
-`inicio.html` es una vista auxiliar y **no reemplaza ninguna de las pantallas P0–P10 definidas en el alcance**.
 
 ---
 

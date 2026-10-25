@@ -3,7 +3,7 @@
 > Curso Integrador I: Sistemas Software — UTP, 2026-02
 > Cliente: Dr. Moisés Barrantes Cabrera (Medicina Interna y Reumatología, Trujillo) — **Consultorio Medifast**
 
-MEDIFAST es una aplicación web en la que los pacientes del Consultorio Medifast se registran, consultan los horarios libres y reservan una cita adjuntando la constancia de un pago con Yape (simulado). El médico revisa la constancia, valida o rechaza el pago, gestiona su agenda, registra si el paciente asistió y obtiene reportes exportables a Excel.
+MEDIFAST es un sistema web en el que los pacientes del Consultorio Medifast se registran, consultan los horarios libres y reservan una cita adjuntando la constancia de un pago con Yape (simulado). El médico revisa la constancia, valida o rechaza el pago, gestiona su agenda, registra si el paciente asistió y obtiene reportes exportables a Excel.
 
 Este README es la referencia funcional y técnica del proyecto. Si un informe, un diagrama o el prototipo lo contradicen, se corrigen ellos. El seguimiento de la rúbrica y de las evidencias del APF3 está en [docs/entregables/checklist-apf3.md](docs/entregables/checklist-apf3.md).
 
@@ -54,7 +54,7 @@ Desarrollar un sistema web en el que los pacientes reserven su cita y adjunten l
 - Las 11 pantallas (P0–P10) y los 16 RF implementados.
 - Ningún bloque de horario asignado a más de una cita activa y ningún paciente con más de una cita activa (garantizado por la BD).
 - Ninguna reserva apartada más de 15 min sin constancia.
-- Pruebas unitarias en verde para todas las reglas de negocio; cobertura ≥ 60 % en la capa `service`.
+- Lograr pruebas unitarias en verde para las reglas de negocio y alcanzar una cobertura objetivo de **≥ 60 % en la capa `service`**, verificada mediante JaCoCo.
 
 ---
 
@@ -221,7 +221,7 @@ Los estados se guardan con los nombres de la BD y se muestran con estas etiqueta
 | RNF08 | Rendimiento    | Disponibilidad y agenda responden en < 2 s con 1 000 citas                                                                                          | Prueba con datos de carga       |
 | RNF09 | Usabilidad     | Reserva en ≤ 4 pantallas desde el login, contador visible de los 15 min y mensajes de error claros                                                 | Prueba de usabilidad            |
 | RNF10 | Mantenibilidad | MVC + DAO + SOLID; Javadoc en los servicios                                                                                                         | Revisión de código            |
-| RNF11 | Calidad        | TDD: las pruebas de cada regla de negocio se escriben antes de implementarla; cobertura ≥ 60 % en `service`                                      | JUnit + JaCoCo                  |
+| RNF11 | Calidad        | Aplicar TDD en las reglas de negocio y alcanzar una cobertura objetivo de ≥ 60 % en la capa `service` | JUnit + JaCoCo |                                     | JUnit + JaCoCo                  |
 | RNF12 | Portabilidad   | Se ejecuta en localhost con Java 21 y MySQL 8.4, en macOS, Linux o Windows, siguiendo este README                                                   | Instalación limpia             |
 | RNF13 | Auditoría     | Columnas `creado_en` / `actualizado_en`; log de login, reserva, validación, rechazo y cancelación                                             | Modelo físico + logs           |
 | RNF14 | Librerías     | Uso real de Guava, Apache Commons, Apache POI y Logback (§11.3)                                                                                    | `pom.xml` + código           |
@@ -290,6 +290,141 @@ Sirve como guía visual de las 11 pantallas. Donde difiere de este README, la im
 | P9, P10  | Filtro por mes                                                         | Rango de fechas (el mes es un atajo); P9 también por día, semana y estado                     |
 
 ---
+
+### 7.3 Estado de implementación de interfaces
+
+La rúbrica del APF3 asigna el mayor peso a la **implementación de las interfaces gráficas**, por lo que no basta con que las pantallas estén definidas en el README o diseñadas en Figma: deben existir realmente en la aplicación Spring Boot + Thymeleaf y funcionar de acuerdo con los requerimientos asociados.
+
+Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero la implementación real todavía se encuentra en progreso.
+
+#### Estado actual de las plantillas
+
+| Código | Pantalla | Plantilla esperada | Estado actual |
+|---|---|---|---|
+| P0 | Login | `login.html` | 🟡 Existe, pero aún requiere completar todo el flujo funcional |
+| P1 | Registro | `registro.html` | ❌ No implementada |
+| P2 | Reservar cita / horarios | `paciente/reservar.html` | ❌ No implementada |
+| P3 | Pago Yape simulado | `paciente/pago.html` | ❌ No implementada |
+| P4 | Confirmación | `paciente/confirmacion.html` | ❌ No implementada |
+| P5 | Mis citas | `paciente/mis-citas.html` | ❌ No implementada |
+| P6 | Mi perfil | `paciente/perfil.html` | ❌ No implementada |
+| P7 | Agenda | `medico/agenda.html` | ❌ No implementada |
+| P8 | Detalle de cita | `medico/detalle-cita.html` | ❌ No implementada |
+| P9 | Reporte de citas | `medico/reporte-citas.html` | ❌ No implementada |
+| P10 | Reporte de pagos | `medico/reporte-pagos.html` | ❌ No implementada |
+
+En el proyecto también existe actualmente:
+
+```text
+templates/
+├── login.html
+├── inicio.html
+├── fragments/
+│   └── layout.html
+└── error/
+    ├── 403.html
+    └── 404.html
+```
+
+`inicio.html` es una vista auxiliar y **no reemplaza ninguna de las pantallas P0–P10 definidas en el alcance**.
+
+---
+
+#### Archivos que deben existir para completar P0–P10
+
+La estructura esperada es:
+
+```text
+medifast-app/
+└── src/
+    └── main/
+        └── resources/
+            └── templates/
+                ├── login.html
+                ├── registro.html
+                ├── paciente/
+                │   ├── reservar.html
+                │   ├── pago.html
+                │   ├── confirmacion.html
+                │   ├── mis-citas.html
+                │   └── perfil.html
+                ├── medico/
+                │   ├── agenda.html
+                │   ├── detalle-cita.html
+                │   ├── reporte-citas.html
+                │   └── reporte-pagos.html
+                ├── fragments/
+                │   └── layout.html
+                └── error/
+                    ├── 403.html
+                    └── 404.html
+```
+
+---
+
+#### Criterio de conformidad
+
+Una pantalla solo debe marcarse como:
+
+```text
+✅ Completa
+```
+
+cuando se cumplan simultáneamente estas condiciones:
+
+1. Existe la plantilla Thymeleaf correspondiente.
+2. Existe el controlador o ruta que permite acceder a ella.
+3. Está conectada con la capa de servicios.
+4. Utiliza datos reales provenientes de la aplicación o de la base de datos.
+5. Cumple los requerimientos funcionales y reglas de negocio asociados.
+6. Las validaciones se realizan también en servidor.
+7. Puede demostrarse funcionando durante la sustentación.
+
+No debe considerarse suficiente:
+
+- que exista únicamente el diseño en Figma;
+- que la pantalla aparezca descrita en el README;
+- que exista solamente un archivo HTML sin lógica ni integración;
+- que una pantalla de inicio genérica sustituya varias pantallas del alcance.
+
+---
+
+#### Prioridad de implementación
+
+Debido a que el criterio de interfaces gráficas tiene el mayor peso en la rúbrica del APF3, la prioridad de desarrollo debe ser:
+
+1. **P1 — Registro**
+2. **P2 — Reserva / horarios**
+3. **P3 — Pago Yape simulado**
+4. **P4 — Confirmación**
+5. **P5 — Mis citas**
+6. **P6 — Mi perfil**
+7. **P7 — Agenda**
+8. **P8 — Detalle de cita**
+9. **P9 — Reporte de citas**
+10. **P10 — Reporte de pagos**
+
+P0 debe mantenerse y completarse en paralelo con el flujo de autenticación.
+
+---
+
+#### Objetivo para el APF3
+
+El objetivo es que las **11 pantallas P0–P10 estén implementadas y funcionales**, de manera que el sistema cubra el 100 % del alcance gráfico comprometido.
+
+Estado actual:
+
+```text
+🟡 En desarrollo
+```
+
+El estado podrá cambiar a:
+
+```text
+✅ Completo
+```
+
+únicamente cuando P0–P10 puedan recorrerse y demostrarse dentro de la aplicación.
 
 ## 8. Casos de uso
 
@@ -592,7 +727,13 @@ Modelos conceptual, lógico y físico, restricciones, índices y diccionario de 
 
 ### 11.1 Arquitectura
 
-Monolito Spring Boot en capas (MVC) ejecutado en localhost. Los controladores dependen de interfaces de servicio, los servicios aplican las reglas de negocio y acceden a la BD solo a través de los DAO.
+La arquitectura objetivo de MEDIFAST corresponde a un monolito Spring Boot organizado en capas mediante MVC y ejecutado en localhost.
+
+Los controladores deberán depender de interfaces de servicio; los servicios concentrarán las reglas de negocio y accederán a la base de datos únicamente mediante interfaces DAO implementadas con Spring Data JPA.
+
+Esta separación busca mantener desacopladas las responsabilidades de presentación, control, lógica de negocio y persistencia.
+
+**Diagramas relacionados:** T-01 Arquitectura MVC + DAO + SOLID y T-02 Clases por capas.
 
 ```mermaid
 flowchart TB
@@ -629,7 +770,9 @@ flowchart TB
 
 Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnicos.md#t-01--arquitectura-mvc-por-capas) y [T-02 Clases por capas](docs/diagramas/tecnicos.md#t-02--clases-por-capas-mvc-servicios-y-dao).
 
-### 11.2 Principios
+### 11.2 Principios de arquitectura definidos para la implementación
+
+> Los siguientes principios representan la arquitectura objetivo de MEDIFAST. Se considerarán completamente implementados únicamente cuando las clases, interfaces, pruebas y demás evidencias correspondientes estén versionadas y puedan demostrarse en el repositorio.
 
 | Principio       | Cómo se aplica                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Dónde se ve                                          |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
@@ -640,7 +783,9 @@ Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnico
 
 **Seguridad:** bcrypt; roles con Spring Security; CSRF; Bean Validation en servidor; consultas parametrizadas; subida de archivos validada por tipo real, tamaño y nombre UUID; bloqueo por intentos fallidos; acceso restringido a constancias y PDF; logs sin datos sensibles; usuario de BD con privilegios mínimos (`medifast_app`).
 
-### 11.3 Librerías obligatorias
+### 11.3 Librerías requeridas y uso definido
+
+> Las siguientes librerías forman parte del diseño técnico comprometido para el APF3. La presencia de una dependencia en `pom.xml` no se considera por sí sola evidencia de cumplimiento; cada librería deberá tener un uso funcional verificable dentro del código antes de marcarse como implementada.
 
 | Librería                      | Uso en MEDIFAST                                                                                                                                                                        |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -671,7 +816,9 @@ Detalle de dependencias entre clases: [T-01 Arquitectura](docs/diagramas/tecnico
 
 ## 12. Estructura del proyecto
 
-Monorepo con la documentación, los scripts de la BD y la aplicación.
+El repositorio utiliza una estructura monorepo que integra documentación, scripts de base de datos y la aplicación Spring Boot.
+
+**Nota:** la estructura mostrada a continuación representa la **estructura objetivo de MEDIFAST**. Algunos controladores, servicios, utilidades y plantillas todavía se encuentran en desarrollo y serán incorporados progresivamente durante el APF3. El estado real de implementación de las interfaces se encuentra documentado en la sección 7.3.
 
 ```text
 medifast/
@@ -735,7 +882,7 @@ Todos están en Mermaid; GitHub y VS Code los muestran directamente. El [índice
 | Archivo                                            | Diagramas                                                                                                                                     |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | [funcionales.md](docs/diagramas/funcionales.md)     | F-01 Casos de uso · F-02 Proceso AS-IS · F-03 Proceso TO-BE · F-04 Estados de la cita · F-05 Estados del pago · F-06 Mapa de navegación |
-| [tecnicos.md](docs/diagramas/tecnicos.md)           | T-01 Arquitectura MVC · T-02 Clases por capas · T-03 Clases del dominio · T-04 y T-05 Secuencias detalladas                                |
+| [tecnicos.md](docs/diagramas/tecnicos.md)           | T-01 Arquitectura MVC + DAO + SOLID · T-02 Clases por capas · T-03 Clases del dominio · T-04 y T-05 Secuencias detalladas |
 | [base-de-datos.md](docs/diagramas/base-de-datos.md) | BD-01 Conceptual · BD-02 Lógico · BD-03 Físico · Restricciones e índices · Diccionario de datos                                        |
 
 ### 13.3 Entregables — [`docs/entregables/`](docs/entregables/)
@@ -745,6 +892,8 @@ Todos están en Mermaid; GitHub y VS Code los muestran directamente. El [índice
 | [checklist-apf3.md](docs/entregables/checklist-apf3.md)                                | Cobertura de la rúbrica, estado de los entregables y evidencias que hay que reunir |
 | [rubrica_apf3.txt](docs/entregables/rubrica_apf3.txt)                                  | Rúbrica de evaluación del APF3                                                    |
 | `APF1_Medifast.pdf`, `APF2_Medifast_Grupo2.pdf`, `Project_Charter_Medifast.pdf` | Informes y acta de constitución entregados                                         |
+| `docs/javadoc/` | Documentación técnica generada mediante Javadoc para las principales clases y métodos del sistema. |
+| `docs/entregables/referencias-apf3.md` | Referencias bibliográficas y documentación técnica consultadas durante el desarrollo del APF3. |
 
 ---
 

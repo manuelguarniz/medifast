@@ -27,7 +27,7 @@ import lombok.Setter;
 		columnNames = { "id_medico", "fecha", "hora_inicio" }))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Horario {
+public class Horario extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

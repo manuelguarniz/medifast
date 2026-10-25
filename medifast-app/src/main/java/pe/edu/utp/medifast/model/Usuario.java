@@ -1,10 +1,5 @@
 package pe.edu.utp.medifast.model;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,7 +24,7 @@ import pe.edu.utp.medifast.model.enums.TipoDocumentoEnum;
 @Table(name = "usuario")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Usuario {
+public class Usuario extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,15 +49,6 @@ public class Usuario {
 	@Column(name = "activo", nullable = false)
 	@Setter
 	private boolean activo = true;
-
-	// Valores puestos por MySQL (RNF13)
-	@Generated(event = EventType.INSERT)
-	@Column(name = "creado_en", insertable = false, updatable = false)
-	private LocalDateTime creadoEn;
-
-	@Generated(event = { EventType.INSERT, EventType.UPDATE })
-	@Column(name = "actualizado_en", insertable = false, updatable = false)
-	private LocalDateTime actualizadoEn;
 
 	public Usuario(TipoDocumentoEnum tipoDocumento, String numeroDocumento, String contrasenaHash, RolEnum rol) {
 		this.tipoDocumento = tipoDocumento;

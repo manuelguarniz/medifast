@@ -33,7 +33,7 @@ import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 		columnNames = { "id_medico", "tipo_cita" }))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Tarifa {
+public class Tarifa extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

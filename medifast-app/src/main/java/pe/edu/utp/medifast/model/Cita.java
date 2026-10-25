@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +38,7 @@ import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 @Table(name = "cita")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cita {
+public class Cita extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,15 +74,6 @@ public class Cita {
 	@Column(name = "cancelada_por")
 	@Setter
 	private CanceladaPorEnum canceladaPor;
-
-	// Valores puestos por MySQL (RNF13)
-	@Generated(event = EventType.INSERT)
-	@Column(name = "creado_en", insertable = false, updatable = false)
-	private LocalDateTime creadoEn;
-
-	@Generated(event = { EventType.INSERT, EventType.UPDATE })
-	@Column(name = "actualizado_en", insertable = false, updatable = false)
-	private LocalDateTime actualizadoEn;
 
 	@OneToMany(mappedBy = "cita", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private List<CitaHorario> bloques = new ArrayList<>();

@@ -1,10 +1,6 @@
 package pe.edu.utp.medifast.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +24,7 @@ import lombok.Setter;
 @Table(name = "paciente")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Paciente {
+public class Paciente extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,15 +54,6 @@ public class Paciente {
 	@Column(name = "correo", nullable = false, unique = true, length = 150)
 	@Setter
 	private String correo;
-
-	// Valores puestos por MySQL (RNF13)
-	@Generated(event = EventType.INSERT)
-	@Column(name = "creado_en", insertable = false, updatable = false)
-	private LocalDateTime creadoEn;
-
-	@Generated(event = { EventType.INSERT, EventType.UPDATE })
-	@Column(name = "actualizado_en", insertable = false, updatable = false)
-	private LocalDateTime actualizadoEn;
 
 	public Paciente(Usuario usuario, String nombres, String apellidos, LocalDate fechaNacimiento, String celular,
 			String correo) {

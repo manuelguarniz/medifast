@@ -32,7 +32,7 @@ import pe.edu.utp.medifast.util.converter.DiaSemanaConverter;
 @Table(name = "horario_semanal")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class HorarioSemanal {
+public class HorarioSemanal extends EntidadAuditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

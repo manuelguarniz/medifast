@@ -223,7 +223,7 @@ Los estados se guardan con los nombres de la BD y se muestran con estas etiqueta
 | RNF10 | Mantenibilidad | MVC + DAO + SOLID; Javadoc en los servicios                                                                                                         | Revisión de código            |
 | RNF11 | Calidad        | Aplicar TDD en las reglas de negocio y alcanzar una cobertura objetivo de ≥ 60 % en la capa `service` | JUnit + JaCoCo |                                     | JUnit + JaCoCo                  |
 | RNF12 | Portabilidad   | Se ejecuta en localhost con Java 21 y MySQL 8.4, en macOS, Linux o Windows, siguiendo este README                                                   | Instalación limpia             |
-| RNF13 | Auditoría     | Columnas `creado_en` / `actualizado_en`; log de login, reserva, validación, rechazo y cancelación                                             | Modelo físico + logs           |
+| RNF13 | Auditoría     | Columnas `creado_en` / `actualizado_en` en todas las tablas; log de login, logout, reserva, validación, rechazo y cancelación                  | Modelo físico + logs           |
 | RNF14 | Librerías     | Uso real de Guava, Apache Commons, Apache POI y Logback (§11.3)                                                                                    | `pom.xml` + código           |
 | RNF15 | Versionado     | Todo el código y la documentación versionados en GitHub, con commits pequeños y descriptivos                                                     | Historial de commits            |
 
@@ -874,6 +874,7 @@ Los nombres de cada plantilla están en la tabla de §7. Fuera de Git: `uploads/
 | [`01_schema.sql`](docs/sql/01_schema.sql)             | Crea la BD `medifast`, las 10 tablas, constraints (incluidas RN-01 y RN-09), índices, la vista `v_cita` y el usuario de aplicación `medifast_app`      |
 | [`02_datos_prueba.sql`](docs/sql/02_datos_prueba.sql) | Datos de prueba: consultorio Medifast, 1 médico, tarifas, horario lunes a sábado 09:00–13:00, bloques ±30 días, 30 pacientes y citas en todos los estados |
 | [`03_consultas.sql`](docs/sql/03_consultas.sql)       | Vista `v_cita`, JOIN de verificación, reporte de citas, reporte de pagos, disponibilidad y pruebas de constraints (INSERT que **deben fallar**)       |
+| [`04_migracion_auditoria.sql`](docs/sql/04_migracion_auditoria.sql) | Solo para BD creadas antes de RNF13 completo: agrega `creado_en` / `actualizado_en` a las tablas que no las tenían. Re-ejecutable; requiere `root` |
 
 ### 13.2 Diagramas — [`docs/diagramas/`](docs/diagramas/)
 
@@ -917,6 +918,12 @@ Sin Docker, ejecuta los scripts en un MySQL 8.4 local:
 mysql -u root -p < docs/sql/01_schema.sql
 mysql -u root -p < docs/sql/02_datos_prueba.sql
 mysql --force -u root -p medifast < docs/sql/03_consultas.sql   # la sección 6 contiene errores esperados
+```
+
+¿Ya tenías la BD creada con una versión anterior del esquema? Actualízala sin perder datos (o recréala con `docker compose down -v && docker compose up -d`):
+
+```bash
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/04_migracion_auditoria.sql
 ```
 
 **Cuentas de prueba** (contraseña `Medifast2026`):

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Bloquea push directo a main: el merge se hace mediante Pull Request.
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "✖ No se permite hacer push directo a 'main'. Abre un Pull Request."
+    exit 1
+  fi
+done

@@ -16,6 +16,8 @@ La referencia funcional es el [README del proyecto](../../README.md) (§3 Alcanc
 
 ## Flujo de trabajo
 
+Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](../../.claude/skills/diseno-stitch/SKILL.md).
+
 1. Abrir una sesión en Stitch y pegar [00-prompt-base.md](00-prompt-base.md).
 2. Pegar el prompt v1 de la pantalla desde [01-prompts-pantallas.md](01-prompts-pantallas.md). En las pantallas siguientes a P0, adjuntar la versión aprobada de P0 como referencia de estilo.
 3. Guardar la captura del resultado como `Pn-nombre/v1.png` (sin espacios en el nombre).
@@ -27,6 +29,8 @@ La referencia funcional es el [README del proyecto](../../README.md) (§3 Alcanc
 - **Una pantalla por corrección:** para corregir, seleccionar en Stitch solo la pantalla afectada. Las instrucciones generales ("en escritorio y móvil") se suelen aplicar solo a una de ellas.
 - **Variantes en un prompt aparte:** las pantallas nuevas (otro estado, otra variante) se piden en un prompt aparte, no dentro de un prompt de corrección.
 - **Tomar como referencia lo que ya está bien:** "copia el estilo del frame X" funciona mejor que volver a describir los tokens.
+- **Escritorio y móvil por separado:** cuando hay que corregir ambas versiones, conviene usar un prompt para los frames de escritorio y otro para los móviles, y pedir que el segundo copie el estilo del primero. En P1, así se resolvieron 14 problemas en una sola iteración.
+- **Contenido exacto en los paneles decorativos:** si no se lista qué va en un panel lateral o una cabecera, Stitch inventa cards (por ejemplo, datos del médico con la especialidad equivocada).
 - **Límite de iteraciones:** si un detalle no se corrige en 2–3 iteraciones, se ajusta en Figma y se anota en `iteraciones.md`.
 
 ## Checklist de revisión
@@ -42,8 +46,8 @@ La referencia funcional es el [README del proyecto](../../README.md) (§3 Alcanc
 
 | # | Pantalla | Carpeta | Versión actual | Estado |
 | --- | --- | --- | --- | --- |
-| P0 | Login | [P0-login](P0-login/iteraciones.md) | v3 | ✅ Aprobada (2 ajustes pendientes en Figma) |
-| P1 | Registro | — | — | ⏳ Pendiente |
+| P0 | Login | [P0-login](P0-login/iteraciones.md) | v3 | ✅ Aprobada (3 ajustes pendientes en Figma) |
+| P1 | Registro | [P1-registro](P1-registro/iteraciones.md) | v2 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P2 | Reservar cita | — | — | ⏳ Pendiente |
 | P3 | Pago Yape (simulado) | — | — | ⏳ Pendiente |
 | P4 | Confirmación | — | — | ⏳ Pendiente |

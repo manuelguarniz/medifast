@@ -154,6 +154,7 @@ Se aprueba v3 y no se itera más en Stitch. Los dos pendientes son mecánicos y 
 
 1. **Input:** crear el componente desde la pantalla de escritorio bloqueada (variantes default, focus, error y disabled) y aplicarlo también en la pantalla de datos incorrectos.
 2. **Estado normal:** duplicar la pantalla bloqueada, quitar la alerta, poner "Ingresar" en estado activo y aplicar la variante focus al campo de documento. Hacer lo mismo en móvil.
+3. **Estado "cuenta creada"** (definido al revisar [P1](../P1-registro/iteraciones.md#decisiones-de-flujo)): duplicar el estado normal y poner arriba una alerta de éxito (fondo #ecfdf5, borde 1px #a7f3d0, radio de 8px, ícono de check en #10b981) con el texto "**Cuenta creada.** Ya puedes iniciar sesión." El número de documento recién registrado va precargado. Hacer lo mismo en móvil.
 
 **Aprendizaje para las siguientes pantallas:**
 

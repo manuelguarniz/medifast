@@ -75,7 +75,7 @@ NO INCLUIR (fuera de alcance)
 - Chatbots o IA
 - Barra de pestañas inferior en móvil (la navegación es solo la navbar con el botón "Menú") ni ícono de avatar en la navbar
 - Sellos o textos de confianza inventados ("Reserva segura y encriptada", candados)
-- Fondos lavanda o morados: los fondos suaves son #f8fafc (neutro) o #ecfdf5 (verde claro)
+- Fondos lavanda, azulados o morados, también en rellenos de controles (control segmentado, selects, cabeceras de tabla, pie): los fondos suaves son solo #f8fafc o #f1f5f9 (neutros) y #ecfdf5 (verde claro)
 ```
 
 ## Cambios
@@ -87,3 +87,4 @@ NO INCLUIR (fuera de alcance)
 | 2026-10-25 | Se define la navbar pública de login y registro | Feedback de [P1 v1](P1-registro/iteraciones.md) |
 | 2026-10-26 | Se excluyen la barra de pestañas inferior, el avatar en la navbar, los sellos de confianza y los fondos lavanda | Feedback de [P2 v1](P2-reservar/iteraciones.md) |
 | 2026-10-27 | Se excluye explícitamente la cancelación por el paciente | Feedback de [P5 v3](P5-mis-citas/iteraciones.md) |
+| 2026-10-26 | Se extiende la exclusión de los fondos lavanda a los rellenos de controles y se agrega #f1f5f9 como neutro | Feedback de [P7 v1](P7-agenda/iteraciones.md) |

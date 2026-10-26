@@ -32,6 +32,7 @@ Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](..
 - **Escritorio y móvil por separado:** cuando hay que corregir ambas versiones, conviene usar un prompt para los frames de escritorio y otro para los móviles, y pedir que el segundo copie el estilo del primero. En P1, así se resolvieron 14 problemas en una sola iteración.
 - **Contenido exacto en los paneles decorativos:** si no se lista qué va en un panel lateral o una cabecera, Stitch inventa cards (por ejemplo, datos del médico con la especialidad equivocada).
 - **Variantes duplicando el frame aprobado:** para un estado nuevo, o para un frame que no se deja corregir, pedir "duplica este frame y cambia solo…" sobre un frame ya correcto. En P2 resolvió en una iteración lo que llevaba tres. Los frames generados en paralelo arrastran elementos inventados (barra de pestañas, textos clínicos) que Stitch luego no quita.
+- **Estados por dispositivo:** al pedir estados duplicando un frame, Stitch los genera solo para el dispositivo seleccionado. Pegar el prompt una vez con el frame de escritorio y otra con el móvil.
 - **Límite de iteraciones:** si un detalle no se corrige en 2–3 iteraciones, se ajusta en Figma y se anota en `iteraciones.md`.
 
 ## Checklist de revisión
@@ -50,9 +51,9 @@ Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](..
 | P0 | Login | [P0-login](P0-login/iteraciones.md) | v3 | ✅ Aprobada (3 ajustes pendientes en Figma) |
 | P1 | Registro | [P1-registro](P1-registro/iteraciones.md) | v2 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P2 | Reservar cita | [P2-reservar](P2-reservar/iteraciones.md) | v3 | ✅ Aprobada (6 ajustes pendientes en Figma) |
-| P3 | Pago Yape (simulado) | — | — | ⏳ Pendiente |
-| P4 | Confirmación | [P4-confirmacion](P4-confirmacion/iteraciones.md) | v2 | ✅ Aprobada (5 ajustes pendientes en Figma; variante "detalle desde Mis citas" por definir) |
-| P5 | Mis citas | — | — | ⏳ Pendiente |
+| P3 | Pago Yape (simulado) | [P3-pago](P3-pago/iteraciones.md) | v4 | ✅ Aprobada (7 ajustes pendientes en Figma) |
+| P4 | Confirmación | [P4-confirmacion](P4-confirmacion/iteraciones.md) | v2 | ✅ Aprobada (5 ajustes pendientes en Figma; falta la variante "Detalle de la cita", prompt en P5) |
+| P5 | Mis citas | [P5-mis-citas](P5-mis-citas/iteraciones.md) | v3 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P6 | Mi perfil | — | — | ⏳ Pendiente |
 | P7 | Agenda | — | — | ⏳ Pendiente |
 | P8 | Detalle de cita | — | — | ⏳ Pendiente |

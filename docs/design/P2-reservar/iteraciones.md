@@ -308,6 +308,10 @@ Después, borrar el frame móvil "Horario no disponible" anterior (el que tiene 
 
 **Aceptado por el usuario:** el logo (corazón o pulso según el frame) y los colores de los enlaces de la navbar superior se consideran tolerables. Se unifican sin costo al usar el componente de navbar de P4 en Figma.
 
+### Decisiones de flujo
+
+- **Variante "Ya tienes una cita activa" con pago pendiente** (decidido en [P3](../P3-pago/iteraciones.md#decisiones-de-flujo), 2026-10-26): el botón "Volver" de P3 regresa a P2 sin liberar el horario. En ese caso la alerta muestra el badge "Pago pendiente" (ámbar) en lugar de "Confirmada", el mini contador del tiempo restante y el botón primario "Continuar pago →" (lleva a P3) en lugar de "Ver mis citas". Se arma en Figma duplicando el frame v2.2 (escritorio y móvil).
+
 ### Decisión
 
 Se aprueba P2 con v3 y no se itera más en Stitch: los pendientes llevan 3–4 iteraciones y son eliminaciones o cambios de texto. Frames base para Figma:

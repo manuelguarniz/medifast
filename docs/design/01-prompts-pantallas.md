@@ -69,6 +69,8 @@ P3 – Pago Yape (simulado):
 - Campo opcional "N.º de operación".
 - Leyenda de advertencia visible: "Simulación — no se realizó ningún cobro".
 - Botón "Enviar constancia →".
+- Sin botón "Volver": nota "Puedes retomar el pago desde Mis citas mientras el tiempo no venza."
+- Prompt detallado y estados (archivo adjunto, error, tiempo vencido) en P3-pago/iteraciones.md.
 ```
 
 ## P4 – Confirmación
@@ -91,6 +93,8 @@ P5 – Mis citas (paciente):
 - Las canceladas muestran el motivo. Las vencidas se muestran como "Vencida" y sin acciones.
 - Como máximo una cita activa.
 - Versión con tarjetas apiladas en móvil y estado vacío "No tienes citas registradas" con el botón "Reservar cita".
+- Pestañas "Próximas" (solo la cita activa, como card) e "Historial" (el resto, en tabla). "Reservar cita" solo si no hay cita activa. "Ver constancia ↗" abre una pestaña nueva.
+- Prompt detallado, tabla de acciones por estado y prompts de estados en P5-mis-citas/iteraciones.md.
 ```
 
 ## P6 – Mi perfil

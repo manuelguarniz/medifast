@@ -68,6 +68,7 @@ NO INCLUIR (fuera de alcance)
 - Historia clínica, diagnósticos, recetas o telemedicina
 - Citas virtuales
 - Reprogramar citas
+- Cancelar citas por el paciente (botón o enlace "Cancelar cita" en las pantallas del paciente)
 - Pagos reales o pedir credenciales bancarias
 - Edición de horarios desde la interfaz
 - Alta de médicos
@@ -85,3 +86,4 @@ NO INCLUIR (fuera de alcance)
 | 2026-10-25 | Se definen el borde y el foco de los inputs, el estilo único de alertas y el subtítulo del logo; se excluye "Recordarme" | Feedback de [P0 v1](P0-login/iteraciones.md) |
 | 2026-10-25 | Se define la navbar pública de login y registro | Feedback de [P1 v1](P1-registro/iteraciones.md) |
 | 2026-10-26 | Se excluyen la barra de pestañas inferior, el avatar en la navbar, los sellos de confianza y los fondos lavanda | Feedback de [P2 v1](P2-reservar/iteraciones.md) |
+| 2026-10-27 | Se excluye explícitamente la cancelación por el paciente | Feedback de [P5 v3](P5-mis-citas/iteraciones.md) |

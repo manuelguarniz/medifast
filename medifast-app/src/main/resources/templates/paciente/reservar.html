@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Reservar cita')}"></head>
+<body class="reserva-page">
+<div class="reserva-shell">
+<nav class="reserva-nav" aria-label="Navegación del paciente">
+    <div class="reserva-nav-inner">
+        <a class="reserva-brand" th:href="@{/paciente/reservar}" aria-label="MEDIFAST, Consultorio Medifast">
+            <span class="reserva-brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M3 12h4l2.2-6 4.1 12 2.1-6H21" />
+                </svg>
+            </span>
+            <span class="reserva-brand-copy"><strong>MEDIFAST</strong><small>Consultorio Medifast</small></span>
+        </a>
+        <button class="reserva-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#reservaMenu"
+                aria-controls="reservaMenu" aria-expanded="false" aria-label="Menú">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+            <span>Menú</span>
+        </button>
+        <div class="reserva-nav-menu collapse" id="reservaMenu">
+            <span class="reserva-nav-label">MENÚ PRINCIPAL</span>
+            <a class="active" th:href="@{/paciente/reservar}" aria-current="page">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+            Reservar cita
+            </a>
+            <a th:href="@{/paciente/citas}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 13h7M9 17h7"></path></svg>
+            Mis citas
+            </a>
+            <a th:href="@{/paciente/perfil}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+            Mi perfil
+            </a>
+            <form class="reserva-logout" th:action="@{/logout}" method="post">
+            <button type="submit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M13 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg>
+                Salir
+            </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<main class="reserva-main">
+    <div class="reserva-topbar">
+        <div class="reserva-topbar-greeting">
+            <p>PORTAL DEL PACIENTE</p>
+            <strong>Hola, <span th:text="${nombreSaludo}"></span></strong>
+        </div>
+        <div class="reserva-patient" th:attr="aria-label='Sesión de ' + ${nombrePaciente}">
+            <span class="reserva-patient-avatar" aria-hidden="true" th:text="${inicialesPaciente}"></span>
+            <span class="reserva-patient-copy">
+            <strong th:text="${nombrePaciente}"></strong>
+            <small>Paciente</small>
+            </span>
+        </div>
+    </div>
+    <div class="reserva-content">
+    <header class="reserva-heading">
+        <p class="reserva-eyebrow">NUEVA RESERVA</p>
+        <h1>Reserva tu cita</h1>
+        <p>Elige el día y la hora de tu cita con el <span th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</span>.</p>
+    </header>
+
+    <div class="reserva-alert reserva-alert-info" th:if="${citaActiva != null}" role="status">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle><path d="M12 11v5m0-8h.01"></path>
+        </svg>
+        <div class="reserva-alert-copy">
+            <strong>Ya tienes una cita activa.</strong> Solo puedes tener una a la vez.
+            <p>
+                <span th:text="${fechaActiva}">Mié, 11 nov</span> ·
+                <span th:text="${horaActiva + '–' + horaFinActiva}">10:30–11:30 a. m.</span> ·
+                <span th:text="${tipoActivo}">Nuevo</span>
+                <span class="reserva-status" th:text="${etiquetaEstadoCita}">Pago pendiente</span>
+            </p>
+        </div>
+        <a class="reserva-alert-action" th:href="@{/paciente/citas}">Ver mis citas</a>
+    </div>
+    <div class="reserva-alert reserva-alert-error" th:if="${errorHorario}" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3 2.8 19h18.4L12 3Z"></path><path d="M12 9v4m0 3h.01"></path>
+        </svg>
+        <strong>Horario no disponible, elija otro.</strong>
+    </div>
+    <div class="reserva-alert reserva-alert-error" th:if="${errorFecha}" role="alert">
+        <strong>La fecha está fuera del rango permitido para reservar. Elige otra fecha.</strong>
+    </div>
+
+    <form class="reserva-layout" method="post" th:action="@{/paciente/reservar}"
+          th:attr="aria-disabled=${citaActiva != null}">
+        <input type="hidden" name="fecha" th:value="${disponibilidad.fecha}">
+
+        <section class="reserva-card reserva-selection-card" aria-label="Selecciona el horario de tu cita">
+            <div class="reserva-step">
+                <span class="reserva-step-number">1</span>
+                <div class="reserva-step-body">
+                    <h2>Tipo de cita</h2>
+                    <p class="reserva-step-description">Lo detectamos según tus citas anteriores.</p>
+                    <div class="reserva-type-card">
+                        <span class="reserva-pulse-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M3 12h4l2.2-6 4.1 12 2.1-6H21" />
+                            </svg>
+                        </span>
+                        <span class="reserva-type-copy">
+                            <strong th:text="${tipoNombre}">Paciente nuevo</strong>
+                            <small th:text="${tipoDescripcion}">Primera consulta · 60 minutos</small>
+                        </span>
+                        <span class="reserva-type-price">
+                            <small>Tarifa</small>
+                            <strong th:text="${monto}">S/ 150.00</strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reserva-step">
+                <span class="reserva-step-number">2</span>
+                <div class="reserva-step-body">
+                    <h2>Elige una fecha</h2>
+                    <p class="reserva-step-description">
+                        Puedes reservar desde
+                        <span th:text="${fechaMinTexto}">mañana</span>
+                        hasta
+                        <span th:text="${fechaMaxTexto}">dentro de 30 días</span>.
+                    </p>
+                    <div class="reserva-calendar-head">
+                        <a class="reserva-week-arrow"
+                           th:href="@{/paciente/reservar(fecha=${semanaAnterior})}"
+                           aria-label="Semana anterior">‹</a>
+                        <strong th:text="${mesVisible}">Noviembre 2026</strong>
+                        <a class="reserva-week-arrow"
+                           th:href="@{/paciente/reservar(fecha=${semanaSiguiente})}"
+                           aria-label="Semana siguiente">›</a>
+                    </div>
+                    <div class="reserva-days" aria-label="Días de la semana">
+                        <th:block th:each="dia : ${dias}">
+                            <a th:if="${dia.habilitado}"
+                               class="reserva-day"
+                               th:classappend="${dia.seleccionado} ? ' selected' : ''"
+                               th:href="@{/paciente/reservar(fecha=${dia.fecha})}"
+                               th:aria-current="${dia.seleccionado} ? 'date' : null">
+                                <span th:text="${dia.nombre}">LUN</span>
+                                <strong th:text="${dia.numero}">9</strong>
+                            </a>
+                            <span th:unless="${dia.habilitado}" class="reserva-day disabled"
+                                  th:attr="aria-label=${dia.descripcion + ', cerrado'}">
+                                <span th:text="${dia.nombre}">DOM</span>
+                                <strong th:text="${dia.numero}">15</strong>
+                                <small>Cerrado</small>
+                            </span>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reserva-step">
+                <span class="reserva-step-number">3</span>
+                <div class="reserva-step-body">
+                    <h2>Elige un horario</h2>
+                    <p class="reserva-step-description">
+                        <span th:text="${fechaCompleta}">Miércoles 11 de noviembre</span>
+                        · tu cita dura <span th:text="${minutos}">60</span> min
+                        (<span th:text="${cantidadBloques}">2</span> bloques).
+                    </p>
+                    <div class="reserva-slots" th:if="${!slots.isEmpty()}">
+                        <label th:each="slot : ${slots}" class="reserva-slot"
+                               th:classappend="${slot.ocupado} ? ' occupied' : (${slot.bloqueado} ? ' unavailable' : (${slot.dentroSeleccion} ? ' selected' : ''))">
+                            <input type="radio" name="idHorario" th:value="${slot.id}"
+                                   th:checked="${slot.seleccionado}"
+                                   th:disabled="${!slot.seleccionable or citaActiva != null}"
+                                   th:attr="data-start=${slot.hora},data-end=${slot.horaFin}">
+                            <span class="reserva-slot-time" th:text="${slot.hora}">09:00</span>
+                            <small th:if="${slot.ocupado}">Ocupado</small>
+                        </label>
+                    </div>
+                    <p class="reserva-empty-slots" th:if="${slots.isEmpty()}">
+                        No hay horarios disponibles para esta fecha. Elige otro día.
+                    </p>
+                    <div class="reserva-legend" aria-label="Estados de horario">
+                        <span><i class="legend-available"></i>Disponible</span>
+                        <span><i class="legend-selected"></i>Seleccionado</span>
+                        <span><i class="legend-occupied"></i>Ocupado</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="reserva-card reserva-summary" aria-label="Resumen de tu cita">
+            <p class="reserva-summary-eyebrow">RESUMEN DE TU CITA</p>
+            <div class="reserva-doctor">
+                <span class="reserva-doctor-avatar" aria-hidden="true">MB</span>
+                <span><strong th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</strong>
+                    <small th:text="${especialidad}">Medicina Interna y Reumatología</small></span>
+            </div>
+            <dl class="reserva-summary-list">
+                <div><dt>Fecha</dt><dd th:text="${fechaCompleta}">Miércoles 11 de noviembre</dd></div>
+                <div><dt>Hora</dt><dd id="resumenHora" th:text="${resumenHora}">—</dd></div>
+                <div><dt>Tipo</dt><dd th:text="${(tipoNombre == 'Paciente nuevo' ? 'Nuevo' : 'Control') + ' · ' + minutos + ' min'}">Nuevo · 60 min</dd></div>
+                <div><dt>Monto</dt><dd class="reserva-summary-amount" th:text="${monto}">S/ 150.00</dd></div>
+            </dl>
+            <div class="reserva-hold-notice">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>
+                </svg>
+                <span>Al continuar, tu horario queda apartado por 15 minutos para que completes el pago.</span>
+            </div>
+            <button class="reserva-continue" type="submit"
+                    th:disabled="${citaActiva != null or horarioId == null}">
+                Continuar al pago <span aria-hidden="true">→</span>
+            </button>
+        </aside>
+
+        <div class="reserva-mobile-continue">
+            <span><small>Tu cita</small><strong id="resumenMovil"
+                  th:text="${fechaCorta} + ' · ' + ${resumenHora}">Mié 11 nov · —</strong></span>
+            <button class="reserva-continue" type="submit"
+                    th:disabled="${citaActiva != null or horarioId == null}">
+                Continuar al pago <span aria-hidden="true">→</span>
+            </button>
+        </div>
+    </form>
+
+    <footer class="reserva-footer">Consultorio Medifast · <span th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</span> · Trujillo, Perú</footer>
+    </div>
+</main>
+</div>
+
+<script th:inline="javascript">
+    (() => {
+        const fecha = /*[[${fechaCorta}]]*/ "Mié 11 nov";
+        const resumen = document.getElementById("resumenHora");
+        const resumenMovil = document.getElementById("resumenMovil");
+        const botones = document.querySelectorAll(".reserva-continue");
+
+        document.querySelectorAll('input[name="idHorario"]').forEach((input) => {
+            input.addEventListener("change", () => {
+                const inicio = input.dataset.start;
+                const seleccionados = [...document.querySelectorAll('input[name="idHorario"]')]
+                    .filter((slot) => slot.checked);
+                const fin = input.dataset.end;
+                const horaRango = `${formatearHora(inicio)}–${formatearHora(fin)}`;
+                resumen.textContent = horaRango;
+                resumenMovil.textContent = `${fecha} · ${horaRango}`;
+                document.querySelectorAll(".reserva-slot").forEach((slot) => {
+                    const slotInput = slot.querySelector("input");
+                    const horaSlot = slotInput.dataset.start;
+                    slot.classList.toggle("selected", horaSlot >= inicio && horaSlot < fin);
+                });
+                botones.forEach((boton) => boton.disabled = seleccionados.length === 0);
+            });
+        });
+
+        function formatearHora(hora) {
+            const [horas, minutos] = hora.split(":").map(Number);
+            const hora12 = horas % 12 || 12;
+            return `${hora12}:${String(minutos).padStart(2, "0")} ${horas < 12 ? "a. m." : "p. m."}`;
+        }
+    })();
+</script>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

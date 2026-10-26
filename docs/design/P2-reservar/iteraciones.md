@@ -332,3 +332,10 @@ Ajustes en Figma:
 - Pedir que Stitch **duplique un frame ya corregido** y cambie solo el estado funcionó mejor que describir cada corrección: resolvió los slots y la alerta, que llevaban 2–3 iteraciones.
 - Aun así, Stitch no elimina elementos que él mismo inventó (barra de pestañas, línea clínica) en frames que no se duplicaron desde cero. Conviene generar las variantes desde el principio duplicando el frame principal ya aprobado, no en paralelo.
 
+## Ajuste de implementación posterior a v3
+
+El usuario solicitó que P2 adopte la composición del prototipo publicado en [Figma Make](https://media-rhythm-49689685.figma.site/): menú lateral verde oscuro, encabezado "PORTAL DEL PACIENTE / Hola, [nombre]" y perfil autenticado en la esquina superior derecha. Este cambio posterior prevalece sobre la navbar superior aprobada en v3 para la implementación de P2.
+
+![Referencia del portal del paciente solicitada](referencia-portal-paciente.png)
+
+El nombre e iniciales se obtienen del paciente autenticado, no de datos de demostración. Se conserva el resumen de la cita y su monto/duración desde la tarifa configurada por tipo; CONTROL aparece como 30 min / S/ 80 solo cuando aplica RN-02/RN-03. No se incorpora la tarjeta de ayuda con teléfono y horario del prototipo porque esos datos no están definidos por el proyecto.

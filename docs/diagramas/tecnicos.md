@@ -104,6 +104,18 @@ classDiagram
         +citas(FiltroReporteDto filtro) List~CitaReporteDto~
         +pagos(FiltroReporteDto filtro) ResumenPagosDto
     }
+    class GeneracionHorarioService {
+        <<interface>>
+        +generar(LocalDate desde, LocalDate hasta) int
+    }
+    class GeneracionHorarioServiceImpl
+    class GeneracionHorarioJob {
+        +ejecutar()
+        ApplicationReadyEvent y 02:00 America/Lima
+    }
+    class ProgramacionConfig {
+        @EnableScheduling
+    }
     class ExportadorReporte {
         <<interface>>
         +exportar(Reporte reporte) byte[]
@@ -156,6 +168,15 @@ classDiagram
     class HorarioDao {
         <<interface>>
         +bloquesLibres(Long idMedico, LocalDate desde, LocalDate hasta) List~Horario~
+        +findAllByMedicoIdAndFechaBetween(Long idMedico, LocalDate desde, LocalDate hasta) List~Horario~
+    }
+    class HorarioSemanalDao {
+        <<interface>>
+        +findAllByMedicoId(Long idMedico) List~HorarioSemanal~
+    }
+    class ConsultorioDao {
+        <<interface>>
+        +findAllByActivoTrue() List~Consultorio~
     }
     class CitaDao {
         <<interface>>
@@ -184,6 +205,12 @@ classDiagram
     ReporteController --> ReporteService
     ReporteController --> ExportadorReporte
     VencimientoReservasJob --> ReservaService
+    GeneracionHorarioJob --> GeneracionHorarioService
+    GeneracionHorarioJob ..> ConsultorioDao
+    GeneracionHorarioServiceImpl ..|> GeneracionHorarioService
+    GeneracionHorarioServiceImpl ..> MedicoDao
+    GeneracionHorarioServiceImpl ..> HorarioSemanalDao
+    GeneracionHorarioServiceImpl ..> HorarioDao
 
     ExcelExportador ..|> ExportadorReporte
     AlmacenamientoLocal ..|> AlmacenamientoService
@@ -205,6 +232,8 @@ classDiagram
     MedicoDao --|> JpaRepository
     TarifaDao --|> JpaRepository
     HorarioDao --|> JpaRepository
+    HorarioSemanalDao --|> JpaRepository
+    ConsultorioDao --|> JpaRepository
     CitaDao --|> JpaRepository
     PagoDao --|> JpaRepository
 ```

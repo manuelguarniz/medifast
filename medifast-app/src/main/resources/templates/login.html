@@ -97,7 +97,7 @@
                     <input type="text" id="numeroDocumento" name="numeroDocumento"
                            placeholder="Ingresa tu DNI o CE" inputmode="text" maxlength="12"
                            pattern="[^\s]+" title="Ingresa tu número de documento sin espacios"
-                           autocomplete="username" required autofocus>
+                           autocomplete="username" th:value="${numeroDocumento}" required autofocus>
                 </div>
                 <div class="login-field">
                     <label for="contrasena">Contraseña</label>

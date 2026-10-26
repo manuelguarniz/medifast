@@ -305,7 +305,7 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 |---|---|---|---|
 | P0 | Login | `login.html` | 🟡 Existe, pero aún requiere completar todo el flujo funcional |
 | P1 | Registro | `registro.html` | 🟡 Implementada: registro transaccional, validaciones y formulario responsive; falta completar la verificación manual |
-| P2 | Reservar cita / horarios | `paciente/reservar.html` | ❌ No implementada |
+| P2 | Reservar cita / horarios | `paciente/reservar.html` | 🟡 Implementada: consulta disponibilidad y crea reservas con tipos, bloques consecutivos y apartado de 15 min; incluye navegación lateral y perfil autenticado; pendiente integrar P3 para completar el pago |
 | P3 | Pago Yape simulado | `paciente/pago.html` | ❌ No implementada |
 | P4 | Confirmación | `paciente/confirmacion.html` | ❌ No implementada |
 | P5 | Mis citas | `paciente/mis-citas.html` | ❌ No implementada |
@@ -320,6 +320,11 @@ En el proyecto también existe actualmente:
 ```text
 templates/
 ├── login.html
+├── registro.html
+├── paciente/
+│   └── reservar.html
+├── medico/
+│   └── reporte-pagos.html
 ├── fragments/
 │   └── layout.html
 └── error/

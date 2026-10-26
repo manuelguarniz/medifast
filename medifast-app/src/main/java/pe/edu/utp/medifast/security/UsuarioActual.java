@@ -20,8 +20,12 @@ public class UsuarioActual {
 
 	/** Devuelve el identificador del perfil paciente asociado a la autenticación. */
 	public Long idPaciente(Authentication authentication) {
+		return paciente(authentication).getId();
+	}
+
+	/** Devuelve el perfil paciente asociado a la autenticación. */
+	public Paciente paciente(Authentication authentication) {
 		return pacienteDao.findByUsuarioNumeroDocumento(authentication.getName())
-				.map(Paciente::getId)
 				.orElseThrow(() -> new IllegalStateException("El usuario autenticado no tiene perfil de paciente"));
 	}
 

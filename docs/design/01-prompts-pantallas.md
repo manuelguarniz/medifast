@@ -103,7 +103,9 @@ P5 – Mis citas (paciente):
 P6 – Mi perfil:
 - Card "Datos personales": tipo y n.º de documento en solo lectura; nombres, apellidos, fecha de nacimiento, celular y correo editables. Botón "Guardar cambios".
 - Card "Cambiar contraseña": contraseña actual, nueva y confirmación.
-- Alerta de éxito de ejemplo.
+- Card "Cambiar contraseña": contraseña actual, nueva y confirmación (RF11).
+- Fecha de nacimiento editable; tipo y n.º de documento en solo lectura con candado.
+- Estados (éxito y errores) en un prompt aparte. Prompt detallado en P6-perfil/iteraciones.md.
 ```
 
 ## P7 – Agenda (médico)

@@ -72,6 +72,9 @@ NO INCLUIR (fuera de alcance)
 - Edición de horarios desde la interfaz
 - Alta de médicos
 - Chatbots o IA
+- Barra de pestañas inferior en móvil (la navegación es solo la navbar con el botón "Menú") ni ícono de avatar en la navbar
+- Sellos o textos de confianza inventados ("Reserva segura y encriptada", candados)
+- Fondos lavanda o morados: los fondos suaves son #f8fafc (neutro) o #ecfdf5 (verde claro)
 ```
 
 ## Cambios
@@ -81,3 +84,4 @@ NO INCLUIR (fuera de alcance)
 | 2026-10-25 | Versión inicial | — |
 | 2026-10-25 | Se definen el borde y el foco de los inputs, el estilo único de alertas y el subtítulo del logo; se excluye "Recordarme" | Feedback de [P0 v1](P0-login/iteraciones.md) |
 | 2026-10-25 | Se define la navbar pública de login y registro | Feedback de [P1 v1](P1-registro/iteraciones.md) |
+| 2026-10-26 | Se excluyen la barra de pestañas inferior, el avatar en la navbar, los sellos de confianza y los fondos lavanda | Feedback de [P2 v1](P2-reservar/iteraciones.md) |

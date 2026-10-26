@@ -49,9 +49,9 @@
 
 ### Decisiones de flujo
 
-Pendiente de confirmar con el usuario:
+Confirmada con el usuario el 2026-10-26:
 
-- **P4 como detalle desde P5:** el README enlaza "Ver detalle / PDF" de P5 a P4. Propuesta: al llegar desde P3 se muestran el titular "Cita reservada" y la alerta de éxito; al llegar desde P5, el titular "Detalle de la cita", sin alerta, y los badges del estado real (Pago pendiente, Atendida, Cancelada con su motivo, etc.). Se pediría como variante en un prompt aparte, después de v2.
+- **P4 como detalle desde P5:** el README enlaza "Ver detalle / PDF" de P5 a P4. Al llegar desde P3 se muestran el titular "Cita reservada" y la alerta de éxito; al llegar desde P5, el titular "Detalle de la cita", sin alerta, y los badges del estado real (Pago pendiente, Atendida, Cancelada con su motivo, etc.). La variante se pide en un prompt aparte cuando se diseñe P5, para tener sus estados a la vista.
 
 ---
 

@@ -51,11 +51,12 @@ P1 – Registro de paciente (versión completa en P1-registro/iteraciones.md):
 
 ```text
 P2 – Reservar cita (paciente):
-- Card de resumen del tipo de cita detectado: "Cita de primera vez (NUEVO) · 60 min · S/ 150".
-- Calendario mensual con solo los días de mañana a +30 días habilitados (los domingos y los días bloqueados en gris).
-- Grilla de slots de 09:00 a 13:00 cada 30 min, con los estados disponible, ocupado y seleccionado. Para NUEVO se seleccionan 2 bloques consecutivos.
-- Panel lateral con el resumen de la cita (médico, fecha, hora, tipo, monto) y el botón "Continuar al pago →".
-- Variante: alerta informativa "Ya tienes una cita activa" con sus datos y el botón "Ver mis citas", y el formulario deshabilitado.
+- Card informativa del tipo de cita detectado (no seleccionable): "Paciente nuevo · Primera consulta · 60 minutos · S/ 150.00".
+- Tira de 7 días con flechas de semana: solo de mañana a +30 días habilitados; hoy, los domingos y los días bloqueados en gris.
+- Grilla de slots de 09:00 a 12:30 cada 30 min, con los estados disponible, ocupado ("Ocupado", tachado), deshabilitado y seleccionado. Para NUEVO se seleccionan 2 bloques consecutivos y se deshabilitan los inicios sin 2 bloques libres o que terminarían después de las 13:00.
+- Panel lateral con el resumen de la cita (médico, fecha, hora como rango, tipo, monto), el aviso de los 15 min y el botón "Continuar al pago →".
+- Variantes en un prompt aparte: alerta informativa "Ya tienes una cita activa" con sus datos y el botón "Ver mis citas", con el formulario deshabilitado; y alerta de error "Horario no disponible, elija otro".
+- Prompt detallado en P2-reservar/iteraciones.md.
 ```
 
 ## P3 – Pago Yape (simulado)

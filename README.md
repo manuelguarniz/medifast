@@ -107,24 +107,24 @@ El rol sale de la cuenta: la pantalla de login no pide elegirlo.
 
 ## 4. Requerimientos funcionales
 
-| ID   | Requerimiento                                                                                                                                    | Actor    | Pantalla              |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | --------------------- |
-| RF01 | Reservar una cita en un horario disponible, con apartado de 15 min                                                                               | Paciente | P2                    |
-| RF02 | Registrar la cuenta: tipo (DNI/CE) y n.º de documento, nombres, apellidos, fecha de nacimiento, celular, correo, contraseña y su confirmación | Paciente | P1                    |
-| RF03 | Simular el pago con Yape: mostrar el monto, adjuntar la constancia y retomar el pago dentro de los 15 min                                        | Paciente | P3                    |
-| RF04 | Consultar la agenda con filtros por día, semana y estado                                                                                        | Médico  | P7                    |
-| RF05 | Mostrar los horarios disponibles según la duración del tipo de cita                                                                            | Paciente | P2                    |
-| RF06 | Generar los bloques a partir del horario semanal configurado en la BD                                                                            | Sistema  | — (BD)               |
-| RF07 | Iniciar y cerrar sesión con n.º de documento, con acceso según el rol                                                                         | Ambos    | P0                    |
-| RF08 | Marcar una cita como atendida o no asistió                                                                                                      | Médico  | P8                    |
-| RF09 | Reportes de citas (día/semana/estado) y de pagos (período), con indicadores de resumen y exportación a Excel                                  | Médico  | P9, P10               |
-| RF10 | Ver el historial de citas propias, de la más reciente a la más antigua                                                                         | Paciente | P5                    |
-| RF11 | Actualizar los datos personales y la contraseña                                                                                                 | Paciente | P6                    |
-| RF12 | Ver la constancia de pago de una cita                                                                                                            | Médico  | P8                    |
-| RF13 | Validar el pago o rechazarlo (rechazo = cancelación con observación)                                                                           | Médico  | P8                    |
-| RF14 | Cancelar una cita con observación obligatoria                                                                                                   | Médico  | P8                    |
-| RF15 | Mostrar la confirmación de la cita en pantalla y descargarla en PDF                                                                             | Paciente | P4, P5                |
-| RF16 | Cancelar automáticamente las reservas sin constancia a los 15 min y liberar el horario                                                          | Sistema  | — (evento de MySQL)  |
+| ID   | Requerimiento                                                                                                                                    | Actor    | Pantalla             |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | -------------------- |
+| RF01 | Reservar una cita en un horario disponible, con apartado de 15 min                                                                               | Paciente | P2                   |
+| RF02 | Registrar la cuenta: tipo (DNI/CE) y n.º de documento, nombres, apellidos, fecha de nacimiento, celular, correo, contraseña y su confirmación | Paciente | P1                   |
+| RF03 | Simular el pago con Yape: mostrar el monto, adjuntar la constancia y retomar el pago dentro de los 15 min                                        | Paciente | P3                   |
+| RF04 | Consultar la agenda con filtros por día, semana y estado                                                                                        | Médico  | P7                   |
+| RF05 | Mostrar los horarios disponibles según la duración del tipo de cita                                                                            | Paciente | P2                   |
+| RF06 | Generar los bloques a partir del horario semanal configurado en la BD                                                                            | Sistema  | — (BD)              |
+| RF07 | Iniciar y cerrar sesión con n.º de documento, con acceso según el rol                                                                         | Ambos    | P0                   |
+| RF08 | Marcar una cita como atendida o no asistió                                                                                                      | Médico  | P8                   |
+| RF09 | Reportes de citas (día/semana/estado) y de pagos (período), con indicadores de resumen y exportación a Excel                                  | Médico  | P9, P10              |
+| RF10 | Ver el historial de citas propias, de la más reciente a la más antigua                                                                         | Paciente | P5                   |
+| RF11 | Actualizar los datos personales y la contraseña                                                                                                 | Paciente | P6                   |
+| RF12 | Ver la constancia de pago de una cita                                                                                                            | Médico  | P8                   |
+| RF13 | Validar el pago o rechazarlo (rechazo = cancelación con observación)                                                                           | Médico  | P8                   |
+| RF14 | Cancelar una cita con observación obligatoria                                                                                                   | Médico  | P8                   |
+| RF15 | Mostrar la confirmación de la cita en pantalla y descargarla en PDF                                                                             | Paciente | P4, P5               |
+| RF16 | Cancelar automáticamente las reservas sin constancia a los 15 min y liberar el horario                                                          | Sistema  | — (evento de MySQL) |
 
 ### 4.1 Criterios de aceptación
 
@@ -221,9 +221,9 @@ Los estados se guardan con los nombres de la BD y se muestran con estas etiqueta
 | RNF08 | Rendimiento    | Disponibilidad y agenda responden en < 2 s con 1 000 citas                                                                                          | Prueba con datos de carga       |
 | RNF09 | Usabilidad     | Reserva en ≤ 4 pantallas desde el login, contador visible de los 15 min y mensajes de error claros                                                 | Prueba de usabilidad            |
 | RNF10 | Mantenibilidad | MVC + DAO + SOLID; Javadoc en los servicios                                                                                                         | Revisión de código            |
-| RNF11 | Calidad        | Aplicar TDD en las reglas de negocio y alcanzar una cobertura objetivo de ≥ 60 % en la capa `service` | JUnit + JaCoCo |                                     | JUnit + JaCoCo                  |
+| RNF11 | Calidad        | Aplicar TDD en las reglas de negocio y alcanzar una cobertura objetivo de ≥ 60 % en la capa `service`                                            | JUnit + JaCoCo                  |
 | RNF12 | Portabilidad   | Se ejecuta en localhost con Java 21 y MySQL 8.4, en macOS, Linux o Windows, siguiendo este README                                                   | Instalación limpia             |
-| RNF13 | Auditoría     | Columnas `creado_en` / `actualizado_en` en todas las tablas; log de login, logout, reserva, validación, rechazo y cancelación                  | Modelo físico + logs           |
+| RNF13 | Auditoría     | Columnas `creado_en` / `actualizado_en` en todas las tablas; log de login, logout, reserva, validación, rechazo y cancelación                 | Modelo físico + logs           |
 | RNF14 | Librerías     | Uso real de Guava, Apache Commons, Apache POI y Logback (§11.3)                                                                                    | `pom.xml` + código           |
 | RNF15 | Versionado     | Todo el código y la documentación versionados en GitHub, con commits pequeños y descriptivos                                                     | Historial de commits            |
 
@@ -240,7 +240,7 @@ La autenticación consulta `usuario` por `numero_documento`, verifica `contrasen
 | P2  | Reservar cita        | Paciente | RF01, RF05             | Tipo de cita detectado y tarifa; calendario de 1 a 30 días; bloques libres; resumen de la cita; aviso si ya tiene una cita activa | `paciente/reservar.html`     |
 | P3  | Pago Yape (simulado) | Paciente | RF03                   | Monto, QR de ejemplo, contador de 15 min, subida de la constancia, n.º de operación                                              | `paciente/pago.html`         |
 | P4  | Confirmación        | Paciente | RF15                   | Datos de la cita y botón "Descargar PDF"                                                                                          | `paciente/confirmacion.html` |
-| P5  | Mis citas            | Paciente | RF10, RF15, RF03, RF12 | Historial; acciones "Continuar pago", "Ver detalle", "Descargar PDF" y "Ver constancia"                                          | `paciente/citas.html`        |
+| P5  | Mis citas            | Paciente | RF10, RF15, RF03, RF12 | Historial; acciones "Continuar pago", "Ver detalle", "Descargar PDF" y "Ver constancia"                                            | `paciente/citas.html`        |
 | P6  | Mi perfil            | Paciente | RF11                   | Datos editables, documento solo lectura y cambio de contraseña                                                                    | `paciente/perfil.html`       |
 | P7  | Agenda               | Médico  | RF04                   | Lista de citas con filtros por día, semana y estado                                                                               | `medico/agenda.html`         |
 | P8  | Detalle de cita      | Médico  | RF08, RF12, RF13, RF14 | Datos de la cita, constancia y botones Validar / Rechazar / Atendida / No asistió / Cancelar (con modal de observación)          | `medico/cita.html`           |
@@ -301,19 +301,19 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 
 #### Estado actual de las plantillas
 
-| Código | Pantalla | Plantilla esperada | Estado actual |
-|---|---|---|---|
-| P0 | Login | `login.html` | 🟡 Existe, pero aún requiere completar todo el flujo funcional |
-| P1 | Registro | `registro.html` | 🟡 Implementada: registro transaccional, validaciones y formulario responsive; falta completar la verificación manual |
-| P2 | Reservar cita / horarios | `paciente/reservar.html` | ❌ No implementada |
-| P3 | Pago Yape simulado | `paciente/pago.html` | ❌ No implementada |
-| P4 | Confirmación | `paciente/confirmacion.html` | ❌ No implementada |
-| P5 | Mis citas | `paciente/mis-citas.html` | ❌ No implementada |
-| P6 | Mi perfil | `paciente/perfil.html` | ❌ No implementada |
-| P7 | Agenda | `medico/agenda.html` | ❌ No implementada |
-| P8 | Detalle de cita | `medico/detalle-cita.html` | ❌ No implementada |
-| P9 | Reporte de citas | `medico/reporte-citas.html` | ❌ No implementada |
-| P10 | Reporte de pagos | `medico/reporte-pagos.html` | ❌ No implementada |
+| Código | Pantalla                 | Plantilla esperada             | Estado actual                                                                                                          |
+| ------- | ------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| P0      | Login                    | `login.html`                 | 🟡 Existe, pero aún requiere completar todo el flujo funcional                                                        |
+| P1      | Registro                 | `registro.html`              | 🟡 Implementada: registro transaccional, validaciones y formulario responsive; falta completar la verificación manual |
+| P2      | Reservar cita / horarios | `paciente/reservar.html`     | ❌ No implementada                                                                                                     |
+| P3      | Pago Yape simulado       | `paciente/pago.html`         | ❌ No implementada                                                                                                     |
+| P4      | Confirmación            | `paciente/confirmacion.html` | ❌ No implementada                                                                                                     |
+| P5      | Mis citas                | `paciente/mis-citas.html`    | ❌ No implementada                                                                                                     |
+| P6      | Mi perfil                | `paciente/perfil.html`       | ❌ No implementada                                                                                                     |
+| P7      | Agenda                   | `medico/agenda.html`         | ❌ No implementada                                                                                                     |
+| P8      | Detalle de cita          | `medico/detalle-cita.html`   | ❌ No implementada                                                                                                     |
+| P9      | Reporte de citas         | `medico/reporte-citas.html`  | ❌ No implementada                                                                                                     |
+| P10     | Reporte de pagos         | `medico/reporte-pagos.html`  | ❌ No implementada                                                                                                     |
 
 En el proyecto también existe actualmente:
 
@@ -835,7 +835,7 @@ medifast/
     └── src/
         ├── main/java/pe/edu/utp/medifast/
         │   ├── MedifastAppApplication.java
-        │   ├── config/           # SecurityConfig, TiempoConfig (Clock America/Lima)
+        │   ├── config/           # SecurityConfig, TiempoConfig (ckClock America/Lima)
         │   ├── controller/       # AuthController, PerfilController, ReservaController, AgendaController, ReporteController, ManejadorErrores
         │   ├── service/          # interfaces de servicio (reglas de negocio)
         │   │   └── impl/         # implementaciones
@@ -868,12 +868,12 @@ Los nombres de cada plantilla están en la tabla de §7. Fuera de Git: `uploads/
 
 ### 13.1 Scripts SQL — [`docs/sql/`](docs/sql/)
 
-| Script                                                 | Contenido                                                                                                                                                      |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`01_schema.sql`](docs/sql/01_schema.sql)             | Crea la BD `medifast`, las 10 tablas, constraints (incluidas RN-01 y RN-09), índices, la vista `v_cita` y el usuario de aplicación `medifast_app`      |
-| [`02_datos_prueba.sql`](docs/sql/02_datos_prueba.sql) | Datos de prueba: consultorio Medifast, 1 médico, tarifas, horario lunes a sábado 09:00–13:00, bloques ±30 días, 30 pacientes y citas en todos los estados |
-| [`03_consultas.sql`](docs/sql/03_consultas.sql)       | Vista `v_cita`, JOIN de verificación, reporte de citas, reporte de pagos, disponibilidad y pruebas de constraints (INSERT que **deben fallar**)       |
-| [`04_migracion_auditoria.sql`](docs/sql/04_migracion_auditoria.sql) | Solo para BD creadas antes de RNF13 completo: agrega `creado_en` / `actualizado_en` a las tablas que no las tenían. Re-ejecutable; requiere `root` |
+| Script                                                               | Contenido                                                                                                                                                      |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`01_schema.sql`](docs/sql/01_schema.sql)                           | Crea la BD `medifast`, las 10 tablas, constraints (incluidas RN-01 y RN-09), índices, la vista `v_cita` y el usuario de aplicación `medifast_app`      |
+| [`02_datos_prueba.sql`](docs/sql/02_datos_prueba.sql)               | Datos de prueba: consultorio Medifast, 1 médico, tarifas, horario lunes a sábado 09:00–13:00, bloques ±30 días, 30 pacientes y citas en todos los estados |
+| [`03_consultas.sql`](docs/sql/03_consultas.sql)                     | Vista `v_cita`, JOIN de verificación, reporte de citas, reporte de pagos, disponibilidad y pruebas de constraints (INSERT que **deben fallar**)       |
+| [`04_migracion_auditoria.sql`](docs/sql/04_migracion_auditoria.sql) | Solo para BD creadas antes de RNF13 completo: agrega `creado_en` / `actualizado_en` a las tablas que no las tenían. Re-ejecutable; requiere `root`      |
 
 ### 13.2 Diagramas — [`docs/diagramas/`](docs/diagramas/)
 
@@ -882,18 +882,18 @@ Todos están en Mermaid; GitHub y VS Code los muestran directamente. El [índice
 | Archivo                                            | Diagramas                                                                                                                                     |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | [funcionales.md](docs/diagramas/funcionales.md)     | F-01 Casos de uso · F-02 Proceso AS-IS · F-03 Proceso TO-BE · F-04 Estados de la cita · F-05 Estados del pago · F-06 Mapa de navegación |
-| [tecnicos.md](docs/diagramas/tecnicos.md)           | T-01 Arquitectura MVC + DAO + SOLID · T-02 Clases por capas · T-03 Clases del dominio · T-04 y T-05 Secuencias detalladas |
+| [tecnicos.md](docs/diagramas/tecnicos.md)           | T-01 Arquitectura MVC + DAO + SOLID · T-02 Clases por capas · T-03 Clases del dominio · T-04 y T-05 Secuencias detalladas                  |
 | [base-de-datos.md](docs/diagramas/base-de-datos.md) | BD-01 Conceptual · BD-02 Lógico · BD-03 Físico · Restricciones e índices · Diccionario de datos                                        |
 
 ### 13.3 Entregables — [`docs/entregables/`](docs/entregables/)
 
-| Archivo                                                                               | Contenido                                                                           |
-| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [checklist-apf3.md](docs/entregables/checklist-apf3.md)                                | Cobertura de la rúbrica, estado de los entregables y evidencias que hay que reunir |
-| [rubrica_apf3.txt](docs/entregables/rubrica_apf3.txt)                                  | Rúbrica de evaluación del APF3                                                    |
-| `APF1_Medifast.pdf`, `APF2_Medifast_Grupo2.pdf`, `Project_Charter_Medifast.pdf` | Informes y acta de constitución entregados                                         |
-| `docs/javadoc/` | Documentación técnica generada mediante Javadoc para las principales clases y métodos del sistema. |
-| `docs/entregables/referencias-apf3.md` | Referencias bibliográficas y documentación técnica consultadas durante el desarrollo del APF3. |
+| Archivo                                                                               | Contenido                                                                                             |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [checklist-apf3.md](docs/entregables/checklist-apf3.md)                                | Cobertura de la rúbrica, estado de los entregables y evidencias que hay que reunir                   |
+| [rubrica_apf3.txt](docs/entregables/rubrica_apf3.txt)                                  | Rúbrica de evaluación del APF3                                                                      |
+| `APF1_Medifast.pdf`, `APF2_Medifast_Grupo2.pdf`, `Project_Charter_Medifast.pdf` | Informes y acta de constitución entregados                                                           |
+| `docs/javadoc/`                                                                     | Documentación técnica generada mediante Javadoc para las principales clases y métodos del sistema. |
+| `docs/entregables/referencias-apf3.md`                                              | Referencias bibliográficas y documentación técnica consultadas durante el desarrollo del APF3.     |
 
 ---
 

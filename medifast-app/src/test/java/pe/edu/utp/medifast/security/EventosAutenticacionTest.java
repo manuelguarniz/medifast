@@ -25,6 +25,9 @@ class EventosAutenticacionTest {
 	@Mock
 	private Auditoria auditoria;
 
+	@Mock
+	private IntentosLoginService intentosLogin;
+
 	@InjectMocks
 	private EventosAutenticacion eventos;
 
@@ -35,6 +38,7 @@ class EventosAutenticacionTest {
 
 		eventos.loginCorrecto(new AuthenticationSuccessEvent(autenticado));
 
+		verify(intentosLogin).reiniciar("45678912");
 		verify(auditoria).registrar(Evento.LOGIN_OK, "45678912", "rol=PACIENTE");
 	}
 
@@ -45,6 +49,7 @@ class EventosAutenticacionTest {
 		eventos.loginFallido(new AuthenticationFailureBadCredentialsEvent(intento,
 				new BadCredentialsException("Credenciales inválidas")));
 
+		verify(intentosLogin).registrarFallo("11112222");
 		verify(auditoria).registrar(Evento.LOGIN_FALLIDO, "11112222", "motivo=credenciales_invalidas");
 	}
 

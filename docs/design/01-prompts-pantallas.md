@@ -69,6 +69,8 @@ P3 – Pago Yape (simulado):
 - Campo opcional "N.º de operación".
 - Leyenda de advertencia visible: "Simulación — no se realizó ningún cobro".
 - Botón "Enviar constancia →".
+- Sin botón "Volver": nota "Puedes retomar el pago desde Mis citas mientras el tiempo no venza."
+- Prompt detallado y estados (archivo adjunto, error, tiempo vencido) en P3-pago/iteraciones.md.
 ```
 
 ## P4 – Confirmación

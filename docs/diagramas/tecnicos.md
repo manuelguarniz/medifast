@@ -124,6 +124,17 @@ classDiagram
         Scheduled cada minuto
         +ejecutar()
     }
+    class GeneracionHorarioService {
+        <<interface>>
+        +generar(LocalDate desde, LocalDate hasta) int
+    }
+    class GeneracionHorarioServiceImpl {
+        @Transactional
+    }
+    class GeneracionHorarioJob {
+        ApplicationReadyEvent
+        Scheduled diario a las 02:00 America/Lima
+    }
 
     class JpaRepository {
         <<Spring Data>>
@@ -134,12 +145,24 @@ classDiagram
     class PacienteDao {
         <<interface>>
     }
+    class MedicoDao {
+        <<interface>>
+    }
+    class ConsultorioDao {
+        <<interface>>
+        +findAllByActivoTrue() List~Consultorio~
+    }
     class TarifaDao {
         <<interface>>
     }
     class HorarioDao {
         <<interface>>
         +bloquesLibres(Long idMedico, LocalDate desde, LocalDate hasta) List~Horario~
+        +existsByMedicoIdAndFechaAndHoraInicio(Long idMedico, LocalDate fecha, LocalTime horaInicio) boolean
+    }
+    class HorarioSemanalDao {
+        <<interface>>
+        +findByMedicoId(Long idMedico) List~HorarioSemanal~
     }
     class CitaDao {
         <<interface>>
@@ -161,6 +184,12 @@ classDiagram
     ReporteController --> ReporteService
     ReporteController --> ExportadorReporte
     VencimientoReservasJob --> ReservaService
+    GeneracionHorarioJob --> GeneracionHorarioService
+    GeneracionHorarioJob ..> ConsultorioDao
+    GeneracionHorarioServiceImpl ..|> GeneracionHorarioService
+    GeneracionHorarioServiceImpl ..> MedicoDao
+    GeneracionHorarioServiceImpl ..> HorarioSemanalDao
+    GeneracionHorarioServiceImpl ..> HorarioDao
 
     ExcelExportador ..|> ExportadorReporte
     AlmacenamientoLocal ..|> AlmacenamientoService
@@ -179,6 +208,9 @@ classDiagram
 
     UsuarioDao --|> JpaRepository
     PacienteDao --|> JpaRepository
+    MedicoDao --|> JpaRepository
+    ConsultorioDao --|> JpaRepository
+    HorarioSemanalDao --|> JpaRepository
     TarifaDao --|> JpaRepository
     HorarioDao --|> JpaRepository
     CitaDao --|> JpaRepository

@@ -717,7 +717,7 @@ erDiagram
 - **`pago` se crea al adjuntar la constancia**; mientras la cita está `PENDIENTE_PAGO` no existe la fila.
 - **El documento vive en `usuario`** porque es el login y no se edita (RN-12).
 - **Constancias** en la carpeta local `uploads/comprobantes/`; la BD guarda la ruta y el tipo MIME.
-- **Tareas automáticas como eventos de MySQL** (Event Scheduler): el vencimiento de reservas cada minuto (RF16) y la generación diaria de los bloques de `horario` a partir de `horario_semanal` (RN-08). Corren en la BD con su propio horario, sin depender de que la aplicación esté levantada; la aplicación solo lee el resultado.
+- **Tareas automáticas:** MySQL Event Scheduler cancela las reservas vencidas cada minuto (RF16); la aplicación genera al iniciar y diariamente a las 02:00 (America/Lima) los bloques faltantes de `horario` a partir de `horario_semanal` (RF06, RN-08).
 
 Modelos conceptual, lógico y físico, restricciones, índices y diccionario de datos: [docs/diagramas/base-de-datos.md](docs/diagramas/base-de-datos.md).
 
@@ -762,7 +762,8 @@ flowchart TB
     end
 
     DAO --> DB[("MySQL 8.4")]
-    EVT["Eventos de MySQL<br/>vencimiento de reservas (cada minuto)<br/>generación de horario (diaria)"] --> DB
+    EVT["Evento de MySQL<br/>vencimiento de reservas (cada minuto)"] --> DB
+    JOB["Spring Scheduling<br/>generación de horarios al iniciar<br/>y diariamente a las 02:00"] --> SRV
     ALS --> FS[("uploads/comprobantes")]
     LOG["Logback"] -.-> CTRL
     LOG -.-> SRV
@@ -836,7 +837,7 @@ medifast/
     └── src/
         ├── main/java/pe/edu/utp/medifast/
         │   ├── MedifastAppApplication.java
-        │   ├── config/           # SecurityConfig, TiempoConfig (Clock America/Lima)
+        │   ├── config/           # SecurityConfig, ProgramacionConfig (Clock America/Lima)
         │   ├── controller/       # AuthController, PerfilController, ReservaController, AgendaController, ReporteController, ManejadorErrores
         │   ├── service/          # interfaces de servicio (reglas de negocio)
         │   │   └── impl/         # implementaciones

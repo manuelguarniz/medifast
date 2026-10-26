@@ -10,4 +10,6 @@ import pe.edu.utp.medifast.model.Paciente;
 public interface PacienteDao extends JpaRepository<Paciente, Long> {
 
 	Optional<Paciente> findByUsuarioNumeroDocumento(String numeroDocumento);
+
+	boolean existsByCorreoIgnoreCase(String correo);
 }

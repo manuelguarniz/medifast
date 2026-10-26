@@ -304,7 +304,7 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 | Código | Pantalla | Plantilla esperada | Estado actual |
 |---|---|---|---|
 | P0 | Login | `login.html` | 🟡 Existe, pero aún requiere completar todo el flujo funcional |
-| P1 | Registro | `registro.html` | ❌ No implementada |
+| P1 | Registro | `registro.html` | 🟡 Implementada: registro transaccional, validaciones y formulario responsive; falta completar la verificación manual |
 | P2 | Reservar cita / horarios | `paciente/reservar.html` | ❌ No implementada |
 | P3 | Pago Yape simulado | `paciente/pago.html` | ❌ No implementada |
 | P4 | Confirmación | `paciente/confirmacion.html` | ❌ No implementada |

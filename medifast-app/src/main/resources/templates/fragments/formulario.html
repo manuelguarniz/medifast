@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="campo(etiqueta, campo, tipo, placeholder, maximo)" class="registro-field">
+    <label th:for="${campo}" th:text="${etiqueta}"></label>
+    <input th:if="${tipo != 'password'}" th:field="*{__${campo}__}" th:type="${tipo}"
+           th:placeholder="${placeholder}" th:attr="maxlength=${maximo},
+               pattern=${campo == 'celular' ? '9[0-9]{8}' : null},
+               inputmode=${campo == 'celular' ? 'numeric' : 'text'},
+               autocomplete=${campo == 'numeroDocumento' ? 'username' : null},
+               aria-invalid=${#fields.hasErrors(campo)},
+               aria-describedby=${#fields.hasErrors(campo) ? campo + '-error' : null}"
+           th:classappend="${#fields.hasErrors(campo)} ? 'is-invalid' : ''" required>
+    <div th:if="${tipo == 'password'}" class="registro-password">
+        <input th:id="${campo}" th:name="${campo}" type="password" th:placeholder="${placeholder}"
+               autocomplete="new-password"
+               th:attr="aria-invalid=${#fields.hasErrors(campo)},
+                   aria-describedby=${#fields.hasErrors(campo) ? campo + '-error' : null}"
+               th:classappend="${#fields.hasErrors(campo)} ? 'is-invalid' : ''" required>
+        <button class="registro-password-toggle" type="button"
+                th:attr="aria-label=|Mostrar ${etiqueta}|, aria-controls=${campo}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/>
+                <circle cx="12" cy="12" r="2.5"/>
+            </svg>
+        </button>
+    </div>
+    <div class="registro-field-error" th:if="${#fields.hasErrors(campo)}" th:id="${campo + '-error'}"
+         th:errors="*{__${campo}__}"></div>
+</div>
+</body>
+</html>

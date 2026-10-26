@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Crear cuenta')}"></head>
+<body class="registro-page">
+<nav class="registro-nav" aria-label="Navegación principal">
+    <a class="login-brand" th:href="@{/}" aria-label="MEDIFAST, inicio">
+        <span class="login-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 12h4l2-5 4 10 2-5h4"/>
+            </svg>
+        </span>
+        <span class="login-brand-copy">
+            <strong>MEDIFAST</strong>
+            <small>Consultorio Medifast</small>
+        </span>
+    </a>
+    <a class="registro-nav-link" th:href="@{/login}">Iniciar sesión</a>
+</nav>
+
+<main class="registro-main">
+    <section class="registro-card" aria-labelledby="registro-title">
+        <header class="registro-intro">
+            <span class="login-pill"><span aria-hidden="true"></span>Portal de pacientes</span>
+            <h1 id="registro-title">Crea <span>tu cuenta</span></h1>
+            <p>Regístrate para reservar tus citas con el Dr. Moisés Barrantes en minutos.</p>
+            <div class="registro-proteccion">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 3 19 6v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                </svg>
+                <span><strong>Tus datos están protegidos</strong><br>Solo los usamos para gestionar tus citas en el consultorio.</span>
+            </div>
+        </header>
+
+        <div class="registro-form-panel">
+            <h2>Datos del paciente</h2>
+            <p class="registro-subtitle">Completa tus datos tal como aparecen en tu documento de identidad.</p>
+
+            <form th:action="@{/registro}" th:object="${registro}" method="post" class="registro-form">
+                <div class="registro-alert" role="alert" aria-live="polite" th:if="${#fields.hasErrors('*')}">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="m9 9 6 6m0-6-6 6"/>
+                    </svg>
+                    <p><strong>Revisa los campos marcados.</strong> Corrige los datos para crear tu cuenta.</p>
+                </div>
+                <div class="registro-grid">
+                    <div class="registro-field">
+                        <label for="tipoDocumento">Tipo de documento</label>
+                        <select id="tipoDocumento" th:field="*{tipoDocumento}"
+                                th:classappend="${#fields.hasErrors('tipoDocumento')} ? 'is-invalid' : ''"
+                                th:attr="aria-invalid=${#fields.hasErrors('tipoDocumento')},
+                                    aria-describedby=${#fields.hasErrors('tipoDocumento') ? 'tipoDocumento-error' : null}"
+                                required>
+                            <option th:each="tipo : ${tiposDocumento}" th:value="${tipo}" th:text="${tipo}"></option>
+                        </select>
+                        <div class="registro-field-error" th:if="${#fields.hasErrors('tipoDocumento')}"
+                             id="tipoDocumento-error" th:errors="*{tipoDocumento}"></div>
+                    </div>
+                    <div th:replace="~{fragments/formulario :: campo('Número de documento', 'numeroDocumento', 'text', '8 dígitos', ${maximoDocumento})}"></div>
+                    <div th:replace="~{fragments/formulario :: campo('Nombres', 'nombres', 'text', 'Ej. Andrea', 100)}"></div>
+                    <div th:replace="~{fragments/formulario :: campo('Apellidos', 'apellidos', 'text', 'Ej. Salazar Pérez', 100)}"></div>
+
+                    <div class="registro-field">
+                        <label for="fechaNacimiento">Fecha de nacimiento</label>
+                        <input id="fechaNacimiento" name="fechaNacimiento" type="date"
+                               th:value="${registro.fechaNacimiento == null ? '' : #temporals.format(registro.fechaNacimiento, 'yyyy-MM-dd')}"
+                               th:attr="max=${hoy},
+                                   aria-invalid=${#fields.hasErrors('fechaNacimiento')},
+                                   aria-describedby=${#fields.hasErrors('fechaNacimiento') ? 'fechaNacimiento-error' : null}"
+                               th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid' : ''" required>
+                        <div class="registro-field-error" th:if="${#fields.hasErrors('fechaNacimiento')}"
+                             id="fechaNacimiento-error" th:errors="*{fechaNacimiento}"></div>
+                    </div>
+                    <div th:replace="~{fragments/formulario :: campo('Celular', 'celular', 'tel', '9 dígitos, empieza con 9', 9)}"></div>
+                    <div class="registro-field registro-field-wide">
+                        <label for="correo">Correo electrónico</label>
+                        <input id="correo" type="email" th:field="*{correo}" placeholder="correo@ejemplo.com"
+                               maxlength="150" autocomplete="email"
+                               th:attr="aria-invalid=${#fields.hasErrors('correo')},
+                                   aria-describedby=${#fields.hasErrors('correo') ? 'correo-error' : null}"
+                               th:classappend="${#fields.hasErrors('correo')} ? 'is-invalid' : ''" required>
+                        <div class="registro-field-error" th:if="${#fields.hasErrors('correo')}"
+                             id="correo-error" th:errors="*{correo}"></div>
+                    </div>
+                    <div th:replace="~{fragments/formulario :: campo('Contraseña', 'contrasena', 'password', 'Mínimo 8 caracteres', null)}"></div>
+                    <div th:replace="~{fragments/formulario :: campo('Confirmar contraseña', 'confirmacion', 'password', 'Repite tu contraseña', null)}"></div>
+                </div>
+
+                <button class="registro-submit" type="submit">Crear cuenta <span aria-hidden="true">→</span></button>
+            </form>
+            <p class="registro-login">¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
+        </div>
+    </section>
+</main>
+
+<footer class="registro-footer">Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú</footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    const tipoDocumento = document.getElementById("tipoDocumento");
+    const numeroDocumento = document.getElementById("numeroDocumento");
+
+    function actualizarDocumento() {
+        const dni = tipoDocumento.value === "DNI";
+        numeroDocumento.maxLength = dni ? 8 : 12;
+        numeroDocumento.placeholder = dni ? "8 dígitos" : "9 a 12 caracteres";
+        numeroDocumento.pattern = dni ? "[0-9]{8}" : "[0-9A-Za-z]{9,12}";
+    }
+
+    tipoDocumento.addEventListener("change", actualizarDocumento);
+    actualizarDocumento();
+
+    document.querySelectorAll(".registro-password-toggle").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            const password = document.getElementById(this.getAttribute("aria-controls"));
+            const visible = password.type === "password";
+            password.type = visible ? "text" : "password";
+            this.setAttribute("aria-label", (visible ? "Ocultar " : "Mostrar ") +
+                (password.id === "contrasena" ? "contraseña" : "confirmación de contraseña"));
+        });
+    });
+</script>
+</body>
+</html>

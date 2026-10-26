@@ -52,8 +52,8 @@ Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](..
 | P1 | Registro | [P1-registro](P1-registro/iteraciones.md) | v2 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P2 | Reservar cita | [P2-reservar](P2-reservar/iteraciones.md) | v3 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P3 | Pago Yape (simulado) | [P3-pago](P3-pago/iteraciones.md) | v4 | ✅ Aprobada (7 ajustes pendientes en Figma) |
-| P4 | Confirmación | [P4-confirmacion](P4-confirmacion/iteraciones.md) | v2 | ✅ Aprobada (5 ajustes pendientes en Figma; variante "detalle desde Mis citas" por definir) |
-| P5 | Mis citas | — | — | ⏳ Pendiente |
+| P4 | Confirmación | [P4-confirmacion](P4-confirmacion/iteraciones.md) | v2 | ✅ Aprobada (5 ajustes pendientes en Figma; falta la variante "Detalle de la cita", prompt en P5) |
+| P5 | Mis citas | [P5-mis-citas](P5-mis-citas/iteraciones.md) | v3 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P6 | Mi perfil | — | — | ⏳ Pendiente |
 | P7 | Agenda | — | — | ⏳ Pendiente |
 | P8 | Detalle de cita | — | — | ⏳ Pendiente |

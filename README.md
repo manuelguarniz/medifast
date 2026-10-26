@@ -835,7 +835,7 @@ medifast/
     └── src/
         ├── main/java/pe/edu/utp/medifast/
         │   ├── MedifastAppApplication.java
-        │   ├── config/           # SecurityConfig, TiempoConfig (ckClock America/Lima)
+        │   ├── config/           # SecurityConfig, TiempoConfig (ckckClock America/Lima)
         │   ├── controller/       # AuthController, PerfilController, ReservaController, AgendaController, ReporteController, ManejadorErrores
         │   ├── service/          # interfaces de servicio (reglas de negocio)
         │   │   └── impl/         # implementaciones

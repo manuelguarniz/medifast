@@ -116,6 +116,7 @@ P7 – Agenda (médico):
 - Tabla ordenada por fecha y hora con: paciente (nombre y DNI parcial), fecha y hora, tipo (NUEVO/CONTROL), estado de la cita, estado del pago y el botón "Ver".
 - Contadores rápidos arriba (citas de hoy, por validar).
 - Tarjetas apiladas en móvil.
+- Navbar superior de médico (sin menú lateral) y estados (semana, filtro, vacío) en un prompt aparte. Prompt detallado en P7-agenda/iteraciones.md.
 ```
 
 ## P8 – Detalle de cita (médico)

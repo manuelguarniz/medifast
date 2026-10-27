@@ -1,133 +1,138 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments/layout :: head('Reporte de pagos')}"></head>
+<body class="perfil-page">
+<nav th:replace="~{fragments/layout :: navbarMedico('pagos', ${nombreMedico})}"></nav>
 
-<body class="bg-light">
-
-    <nav th:replace="~{fragments/layout :: navbar}"></nav>
-
-    <main class="container py-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-            <div>
-                <h1 class="h3 mb-1">Reporte de pagos</h1>
-                <p class="text-muted mb-0">Consulta los pagos validados por período.</p>
-            </div>
-
-            <a class="btn btn-success" th:href="@{/medico/reportes/pagos.xlsx(desde=${desde},hasta=${hasta})}">
-                Exportar Excel
-            </a>
+<main class="perfil-main reporte-main">
+    <header class="perfil-heading reporte-heading">
+        <div>
+            <p class="perfil-eyebrow">REPORTES</p>
+            <h1>Reporte de pagos</h1>
+            <p>Pagos verificados por período.</p>
         </div>
+        <th:block th:replace="~{fragments/reportes :: exportar(
+                @{/medico/reportes/pagos.xlsx(desde=${fechas.desde},hasta=${fechas.hasta})},
+                ${filas != null and !filas.isEmpty()})}"></th:block>
+    </header>
 
-        <section class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <form th:action="@{/medico/reportes/pagos}" method="get" class="row g-3 align-items-end">
-                    <div class="col-12 col-md-4">
-                        <label for="desde" class="form-label fw-semibold">Desde</label>
-                        <input type="date" class="form-control" id="desde" name="desde" th:value="${desde}" required>
-                    </div>
+    <!-- Filtro de RF09: período por fecha de validación (el mes es un atajo). Solo pagos VALIDADO -->
+    <form class="reporte-filtros" th:action="@{/medico/reportes/pagos}" method="get" novalidate data-reporte-filtros>
+        <div th:replace="~{fragments/reportes :: atajos}"></div>
+        <p class="reporte-ayuda">Filtra por la fecha de validación del pago.</p>
+        <div class="reporte-campos reporte-campos-pagos">
+            <div th:replace="~{fragments/reportes :: campoFecha('desde', 'Desde', ${fechas.valorDesde}, ${fechas.errorDesde})}"></div>
+            <div th:replace="~{fragments/reportes :: campoFecha('hasta', 'Hasta', ${fechas.valorHasta}, ${fechas.errorHasta})}"></div>
+            <button class="registro-submit reporte-aplicar" type="submit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                Aplicar filtros
+            </button>
+        </div>
+    </form>
 
-                    <div class="col-12 col-md-4">
-                        <label for="hasta" class="form-label fw-semibold">Hasta</label>
-                        <input type="date" class="form-control" id="hasta" name="hasta" th:value="${hasta}" required>
-                    </div>
-
-                    <div class="col-12 col-md-4 d-grid">
-                        <button type="submit" class="btn btn-primary">Consultar</button>
-                    </div>
-                </form>
-
-                <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
-                    <a class="btn btn-outline-secondary"
-                        th:href="@{/medico/reportes/pagos(desde=${inicioMesActual},hasta=${finMesActual})}">
-                        Este mes
-                    </a>
-
-                    <a class="btn btn-outline-secondary"
-                        th:href="@{/medico/reportes/pagos(desde=${inicioMesAnterior},hasta=${finMesAnterior})}">
-                        Mes anterior
-                    </a>
-                </div>
-            </div>
+    <th:block th:if="${fechas.valido()}">
+        <!-- Indicadores de RF09: cantidad, total en S/ y ticket promedio -->
+        <section class="agenda-indicadores reporte-indicadores-3" aria-label="Resumen">
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>Pagos verificados</span>
+                    <span class="agenda-indicador-icono agenda-icono-verde" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${cantidad}">6</strong>
+                <small th:text="${notaRango}">Del 9 al 14 nov 2026</small>
+            </article>
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>Total verificado</span>
+                    <span class="agenda-indicador-icono agenda-icono-verde" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${totalSoles}">S/ 690.00</strong>
+                <small class="agenda-nota-verde">Solo pagos verificados</small>
+            </article>
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>Ticket promedio</span>
+                    <span class="agenda-indicador-icono agenda-icono-neutro" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${ticketPromedio}">S/ 115.00</strong>
+                <small>Total ÷ cantidad de pagos</small>
+            </article>
         </section>
 
-        <section class="row g-3 mb-4">
-            <div class="col-12 col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <p class="text-muted text-uppercase small fw-semibold mb-2">Total validado</p>
-                        <p class="h3 mb-0" th:text="${'S/ ' + #numbers.formatDecimal(resumen.montoTotal, 1, 2)}">
-                            S/ 0.00
-                        </p>
-                    </div>
-                </div>
+        <th:block th:unless="${filas.isEmpty()}">
+            <!-- Escritorio: un pago por fila y la fila de total -->
+            <div class="citas-tabla-card">
+                <table class="citas-tabla reporte-tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">Validado el</th>
+                        <th scope="col">N.º de cita</th>
+                        <th scope="col">Paciente</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">N.º de operación</th>
+                        <th scope="col" class="reporte-monto">Monto</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="pago : ${filas}" class="agenda-fila" th:data-href="@{/medico/citas/{id}(id=${pago.idCita})}">
+                        <td class="reporte-gris" th:text="${pago.validadoEl}">Lun 9 nov 2026, 08:40</td>
+                        <td><a class="reporte-numero" th:href="@{/medico/citas/{id}(id=${pago.idCita})}"
+                               th:text="${pago.numero}">#000118</a></td>
+                        <td><span th:replace="~{fragments/reportes :: paciente(${pago.paciente}, ${pago.documento})}"></span></td>
+                        <td class="reporte-gris" th:text="${pago.tipo}">Control</td>
+                        <td>
+                            <span th:if="${pago.operacion != null}" th:text="${pago.operacion}">25790114</span>
+                            <span th:if="${pago.operacion == null}" class="citas-guion" aria-label="Sin n.º de operación">—</span>
+                        </td>
+                        <td class="reporte-monto" th:text="${pago.monto}">S/ 80.00</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr class="reporte-total">
+                        <td colspan="5" th:text="|Total · ${contador}|">Total · 6 pagos</td>
+                        <td class="reporte-monto" th:text="${totalSoles}">S/ 690.00</td>
+                    </tr>
+                    </tfoot>
+                </table>
             </div>
 
-            <div class="col-12 col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <p class="text-muted text-uppercase small fw-semibold mb-2">Cantidad de pagos</p>
-                        <p class="h3 mb-0" th:text="${resumen.cantidadTotal}">0</p>
-                    </div>
-                </div>
+            <!-- Móvil (360 px): una tarjeta por pago y la tarjeta de total -->
+            <div class="reporte-lista">
+                <a th:each="pago : ${filas}" class="reporte-item" th:href="@{/medico/citas/{id}(id=${pago.idCita})}">
+                    <span class="reporte-item-top">
+                        <strong th:text="${pago.numero}">#000118</strong>
+                        <strong th:text="${pago.monto}">S/ 80.00</strong>
+                    </span>
+                    <span class="reporte-item-fecha" th:text="|Validado el ${pago.validadoEl}|">Validado el Lun 9 nov 2026, 08:40</span>
+                    <span th:replace="~{fragments/reportes :: paciente(${pago.paciente}, ${pago.documento})}"></span>
+                    <span class="reporte-item-pie"
+                          th:text="|${pago.tipo} · Op. ${pago.operacion != null ? pago.operacion : '—'}|">Control · Op. 25790114</span>
+                </a>
+                <p class="reporte-item reporte-total-movil">
+                    <strong th:text="|Total · ${contador}|">Total · 6 pagos</strong>
+                    <strong th:text="${totalSoles}">S/ 690.00</strong>
+                </p>
             </div>
+        </th:block>
 
-            <div class="col-12 col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <p class="text-muted text-uppercase small fw-semibold mb-2">Ticket promedio</p>
-                        <p class="h3 mb-0" th:text="${'S/ ' + #numbers.formatDecimal(resumen.ticketPromedio, 1, 2)}">
-                            S/ 0.00
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div th:if="${filas.isEmpty()}" class="citas-vacio">
+            <span class="citas-vacio-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/></svg>
+            </span>
+            <h2>No hay pagos verificados en este período</h2>
+            <p>Prueba con otro rango de fechas.</p>
+        </div>
+    </th:block>
+</main>
 
-        <section class="card shadow-sm border-0">
-            <div class="card-body">
-                <h2 class="h5 mb-3">Pagos por día</h2>
-
-                <div th:if="${!#lists.isEmpty(resumen.dias)}" class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Fecha</th>
-                                <th class="text-end">Cantidad</th>
-                                <th class="text-end">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="dia : ${resumen.dias}">
-                                <td th:text="${dia.fechaFormateada}">24/10/2026</td>
-                                <td class="text-end" th:text="${dia.cantidad}">0</td>
-                                <td class="text-end" th:text="${'S/ ' + #numbers.formatDecimal(dia.total, 1, 2)}">
-                                    S/ 0.00
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot class="table-light fw-semibold">
-                            <tr>
-                                <td>Total</td>
-                                <td class="text-end" th:text="${resumen.cantidadTotal}">0</td>
-                                <td class="text-end"
-                                    th:text="${'S/ ' + #numbers.formatDecimal(resumen.montoTotal, 1, 2)}">
-                                    S/ 0.00
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
-                <div th:if="${#lists.isEmpty(resumen.dias)}" class="text-center py-5">
-                    <h3 class="h5">No se encontraron pagos</h3>
-                    <p class="text-muted mb-0">No existen pagos validados para el período seleccionado.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div th:replace="~{fragments/layout :: scripts}"></div>
+<footer class="perfil-footer agenda-footer">Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú</footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/reportes.js}"></script>
 </body>
-
 </html>

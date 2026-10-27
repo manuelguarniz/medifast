@@ -1,190 +1,173 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments/layout :: head('Reporte de citas')}"></head>
+<body class="perfil-page">
+<nav th:replace="~{fragments/layout :: navbarMedico('citas', ${nombreMedico})}"></nav>
 
-<body class="bg-light">
-    <nav th:replace="~{fragments/layout :: navbar}"></nav>
-
-    <main class="container py-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-            <div>
-                <h1 class="h3 mb-1">Reporte de citas</h1>
-                <p class="text-muted mb-0">Consulta las citas por período y estado.</p>
-            </div>
-
-            <a class="btn btn-success"
-               th:href="@{/medico/reportes/citas.xlsx(desde=${desde},hasta=${hasta},estado=${estado})}">
-                Exportar Excel
-            </a>
+<main class="perfil-main reporte-main">
+    <header class="perfil-heading reporte-heading">
+        <div>
+            <p class="perfil-eyebrow">REPORTES</p>
+            <h1>Reporte de citas</h1>
+            <p>Citas por día, semana o estado.</p>
         </div>
+        <th:block th:replace="~{fragments/reportes :: exportar(
+                @{/medico/reportes/citas.xlsx(desde=${fechas.desde},hasta=${fechas.hasta},estado=${estado})},
+                ${filas != null and !filas.isEmpty()})}"></th:block>
+    </header>
 
-        <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}">
-            La fecha desde no puede ser posterior a la fecha hasta
+    <!-- Filtros de RF09: rango de fechas (día, semana o mes como atajos) y estado -->
+    <form class="reporte-filtros" th:action="@{/medico/reportes/citas}" method="get" novalidate data-reporte-filtros>
+        <div th:replace="~{fragments/reportes :: atajos}"></div>
+        <div class="reporte-campos">
+            <div th:replace="~{fragments/reportes :: campoFecha('desde', 'Desde', ${fechas.valorDesde}, ${fechas.errorDesde})}"></div>
+            <div th:replace="~{fragments/reportes :: campoFecha('hasta', 'Hasta', ${fechas.valorHasta}, ${fechas.errorHasta})}"></div>
+            <div class="reporte-campo">
+                <label for="estado">Estado</label>
+                <select class="reporte-input agenda-estado" id="estado" name="estado"
+                        th:classappend="${estado != null} ? 'agenda-estado-activo'">
+                    <option value="">Todos los estados</option>
+                    <option th:each="opcion : ${estados}" th:value="${opcion.key}" th:text="${opcion.value}"
+                            th:selected="${opcion.key == estado}">Confirmada</option>
+                </select>
+            </div>
+            <button class="registro-submit reporte-aplicar" type="submit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                Aplicar filtros
+            </button>
         </div>
+    </form>
 
-        <section class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <form th:action="@{/medico/reportes/citas}" method="get" class="row g-3 align-items-end">
-                    <div class="col-12 col-md-4">
-                        <label for="desde" class="form-label fw-semibold">Desde</label>
-                        <input type="date" class="form-control" id="desde" name="desde" th:value="${desde}" required>
-                    </div>
-
-                    <div class="col-12 col-md-4">
-                        <label for="hasta" class="form-label fw-semibold">Hasta</label>
-                        <input type="date" class="form-control" id="hasta" name="hasta" th:value="${hasta}" required>
-                    </div>
-
-                    <div class="col-12 col-md-4">
-                        <label for="estado" class="form-label fw-semibold">Estado</label>
-                        <select class="form-select" id="estado" name="estado">
-                            <option value="">Todos</option>
-                            <option value="PENDIENTE_PAGO"
-                                    th:selected="${estado != null and estado.name() == 'PENDIENTE_PAGO'}">
-                                Pago pendiente
-                            </option>
-                            <option value="PROGRAMADA"
-                                    th:selected="${estado != null and estado.name() == 'PROGRAMADA'}">
-                                Programada
-                            </option>
-                            <option value="ATENDIDA"
-                                    th:selected="${estado != null and estado.name() == 'ATENDIDA'}">
-                                Atendida
-                            </option>
-                            <option value="NO_ASISTIO"
-                                    th:selected="${estado != null and estado.name() == 'NO_ASISTIO'}">
-                                No asistió
-                            </option>
-                            <option value="CANCELADA"
-                                    th:selected="${estado != null and estado.name() == 'CANCELADA'}">
-                                Cancelada
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="col-12 d-grid d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-primary">Consultar</button>
-                    </div>
-                </form>
-
-                <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
-                    <a class="btn btn-outline-secondary"
-                       th:href="@{/medico/reportes/citas(desde=${hoy},hasta=${hoy},estado=${estado})}">
-                        Hoy
-                    </a>
-                    <a class="btn btn-outline-secondary"
-                       th:href="@{/medico/reportes/citas(desde=${inicioSemana},hasta=${finSemana},estado=${estado})}">
-                        Esta semana
-                    </a>
-                </div>
-            </div>
+    <th:block th:if="${fechas.valido()}">
+        <!-- Indicadores de RF09 sobre el resultado filtrado -->
+        <section class="agenda-indicadores" aria-label="Resumen">
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>Total de citas</span>
+                    <span class="agenda-indicador-icono agenda-icono-neutro" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h8M8 17h5"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${total}">10</strong>
+                <small th:text="${notaRango}">Del 9 al 14 nov 2026</small>
+            </article>
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>Atendidas</span>
+                    <span class="agenda-indicador-icono agenda-icono-verde" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${atendidas}">4</strong>
+                <small class="agenda-nota-verde" th:text="${pctAtendidas}">40 % del total</small>
+            </article>
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>Canceladas</span>
+                    <span class="agenda-indicador-icono reporte-icono-rojo" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${canceladas}">1</strong>
+                <small class="reporte-nota-rojo" th:text="${pctCanceladas}">10 % del total</small>
+            </article>
+            <article class="agenda-indicador">
+                <p class="agenda-indicador-top">
+                    <span>No asistieron</span>
+                    <span class="agenda-indicador-icono agenda-icono-neutro" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 13-6.2M3 3l18 18"/></svg>
+                    </span>
+                </p>
+                <strong th:text="${noAsistieron}">1</strong>
+                <small th:text="${pctNoAsistieron}">10 % del total</small>
+            </article>
         </section>
 
-        <section class="row g-3 mb-4">
-            <div class="col-12 col-sm-6 col-lg">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <span class="badge text-bg-warning mb-2">Pago pendiente</span>
-                        <p class="h3 mb-0" th:text="${pendientesPago}">0</p>
-                    </div>
-                </div>
+        <!-- RF09: total por cada uno de los 5 estados de la cita (las cards muestran los del diseño aprobado) -->
+        <p class="reporte-por-estado" aria-label="Citas por estado">
+            <span class="reporte-por-estado-rotulo">Por estado:</span>
+            <span th:each="item : ${porEstado}" class="reporte-status" th:classappend="'citas-badge-' + ${item.clase}"
+                  th:text="|${item.etiqueta} · ${item.cantidad}|">Atendida · 4</span>
+        </p>
+
+        <th:block th:unless="${filas.isEmpty()}">
+            <!-- Escritorio: tabla ordenada por fecha y hora; cada fila abre el detalle (P8) -->
+            <div class="citas-tabla-card">
+                <table class="citas-tabla reporte-tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">N.º</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Paciente</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Cita</th>
+                        <th scope="col">Pago</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cita : ${filas}" class="agenda-fila" th:data-href="@{/medico/citas/{id}(id=${cita.id})}">
+                        <td><a class="reporte-numero" th:href="@{/medico/citas/{id}(id=${cita.id})}"
+                               th:text="${cita.numero}">#000118</a></td>
+                        <td class="reporte-gris" th:text="${cita.fecha}">Lun 9 nov 2026</td>
+                        <td th:text="${cita.hora}">09:30</td>
+                        <td><span th:replace="~{fragments/reportes :: paciente(${cita.paciente}, ${cita.documento})}"></span></td>
+                        <td class="reporte-gris" th:text="${cita.tipo}">Control</td>
+                        <td><span class="reporte-status" th:classappend="'citas-badge-' + ${cita.claseCita}"
+                                  th:text="${cita.etiquetaCita}">Atendida</span></td>
+                        <td>
+                            <span th:if="${cita.etiquetaPago != null}" class="reporte-status"
+                                  th:classappend="'citas-badge-' + ${cita.clasePago}"
+                                  th:text="${cita.etiquetaPago}">Verificado</span>
+                            <span th:if="${cita.etiquetaPago == null}" class="citas-guion" aria-label="Sin pago">—</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr><td colspan="7" class="reporte-contador" th:text="${contador}">10 citas</td></tr>
+                    </tfoot>
+                </table>
             </div>
 
-            <div class="col-12 col-sm-6 col-lg">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <span class="badge text-bg-primary mb-2">Programada</span>
-                        <p class="h3 mb-0" th:text="${programadas}">0</p>
-                    </div>
-                </div>
+            <!-- Móvil (360 px): una tarjeta por cita -->
+            <div class="reporte-lista">
+                <a th:each="cita : ${filas}" class="reporte-item" th:href="@{/medico/citas/{id}(id=${cita.id})}">
+                    <span class="reporte-item-top">
+                        <strong th:text="${cita.numero}">#000118</strong>
+                        <span class="agenda-tipo" th:text="${cita.tipo}">Control</span>
+                    </span>
+                    <span class="reporte-item-fecha">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                        <span th:text="${cita.fecha + ' · ' + cita.hora}">Lun 9 nov 2026 · 09:30</span>
+                    </span>
+                    <span th:replace="~{fragments/reportes :: paciente(${cita.paciente}, ${cita.documento})}"></span>
+                    <span class="agenda-item-estados reporte-item-estados">
+                        <span>Cita:</span>
+                        <span class="reporte-status" th:classappend="'citas-badge-' + ${cita.claseCita}"
+                              th:text="${cita.etiquetaCita}">Atendida</span>
+                        <span>Pago:</span>
+                        <span th:if="${cita.etiquetaPago != null}" class="reporte-status"
+                              th:classappend="'citas-badge-' + ${cita.clasePago}"
+                              th:text="${cita.etiquetaPago}">Verificado</span>
+                        <span th:if="${cita.etiquetaPago == null}" class="citas-guion" aria-label="Sin pago">—</span>
+                    </span>
+                </a>
+                <p class="reporte-contador" th:text="${contador}">10 citas</p>
             </div>
+        </th:block>
 
-            <div class="col-12 col-sm-6 col-lg">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <span class="badge text-bg-success mb-2">Atendida</span>
-                        <p class="h3 mb-0" th:text="${atendidas}">0</p>
-                    </div>
-                </div>
-            </div>
+        <div th:if="${filas.isEmpty()}" class="citas-vacio">
+            <span class="citas-vacio-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+            </span>
+            <h2>No hay citas en este período</h2>
+            <p>Prueba con otro rango de fechas o estado.</p>
+        </div>
+    </th:block>
+</main>
 
-            <div class="col-12 col-sm-6 col-lg">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <span class="badge text-bg-secondary mb-2">No asistió</span>
-                        <p class="h3 mb-0" th:text="${noAsistieron}">0</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-sm-6 col-lg">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <span class="badge text-bg-danger mb-2">Cancelada</span>
-                        <p class="h3 mb-0" th:text="${canceladas}">0</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="card shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 mb-0">Detalle de citas</h2>
-                    <span class="text-muted small" th:text="|${reporte.filas.size()} cita(s)|">0 cita(s)</span>
-                </div>
-
-                <div th:if="${!#lists.isEmpty(reporte.filas)}" class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>N.º cita</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Paciente</th>
-                                <th>Tipo</th>
-                                <th>Estado</th>
-                                <th class="text-end">Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="cita : ${reporte.filas}">
-                                <td th:text="${cita.idCita}">1</td>
-                                <td th:text="${cita.fecha}">2026-10-25</td>
-                                <td th:text="${cita.horaInicio}">09:00</td>
-                                <td th:text="${cita.paciente}">Paciente</td>
-                                <td th:text="${cita.tipoCita}">CONTROL</td>
-                                <td>
-                                    <span class="badge"
-                                          th:classappend="${cita.estado.name() == 'PENDIENTE_PAGO'} ? ' text-bg-warning' :
-                                                          (${cita.estado.name() == 'PROGRAMADA'} ? ' text-bg-primary' :
-                                                          (${cita.estado.name() == 'ATENDIDA'} ? ' text-bg-success' :
-                                                          (${cita.estado.name() == 'NO_ASISTIO'} ? ' text-bg-secondary' : ' text-bg-danger')))"
-                                          th:text="${cita.estado}">
-                                        ATENDIDA
-                                    </span>
-                                </td>
-                                <td class="text-end"
-                                    th:text="${cita.monto != null ? 'S/ ' + cita.monto : '-'}">
-                                    S/ 80.00
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div th:if="${#lists.isEmpty(reporte.filas)}" class="text-center py-5">
-                    <h3 class="h5">No se encontraron citas</h3>
-                    <p class="text-muted mb-0">
-                        No existen citas que coincidan con los filtros seleccionados.
-                    </p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div th:replace="~{fragments/layout :: scripts}"></div>
+<footer class="perfil-footer agenda-footer">Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú</footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:src="@{/js/reportes.js}"></script>
 </body>
-
 </html>

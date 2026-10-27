@@ -266,3 +266,16 @@ Se aprueba v3. Frames base para Figma: [v2](v2.png) (estado principal), [v3.1](v
 5. **Componentes nuevos:** filtros de reporte (atajos + Desde/Hasta + Estado + Aplicar), tarjeta de indicador con ícono y porcentaje, tabla de reporte y su tarjeta móvil, botón "Exportar Excel" (normal y deshabilitado). Se reutilizan en P10.
 
 **Aprendizaje para las siguientes pantallas:** con los hex de cada badge en el prompt base y los títulos de las cards escritos en cada estado, los duplicados salieron consistentes a la primera.
+
+---
+
+## Implementación (2026-10-27)
+
+Implementada en `templates/medico/reporte-citas.html` (`ReporteController`, SD-07 del README) a partir de [v2](v2.png) y [v3.1–v3.3](v3.1.png), con los ajustes de Figma 1–4 aplicados: el error de fechas marca solo "Hasta" con el mensaje debajo, el select con filtro activo lleva borde #0d5c4d, el indicador se titula "Total de citas" y la navbar es el fragmento `navbarMedico` de P7. Las piezas comunes con P10 están en `fragments/reportes.html` y `static/js/reportes.js`.
+
+Decisiones tomadas al implementar:
+
+- **Total por estado (RF09):** el README pide el total de los 5 estados y el diseño aprobado muestra 4 cards. Se mantienen las 4 cards y debajo se agrega la franja "Por estado:" con un badge por estado ("Pago pendiente · 1", "Confirmada · 6"…). El Excel trae el total y los 5 estados con su porcentaje.
+- **Validación en cliente y servidor:** el script evita la recarga y muestra el error bajo el campo; si la petición llega igual (sin JS o por URL), el servidor no consulta, muestra el mismo mensaje y oculta indicadores y tabla. El .xlsx con fechas inválidas redirige a la pantalla con el error.
+- **Atajo activo:** se marca el atajo cuyo rango coincide con Desde / Hasta, también al editar las fechas a mano.
+- **Fila → P8:** la fila y el n.º de cita abren `/medico/citas/{id}` (P8, pendiente).

@@ -250,3 +250,17 @@ Se aprueba v3. Frames base para Figma: [v2](v2.png) (Día, todos los estados), [
 6. **Componentes nuevos:** fila de cita (escritorio) y tarjeta de cita (móvil), con variantes para los 5 estados de la cita y los 3 del pago más "—"; tarjeta de indicador; control segmentado Día / Semana; navegación de fecha.
 
 **Aprendizaje para las siguientes pantallas:** en P9 y P10, calcular los indicadores a partir de las filas de ejemplo antes de escribir el prompt.
+
+---
+
+## Implementación (2026-10-27)
+
+Implementada en `templates/medico/agenda.html` (`AgendaController`, `GestionCitaService.agenda`, SD-09 del README) a partir de los frames aprobados v2 y v3.1–v3.3, con los ajustes de Figma 1, 3 y 4 ya aplicados: navbar de médico con el logo de pulso y "Consultorio Medifast" completo (fragmento `navbarMedico`, reutilizable en P8–P10), cabecera de día #f8fafc con el contador "N citas" en escritorio y móvil, y el resumen "2 citas · Confirmada" con "Quitar filtro ×" en ambos. Los ajustes 2 y 5 no aplican: los indicadores y las filas salen de la BD.
+
+Decisiones tomadas al implementar:
+
+- **Semana:** se consulta de lunes a domingo, pero se rotula hasta el último día del `horario_semanal` (por defecto el sábado: "9 – 14 nov 2026"), salvo que haya citas después. La nota del indicador ("Lunes a sábado", "De 09:00 a 13:00") también sale del horario de la BD (RN-08); sin horario dice "Sin horario de atención".
+- **"Por validar"** cuenta las citas Confirmadas con el pago Por validar: son las que el médico puede validar o rechazar (RF13).
+- **Estados vacíos adicionales:** semana sin citas ("No hay citas para esta semana" + "Ver hoy") y filtro sin resultados ("No hay citas con este estado…" + "Quitar filtro").
+- **Parámetros inválidos** en la URL (`vista`, `fecha`, `estado`) vuelven a los valores por defecto (Día, hoy, todos) en lugar de mostrar un error.
+- **Fila → P8:** la fila y "Ver detalle" llevan a `/medico/citas/{id}?vista&fecha&estado`, para que P8 vuelva con los mismos filtros.

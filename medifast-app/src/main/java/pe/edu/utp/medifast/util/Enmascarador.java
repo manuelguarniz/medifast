@@ -29,6 +29,18 @@ public final class Enmascarador {
 		return ocultarMenosUltimos(numeroDocumento);
 	}
 
+	/**
+	 * Documento abreviado para pantalla, con los datos mínimos (RNF07): {@code 45678912 → ••••8912}. A diferencia
+	 * de {@link #documento(String)}, no revela la longitud del documento.
+	 */
+	public static String documentoEnPantalla(String numeroDocumento) {
+		if (StringUtils.isBlank(numeroDocumento)) {
+			return SIN_DATO;
+		}
+		String limpio = numeroDocumento.strip();
+		return limpio.length() <= VISIBLES ? "••••" : "••••" + StringUtils.right(limpio, VISIBLES);
+	}
+
 	/** {@code 987654321 → *****4321}. */
 	public static String celular(String celular) {
 		return ocultarMenosUltimos(celular);

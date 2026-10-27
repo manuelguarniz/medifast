@@ -4,38 +4,34 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-public class ResumenPagosDto {
+/**
+ * Reporte de pagos verificados (P10, RF09): las filas y sus 3 indicadores, calculados sobre esas mismas filas.
+ *
+ * @param pagos pagos {@code VALIDADO} del período, por fecha de validación
+ */
+public record ResumenPagosDto(List<PagoValidadoDto> pagos) {
 
-    private final List<PagoDiaDto> dias;
-    private final long cantidadTotal;
-    private final BigDecimal montoTotal;
-    private final BigDecimal ticketPromedio;
+	public ResumenPagosDto {
+		pagos = List.copyOf(pagos);
+	}
 
-    public ResumenPagosDto(List<PagoDiaDto> dias) {
-        this.dias = List.copyOf(dias);
-        this.cantidadTotal = dias.stream().mapToLong(PagoDiaDto::getCantidad).sum();
-        this.montoTotal = dias.stream()
-                .map(PagoDiaDto::getTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
-        this.ticketPromedio = cantidadTotal == 0
-                ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)
-                : montoTotal.divide(BigDecimal.valueOf(cantidadTotal), 2, RoundingMode.HALF_UP);
-    }
+	/** Cantidad de pagos verificados. */
+	public long cantidad() {
+		return pagos.size();
+	}
 
-    public List<PagoDiaDto> getDias() {
-        return dias;
-    }
+	/** Total verificado en S/, con 2 decimales. */
+	public BigDecimal total() {
+		return pagos.stream()
+				.map(PagoValidadoDto::monto)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.setScale(2, RoundingMode.HALF_UP);
+	}
 
-    public long getCantidadTotal() {
-        return cantidadTotal;
-    }
-
-    public BigDecimal getMontoTotal() {
-        return montoTotal;
-    }
-
-    public BigDecimal getTicketPromedio() {
-        return ticketPromedio;
-    }
+	/** Total ÷ cantidad, con 2 decimales; S/ 0.00 si no hay pagos. */
+	public BigDecimal ticketPromedio() {
+		return pagos.isEmpty()
+				? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)
+				: total().divide(BigDecimal.valueOf(pagos.size()), 2, RoundingMode.HALF_UP);
+	}
 }

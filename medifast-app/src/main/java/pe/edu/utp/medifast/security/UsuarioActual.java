@@ -31,8 +31,12 @@ public class UsuarioActual {
 
 	/** Devuelve el identificador del perfil médico asociado a la autenticación. */
 	public Long idMedico(Authentication authentication) {
+		return medico(authentication).getId();
+	}
+
+	/** Devuelve el perfil médico asociado a la autenticación. */
+	public Medico medico(Authentication authentication) {
 		return medicoDao.findByUsuarioNumeroDocumento(authentication.getName())
-				.map(Medico::getId)
 				.orElseThrow(() -> new IllegalStateException("El usuario autenticado no tiene perfil de médico"));
 	}
 }

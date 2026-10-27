@@ -197,3 +197,13 @@ Se aprueba v2. Frames base para Figma: [v2.1](v2.1.png) (estado principal) y [v2
 4. **Componentes:** reutilizar los de P9 (filtros, tarjeta de indicador, tabla, "Exportar Excel"); nuevos: fila de total (escritorio) y tarjeta de total y tarjeta de pago (móvil). Navbar de médico de P7.
 
 **Aprendizaje para las siguientes pantallas:** cuando una pantalla es casi igual a otra aprobada, duplicar el frame aprobado y cambiar solo el contenido resolvió el escritorio a la primera. El móvil, pedido en el mismo prompt "copiando los contenidos de escritorio", salió con secciones faltantes y duplicadas: conviene listar en el prompt móvil cada sección en orden ("filtros → 3 indicadores → lista → total"), como en una corrección.
+
+---
+
+## Implementación (2026-10-27)
+
+Implementada en `templates/medico/reporte-pagos.html` (`ReporteController`, `PagoDao.pagosValidados`, SD-07 del README) a partir de [v2.1](v2.1.png) y [v2.2](v2.2.png), con los ajustes de Figma 1–3 aplicados: la ayuda "Filtra por la fecha de validación del pago." va encima de "Desde", el pie de página aparece en móvil y el error de fechas usa el mismo componente que P9, sin el select de estado.
+
+Las decisiones de flujo propuestas arriba se implementaron tal cual: el período filtra por `pago.validado_en`; el ticket promedio es total ÷ cantidad con 2 decimales (S/ 0.00 sin pagos); el n.º de operación vacío se muestra "—"; "Exportar Excel" trae las filas, la fila de total y los 3 indicadores, y se deshabilita sin resultados; cada fila abre P8.
+
+Única diferencia con P9: **"Esta semana" va de lunes a domingo**, porque un pago se puede validar cualquier día; en P9 va de lunes a sábado porque las citas solo caen en el horario de atención. Los montos usan separador de miles ("S/ 2,430.00").

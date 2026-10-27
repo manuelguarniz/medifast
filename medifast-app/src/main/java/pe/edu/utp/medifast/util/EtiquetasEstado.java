@@ -40,4 +40,27 @@ public final class EtiquetasEstado {
 	public static String tipo(TipoCitaEnum tipo) {
 		return tipo == TipoCitaEnum.NUEVO ? "Nuevo" : "Control";
 	}
+
+	/** Sufijo de la clase {@code citas-badge-*} que da el color del badge de la cita. */
+	public static String claseCita(EstadoCitaEnum estado) {
+		return switch (estado) {
+			case PENDIENTE_PAGO -> "pendiente";
+			case PROGRAMADA -> "confirmada";
+			case ATENDIDA -> "atendida";
+			case NO_ASISTIO -> "no-asistio";
+			case CANCELADA -> "cancelada";
+		};
+	}
+
+	/** Sufijo de la clase {@code citas-badge-*} del pago; {@code null} si la cita aún no tiene pago. */
+	public static String clasePago(EstadoPagoEnum estado) {
+		if (estado == null) {
+			return null;
+		}
+		return switch (estado) {
+			case POR_VALIDAR -> "pendiente";
+			case VALIDADO -> "atendida";
+			case RECHAZADO -> "cancelada";
+		};
+	}
 }

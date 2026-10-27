@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- "Exportar Excel" (secundario); deshabilitado cuando no hay resultados (diseño de P9 y P10) -->
+<th:block th:fragment="exportar(url, habilitado)">
+    <a th:if="${habilitado}" class="reporte-exportar" th:href="${url}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+        Exportar Excel
+    </a>
+    <span th:unless="${habilitado}" class="reporte-exportar reporte-exportar-deshabilitado" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+        Exportar Excel
+    </span>
+</th:block>
+
+<!-- Atajos de período: solo rellenan Desde / Hasta; la consulta se hace con "Aplicar filtros" -->
+<div th:fragment="atajos" class="reporte-atajos" role="group" aria-label="Atajos de período">
+    <button th:each="atajo : ${atajos}" type="button" class="reporte-atajo"
+            th:classappend="${atajo.nombre == atajoActivo} ? 'active'"
+            th:attr="aria-pressed=${atajo.nombre == atajoActivo},data-desde=${atajo.desde},data-hasta=${atajo.hasta}"
+            th:text="${atajo.nombre}">Esta semana</button>
+</div>
+
+<!-- Campo de fecha con su error de validación (también lo usa el script del cliente) -->
+<div th:fragment="campoFecha(nombre, etiqueta, valor, error)" class="reporte-campo">
+    <label th:for="${nombre}" th:text="${etiqueta}">Desde</label>
+    <input class="reporte-input" type="date" th:id="${nombre}" th:name="${nombre}" th:value="${valor}" required
+           th:classappend="${error != null} ? 'reporte-input-error'"
+           th:attr="aria-invalid=${error != null},aria-describedby=${nombre + 'Error'}">
+    <p class="reporte-error" th:id="${nombre + 'Error'}" th:hidden="${error == null}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 4h.01"/></svg>
+        <span th:text="${error}">La fecha final debe ser igual o posterior a la inicial.</span>
+    </p>
+</div>
+
+<!-- Paciente con su documento abreviado (RNF07) -->
+<span th:fragment="paciente(nombre, documento)" class="reporte-paciente">
+    <strong th:text="${nombre}">Roberto Castro Silva</strong>
+    <small th:text="${documento}">DNI ••••3214</small>
+</span>
+
+</body>
+</html>

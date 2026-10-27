@@ -101,8 +101,8 @@ classDiagram
     }
     class ReporteService {
         <<interface>>
-        +citas(FiltroReporteDto filtro) List~CitaReporteDto~
-        +pagos(FiltroReporteDto filtro) ResumenPagosDto
+        +citas(Long idMedico, FiltroReporteDto filtro) ReporteCitasDto
+	+pagos(Long idMedico, FiltroReporteDto filtro) ResumenPagosDto
     }
     class GeneracionHorarioService {
         <<interface>>
@@ -224,7 +224,7 @@ classDiagram
     ReservaService ..> AlmacenamientoService
     GestionCitaService ..> CitaDao
     GestionCitaService ..> PagoDao
-    ReporteService ..> CitaDao
+    ReporteService ..> VistaCitaDao
     ReporteService ..> PagoDao
 
     UsuarioDao --|> JpaRepository

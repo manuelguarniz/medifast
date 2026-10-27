@@ -308,6 +308,10 @@ Después, borrar el frame móvil "Horario no disponible" anterior (el que tiene 
 
 **Aceptado por el usuario:** el logo (corazón o pulso según el frame) y los colores de los enlaces de la navbar superior se consideran tolerables. Se unifican sin costo al usar el componente de navbar de P4 en Figma.
 
+### Decisiones de flujo
+
+- **Variante "Ya tienes una cita activa" con pago pendiente** (decidido en [P3](../P3-pago/iteraciones.md#decisiones-de-flujo), 2026-10-26): el botón "Volver" de P3 regresa a P2 sin liberar el horario. En ese caso la alerta muestra el badge "Pago pendiente" (ámbar) en lugar de "Confirmada", el mini contador del tiempo restante y el botón primario "Continuar pago →" (lleva a P3) en lugar de "Ver mis citas". Se arma en Figma duplicando el frame v2.2 (escritorio y móvil).
+
 ### Decisión
 
 Se aprueba P2 con v3 y no se itera más en Stitch: los pendientes llevan 3–4 iteraciones y son eliminaciones o cambios de texto. Frames base para Figma:
@@ -332,3 +336,10 @@ Ajustes en Figma:
 - Pedir que Stitch **duplique un frame ya corregido** y cambie solo el estado funcionó mejor que describir cada corrección: resolvió los slots y la alerta, que llevaban 2–3 iteraciones.
 - Aun así, Stitch no elimina elementos que él mismo inventó (barra de pestañas, línea clínica) en frames que no se duplicaron desde cero. Conviene generar las variantes desde el principio duplicando el frame principal ya aprobado, no en paralelo.
 
+## Ajuste de implementación posterior a v3
+
+El usuario solicitó que P2 adopte la composición del prototipo publicado en [Figma Make](https://media-rhythm-49689685.figma.site/): menú lateral verde oscuro, encabezado "PORTAL DEL PACIENTE / Hola, [nombre]" y perfil autenticado en la esquina superior derecha. Este cambio posterior prevalece sobre la navbar superior aprobada en v3 para la implementación de P2.
+
+![Referencia del portal del paciente solicitada](referencia-portal-paciente.png)
+
+El nombre e iniciales se obtienen del paciente autenticado, no de datos de demostración. Se conserva el resumen de la cita y su monto/duración desde la tarifa configurada por tipo; CONTROL aparece como 30 min / S/ 80 solo cuando aplica RN-02/RN-03. No se incorpora la tarjeta de ayuda con teléfono y horario del prototipo porque esos datos no están definidos por el proyecto.

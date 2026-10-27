@@ -14,4 +14,5 @@ public interface MedicoDao extends JpaRepository<Medico, Long> {
 
     @EntityGraph(attributePaths = "consultorio")
     List<Medico> findAllByActivoTrue();
+    Optional<Medico> findFirstByActivoTrueOrderByIdAsc();
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.Cita;
+import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 
 /** DAO de {@link Cita}. */
 public interface CitaDao extends JpaRepository<Cita, Long> {

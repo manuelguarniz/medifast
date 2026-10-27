@@ -137,7 +137,7 @@ El rol sale de la cuenta: la pantalla de login no pide elegirlo.
 - **RF07** — `/paciente/**` exige el rol PACIENTE y `/medico/**` el rol MEDICO. Al iniciar sesión, cada rol llega a su pantalla principal (P2 o P7).
 - **RF08** — Solo sobre citas `PROGRAMADA` cuya hora de inicio ya llegó. `ATENDIDA` exige el pago `VALIDADO`; `NO_ASISTIO` no lo exige.
 - **RF09** — Cada reporte tiene filtros, una tabla, indicadores de resumen, una consulta documentada y exportación a .xlsx.
-  - **Citas (P9):** filtros por rango de fechas (día o semana) y estado. Indicadores: total de citas, atendidas, canceladas y no asistieron.
+  - **Citas (P9):** filtros por rango de fechas (día o semana) y estado. Indicadores: total por cada estado (PENDIENTE_PAGO, PROGRAMADA, ATENDIDA, NO_ASISTIO y CANCELADA).
   - **Pagos (P10):** filtro por período (rango de fechas; el mes es un atajo). Solo pagos `VALIDADO`. Indicadores: cantidad, total en S/ y ticket promedio.
 - **RF10** — Cada cita muestra fecha, hora, tipo, monto, estado de la cita y estado del pago. Acciones: "Continuar pago" (si está `PENDIENTE_PAGO` y no venció), "Ver detalle" y "Descargar PDF" (si está `PROGRAMADA` o `ATENDIDA`) y "Ver constancia" (si tiene pago, RF12). Las canceladas muestran su observación. Una cita `PENDIENTE_PAGO` vencida que la tarea de RF16 aún no canceló se muestra como "Vencida", sin acciones.
 - **RF11** — Se pueden editar nombres, apellidos, fecha de nacimiento, celular, correo y contraseña. El cambio de contraseña pide la actual y la confirmación de la nueva. El tipo y el n.º de documento se muestran pero no se editan. Se aplican las validaciones de RF02.
@@ -320,6 +320,11 @@ En el proyecto también existe actualmente:
 ```text
 templates/
 ├── login.html
+├── registro.html
+├── paciente/
+│   └── reservar.html
+├── medico/
+│   └── reporte-pagos.html
 ├── fragments/
 │   └── layout.html
 └── error/
@@ -642,14 +647,14 @@ sequenceDiagram
     participant C as ReporteController
     participant R as ReporteService
     participant E as ExportadorReporte (ExcelExportador, Apache POI)
-    participant D as CitaDao / PagoDao
+    participant D as VistaCitaDao / PagoDao
     participant DB as MySQL
 
     Med->>C: GET /medico/reportes/citas?desde&hasta&estado
     C->>R: citas(filtro)
     R->>D: citas por rango y estado
     D->>DB: SELECT sobre v_cita
-    R->>R: indicadores (total, atendidas, canceladas, no asistieron)
+    R->>R: totales para los 5 estados de la cita
     C-->>Med: P9 con indicadores y tabla
 
     Med->>C: GET /medico/reportes/citas.xlsx?desde&hasta&estado

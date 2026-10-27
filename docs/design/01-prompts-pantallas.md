@@ -51,11 +51,12 @@ P1 – Registro de paciente (versión completa en P1-registro/iteraciones.md):
 
 ```text
 P2 – Reservar cita (paciente):
-- Card de resumen del tipo de cita detectado: "Cita de primera vez (NUEVO) · 60 min · S/ 150".
-- Calendario mensual con solo los días de mañana a +30 días habilitados (los domingos y los días bloqueados en gris).
-- Grilla de slots de 09:00 a 13:00 cada 30 min, con los estados disponible, ocupado y seleccionado. Para NUEVO se seleccionan 2 bloques consecutivos.
-- Panel lateral con el resumen de la cita (médico, fecha, hora, tipo, monto) y el botón "Continuar al pago →".
-- Variante: alerta informativa "Ya tienes una cita activa" con sus datos y el botón "Ver mis citas", y el formulario deshabilitado.
+- Card informativa del tipo de cita detectado (no seleccionable): "Paciente nuevo · Primera consulta · 60 minutos · S/ 150.00".
+- Tira de 7 días con flechas de semana: solo de mañana a +30 días habilitados; hoy, los domingos y los días bloqueados en gris.
+- Grilla de slots de 09:00 a 12:30 cada 30 min, con los estados disponible, ocupado ("Ocupado", tachado), deshabilitado y seleccionado. Para NUEVO se seleccionan 2 bloques consecutivos y se deshabilitan los inicios sin 2 bloques libres o que terminarían después de las 13:00.
+- Panel lateral con el resumen de la cita (médico, fecha, hora como rango, tipo, monto), el aviso de los 15 min y el botón "Continuar al pago →".
+- Variantes en un prompt aparte: alerta informativa "Ya tienes una cita activa" con sus datos y el botón "Ver mis citas", con el formulario deshabilitado; y alerta de error "Horario no disponible, elija otro".
+- Prompt detallado en P2-reservar/iteraciones.md.
 ```
 
 ## P3 – Pago Yape (simulado)
@@ -68,6 +69,8 @@ P3 – Pago Yape (simulado):
 - Campo opcional "N.º de operación".
 - Leyenda de advertencia visible: "Simulación — no se realizó ningún cobro".
 - Botón "Enviar constancia →".
+- Sin botón "Volver": nota "Puedes retomar el pago desde Mis citas mientras el tiempo no venza."
+- Prompt detallado y estados (archivo adjunto, error, tiempo vencido) en P3-pago/iteraciones.md.
 ```
 
 ## P4 – Confirmación
@@ -90,6 +93,8 @@ P5 – Mis citas (paciente):
 - Las canceladas muestran el motivo. Las vencidas se muestran como "Vencida" y sin acciones.
 - Como máximo una cita activa.
 - Versión con tarjetas apiladas en móvil y estado vacío "No tienes citas registradas" con el botón "Reservar cita".
+- Pestañas "Próximas" (solo la cita activa, como card) e "Historial" (el resto, en tabla). "Reservar cita" solo si no hay cita activa. "Ver constancia ↗" abre una pestaña nueva.
+- Prompt detallado, tabla de acciones por estado y prompts de estados en P5-mis-citas/iteraciones.md.
 ```
 
 ## P6 – Mi perfil
@@ -98,7 +103,9 @@ P5 – Mis citas (paciente):
 P6 – Mi perfil:
 - Card "Datos personales": tipo y n.º de documento en solo lectura; nombres, apellidos, fecha de nacimiento, celular y correo editables. Botón "Guardar cambios".
 - Card "Cambiar contraseña": contraseña actual, nueva y confirmación.
-- Alerta de éxito de ejemplo.
+- Card "Cambiar contraseña": contraseña actual, nueva y confirmación (RF11).
+- Fecha de nacimiento editable; tipo y n.º de documento en solo lectura con candado.
+- Estados (éxito y errores) en un prompt aparte. Prompt detallado en P6-perfil/iteraciones.md.
 ```
 
 ## P7 – Agenda (médico)
@@ -109,6 +116,7 @@ P7 – Agenda (médico):
 - Tabla ordenada por fecha y hora con: paciente (nombre y DNI parcial), fecha y hora, tipo (NUEVO/CONTROL), estado de la cita, estado del pago y el botón "Ver".
 - Contadores rápidos arriba (citas de hoy, por validar).
 - Tarjetas apiladas en móvil.
+- Navbar superior de médico (sin menú lateral) y estados (semana, filtro, vacío) en un prompt aparte. Prompt detallado en P7-agenda/iteraciones.md.
 ```
 
 ## P8 – Detalle de cita (médico)
@@ -117,8 +125,9 @@ P7 – Agenda (médico):
 P8 – Detalle de cita (médico):
 - Card con los datos del paciente y de la cita.
 - Visor de la constancia (imagen/PDF) con el n.º de operación.
-- Barra de acciones según el estado: "Validar pago" (éxito), "Rechazar pago" (peligro), "Marcar atendida", "No asistió" y "Cancelar cita". Los botones no aplicables aparecen deshabilitados con un tooltip.
-- Modal "Motivo de cancelación" / "Motivo del rechazo" con un textarea obligatorio (mín. 20 caracteres) y los botones "Cancelar" y "Confirmar".
+- Barra de acciones según el estado: "Validar pago" (éxito), "Rechazar pago" (peligro), "Marcar atendida", "No asistió" y "Cancelar cita". Ver la tabla de acciones según el estado en P8-detalle-cita/iteraciones.md.
+- Modal "Rechazar pago" / "Cancelar cita" con el textarea obligatorio del motivo (hasta 500 caracteres) y los botones "Volver" y la acción en rojo.
+- "Marcar atendida" y "No asistió" deshabilitados con una ayuda visible; los botones de pago se ocultan si no hay pago por validar. Prompt detallado en P8-detalle-cita/iteraciones.md.
 ```
 
 ## P9 – Reporte de citas
@@ -128,6 +137,7 @@ P9 – Reporte de citas:
 - Filtros: rango de fechas, atajos Día/Semana/Mes y estado.
 - 4 KPI cards: total de citas, atendidas, canceladas y no asistieron.
 - Tabla de resultados y el botón "Exportar Excel" (ícono de hoja de cálculo).
+- Sin buscador ni comparación con otros períodos; indicadores calculados sobre el resultado filtrado. Prompt detallado en P9-reporte-citas/iteraciones.md.
 ```
 
 ## P10 – Reporte de pagos
@@ -137,6 +147,7 @@ P10 – Reporte de pagos:
 - Filtro de período (rango de fechas y atajo de mes). Muestra solo pagos Verificados.
 - 3 KPI cards: cantidad de pagos, total en S/ y ticket promedio.
 - Tabla con una fila de total al final y el botón "Exportar Excel".
+- Se genera duplicando el frame aprobado de P9; sin filtro ni columna de estado. Prompt detallado en P10-reporte-pagos/iteraciones.md.
 ```
 
 ## Errores 403 / 404

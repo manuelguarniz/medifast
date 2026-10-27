@@ -36,6 +36,7 @@ SISTEMA DE DISEÑO (respetar estrictamente)
 - Badges tipo píldora con punto de color:
   - Estados de cita: "Pago pendiente" (ámbar), "Confirmada" (azul info), "Atendida" (verde), "No asistió" (gris), "Cancelada" (rojo)
   - Estados de pago: "Por validar" (ámbar), "Verificado" (verde), "Rechazado" (rojo)
+  - Colores exactos (fondo / punto / texto): ámbar #fef3c7 / #f59e0b / #b45309; azul info #e0f2fe / #0284c7 / #0369a1; verde #d1fae5 / #10b981 / #047857; gris #f1f5f9 / #64748b / #475569; rojo #fee2e2 / #ef4444 / #b91c1c
 - Alertas flash: éxito, error, información y advertencia, con fondo tenue, borde de 1px del mismo color, radio de 8px, ícono a la izquierda y texto en negrita al inicio.
 - Slots de horario: botones cuadrados con la hora en tres estados (Disponible, Seleccionado relleno primario, Ocupado gris tachado). Los slots no se mueven de lugar.
 - Contador regresivo mm:ss en una píldora oscura dentro de un aviso verde claro: "Tu horario está bloqueado temporalmente para completar el pago".
@@ -68,10 +69,14 @@ NO INCLUIR (fuera de alcance)
 - Historia clínica, diagnósticos, recetas o telemedicina
 - Citas virtuales
 - Reprogramar citas
+- Cancelar citas por el paciente (botón o enlace "Cancelar cita" en las pantallas del paciente)
 - Pagos reales o pedir credenciales bancarias
 - Edición de horarios desde la interfaz
 - Alta de médicos
 - Chatbots o IA
+- Barra de pestañas inferior en móvil (la navegación es solo la navbar con el botón "Menú") ni ícono de avatar en la navbar
+- Sellos o textos de confianza inventados ("Reserva segura y encriptada", candados)
+- Fondos lavanda, azulados o morados, también en rellenos de controles (control segmentado, selects, cabeceras de tabla, pie): los fondos suaves son solo #f8fafc o #f1f5f9 (neutros) y #ecfdf5 (verde claro)
 ```
 
 ## Cambios
@@ -81,3 +86,7 @@ NO INCLUIR (fuera de alcance)
 | 2026-10-25 | Versión inicial | — |
 | 2026-10-25 | Se definen el borde y el foco de los inputs, el estilo único de alertas y el subtítulo del logo; se excluye "Recordarme" | Feedback de [P0 v1](P0-login/iteraciones.md) |
 | 2026-10-25 | Se define la navbar pública de login y registro | Feedback de [P1 v1](P1-registro/iteraciones.md) |
+| 2026-10-26 | Se excluyen la barra de pestañas inferior, el avatar en la navbar, los sellos de confianza y los fondos lavanda | Feedback de [P2 v1](P2-reservar/iteraciones.md) |
+| 2026-10-27 | Se excluye explícitamente la cancelación por el paciente | Feedback de [P5 v3](P5-mis-citas/iteraciones.md) |
+| 2026-10-26 | Se extiende la exclusión de los fondos lavanda a los rellenos de controles y se agrega #f1f5f9 como neutro | Feedback de [P7 v1](P7-agenda/iteraciones.md) |
+| 2026-10-26 | Se agregan los hex de fondo, punto y texto de cada badge | Feedback de [P9 v1](P9-reporte-citas/iteraciones.md) |

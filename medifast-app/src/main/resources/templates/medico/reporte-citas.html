@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Reporte de citas')}"></head>
+
+<body class="bg-light">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="container py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h1 class="h3 mb-1">Reporte de citas</h1>
+                <p class="text-muted mb-0">Consulta las citas por período y estado.</p>
+            </div>
+
+            <a class="btn btn-success"
+               th:href="@{/medico/reportes/citas.xlsx(desde=${desde},hasta=${hasta},estado=${estado})}">
+                Exportar Excel
+            </a>
+        </div>
+
+        <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}">
+            La fecha desde no puede ser posterior a la fecha hasta
+        </div>
+
+        <section class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <form th:action="@{/medico/reportes/citas}" method="get" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label for="desde" class="form-label fw-semibold">Desde</label>
+                        <input type="date" class="form-control" id="desde" name="desde" th:value="${desde}" required>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="hasta" class="form-label fw-semibold">Hasta</label>
+                        <input type="date" class="form-control" id="hasta" name="hasta" th:value="${hasta}" required>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="estado" class="form-label fw-semibold">Estado</label>
+                        <select class="form-select" id="estado" name="estado">
+                            <option value="">Todos</option>
+                            <option value="PENDIENTE_PAGO"
+                                    th:selected="${estado != null and estado.name() == 'PENDIENTE_PAGO'}">
+                                Pago pendiente
+                            </option>
+                            <option value="PROGRAMADA"
+                                    th:selected="${estado != null and estado.name() == 'PROGRAMADA'}">
+                                Programada
+                            </option>
+                            <option value="ATENDIDA"
+                                    th:selected="${estado != null and estado.name() == 'ATENDIDA'}">
+                                Atendida
+                            </option>
+                            <option value="NO_ASISTIO"
+                                    th:selected="${estado != null and estado.name() == 'NO_ASISTIO'}">
+                                No asistió
+                            </option>
+                            <option value="CANCELADA"
+                                    th:selected="${estado != null and estado.name() == 'CANCELADA'}">
+                                Cancelada
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-grid d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">Consultar</button>
+                    </div>
+                </form>
+
+                <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
+                    <a class="btn btn-outline-secondary"
+                       th:href="@{/medico/reportes/citas(desde=${hoy},hasta=${hoy},estado=${estado})}">
+                        Hoy
+                    </a>
+                    <a class="btn btn-outline-secondary"
+                       th:href="@{/medico/reportes/citas(desde=${inicioSemana},hasta=${finSemana},estado=${estado})}">
+                        Esta semana
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <span class="badge text-bg-warning mb-2">Pago pendiente</span>
+                        <p class="h3 mb-0" th:text="${pendientesPago}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <span class="badge text-bg-primary mb-2">Programada</span>
+                        <p class="h3 mb-0" th:text="${programadas}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <span class="badge text-bg-success mb-2">Atendida</span>
+                        <p class="h3 mb-0" th:text="${atendidas}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <span class="badge text-bg-secondary mb-2">No asistió</span>
+                        <p class="h3 mb-0" th:text="${noAsistieron}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <span class="badge text-bg-danger mb-2">Cancelada</span>
+                        <p class="h3 mb-0" th:text="${canceladas}">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">Detalle de citas</h2>
+                    <span class="text-muted small" th:text="|${reporte.filas.size()} cita(s)|">0 cita(s)</span>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(reporte.filas)}" class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>N.º cita</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Paciente</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th class="text-end">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="cita : ${reporte.filas}">
+                                <td th:text="${cita.idCita}">1</td>
+                                <td th:text="${cita.fecha}">2026-10-25</td>
+                                <td th:text="${cita.horaInicio}">09:00</td>
+                                <td th:text="${cita.paciente}">Paciente</td>
+                                <td th:text="${cita.tipoCita}">CONTROL</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${cita.estado.name() == 'PENDIENTE_PAGO'} ? ' text-bg-warning' :
+                                                          (${cita.estado.name() == 'PROGRAMADA'} ? ' text-bg-primary' :
+                                                          (${cita.estado.name() == 'ATENDIDA'} ? ' text-bg-success' :
+                                                          (${cita.estado.name() == 'NO_ASISTIO'} ? ' text-bg-secondary' : ' text-bg-danger')))"
+                                          th:text="${cita.estado}">
+                                        ATENDIDA
+                                    </span>
+                                </td>
+                                <td class="text-end"
+                                    th:text="${cita.monto != null ? 'S/ ' + cita.monto : '-'}">
+                                    S/ 80.00
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${#lists.isEmpty(reporte.filas)}" class="text-center py-5">
+                    <h3 class="h5">No se encontraron citas</h3>
+                    <p class="text-muted mb-0">
+                        No existen citas que coincidan con los filtros seleccionados.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+
+</html>

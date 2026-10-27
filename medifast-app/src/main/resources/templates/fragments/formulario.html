@@ -28,5 +28,54 @@
     <div class="registro-field-error" th:if="${#fields.hasErrors(campo)}" th:id="${campo + '-error'}"
          th:errors="*{__${campo}__}"></div>
 </div>
+
+<!-- Campos de P6 (Mi perfil): variantes Normal, Solo lectura y Error del componente Input -->
+<div th:fragment="campoPerfil(etiqueta, campo, tipo, placeholder, maximo, autocompletar)"
+     class="registro-field perfil-field" th:classappend="${campo == 'correo'} ? 'registro-field-wide'">
+    <label th:for="${campo}" th:text="${etiqueta}"></label>
+    <input th:if="${tipo != 'password'}" th:field="*{__${campo}__}" th:type="${tipo}"
+           th:placeholder="${placeholder}" th:attr="maxlength=${maximo}, autocomplete=${autocompletar},
+               pattern=${campo == 'celular' ? '9[0-9]{8}' : null},
+               inputmode=${campo == 'celular' ? 'numeric' : null},
+               aria-invalid=${#fields.hasErrors(campo)},
+               aria-describedby=${#fields.hasErrors(campo) ? campo + '-error' : null}"
+           th:classappend="${#fields.hasErrors(campo)} ? 'is-invalid' : ''" required>
+    <div th:if="${tipo == 'password'}" class="registro-password">
+        <input th:id="${campo}" th:name="${campo}" type="password" th:placeholder="${placeholder}"
+               th:attr="autocomplete=${autocompletar},
+                   aria-invalid=${#fields.hasErrors(campo)},
+                   aria-describedby=${#fields.hasErrors(campo) ? campo + '-error' : null}"
+               th:classappend="${#fields.hasErrors(campo)} ? 'is-invalid' : ''" required>
+        <button class="registro-password-toggle" type="button"
+                th:attr="aria-label=|Mostrar ${#strings.toLowerCase(etiqueta)}|, aria-controls=${campo},
+                    data-etiqueta=${#strings.toLowerCase(etiqueta)}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/>
+                <circle cx="12" cy="12" r="2.5"/>
+            </svg>
+        </button>
+    </div>
+    <div th:replace="~{fragments/formulario :: errorPerfil(${campo})}"></div>
+</div>
+
+<div th:fragment="errorPerfil(campo)" class="perfil-field-error" th:if="${#fields.hasErrors(campo)}"
+     th:id="${campo + '-error'}">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 7v6m0 3.5h.01"/>
+    </svg>
+    <span th:errors="*{__${campo}__}"></span>
+</div>
+
+<div th:fragment="soloLectura(etiqueta, id, valor)" class="registro-field perfil-field">
+    <label th:for="${id}" th:text="${etiqueta}"></label>
+    <div class="perfil-readonly">
+        <input th:id="${id}" type="text" th:value="${valor}" readonly aria-describedby="documento-ayuda">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="5" y="11" width="14" height="10" rx="2"/>
+            <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+        </svg>
+    </div>
+</div>
 </body>
 </html>

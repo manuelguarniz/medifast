@@ -309,7 +309,7 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 | P3      | Pago Yape simulado       | `paciente/pago.html`         | ❌ No implementada                                                                                                     |
 | P4      | Confirmación            | `paciente/confirmacion.html` | ❌ No implementada                                                                                                     |
 | P5      | Mis citas                | `paciente/mis-citas.html`    | ❌ No implementada                                                                                                     |
-| P6      | Mi perfil                | `paciente/perfil.html`       | ❌ No implementada                                                                                                     |
+| P6      | Mi perfil                | `paciente/perfil.html`       | ✅ Implementada: datos personales y contraseña en formularios independientes, documento en solo lectura, validación en servidor y auditoría |
 | P7      | Agenda                   | `medico/agenda.html`         | ❌ No implementada                                                                                                     |
 | P8      | Detalle de cita          | `medico/detalle-cita.html`   | ❌ No implementada                                                                                                     |
 | P9      | Reporte de citas         | `medico/reporte-citas.html`  | ❌ No implementada                                                                                                     |

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import pe.edu.utp.medifast.dto.validacion.ContrasenaConfirmada;
 import pe.edu.utp.medifast.dto.validacion.ContrasenasCoinciden;
 import pe.edu.utp.medifast.dto.validacion.DocumentoValido;
 import pe.edu.utp.medifast.dto.validacion.LongitudBcryptValida;
@@ -26,9 +27,9 @@ public record RegistroDto(
 		@NotBlank(message = "Ingresa tus apellidos.") @Size(max = 100, message = "Tus apellidos no pueden superar 100 caracteres.") String apellidos,
 		@NotNull(message = "Ingresa una fecha de nacimiento anterior a hoy.") @Past(message = "Ingresa una fecha de nacimiento anterior a hoy.") LocalDate fechaNacimiento,
 		@NotBlank(message = "Ingresa 9 dígitos que empiecen con 9.") @Pattern(regexp = "^9\\d{8}$", message = "Ingresa 9 dígitos que empiecen con 9.") String celular,
-		@NotBlank(message = "Ingresa un correo válido.") @Email(message = "Ingresa un correo válido.") @Size(max = 150, message = "El correo no puede superar 150 caracteres.") String correo,
+		@NotBlank(message = "Ingresa un correo válido.") @Email(regexp = ".+@[^@]+\\.[^@.]+$", message = "Ingresa un correo válido.") @Size(max = 150, message = "El correo no puede superar 150 caracteres.") String correo,
 		@NotBlank(message = "Ingresa una contraseña.") @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres.") @LongitudBcryptValida String contrasena,
-		@NotBlank(message = "Confirma tu contraseña.") String confirmacion) {
+		@NotBlank(message = "Confirma tu contraseña.") String confirmacion) implements ContrasenaConfirmada {
 
 	public static RegistroDto vacio() {
 		return new RegistroDto(TipoDocumentoEnum.DNI, "", "", "", null, "", "", "", "");

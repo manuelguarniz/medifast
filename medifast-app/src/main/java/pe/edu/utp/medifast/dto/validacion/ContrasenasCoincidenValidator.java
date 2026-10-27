@@ -4,16 +4,15 @@ import java.util.Objects;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import pe.edu.utp.medifast.dto.RegistroDto;
 
 /** Asocia el error de confirmación con el campo que debe corregir la persona. */
-public class ContrasenasCoincidenValidator implements ConstraintValidator<ContrasenasCoinciden, RegistroDto> {
+public class ContrasenasCoincidenValidator implements ConstraintValidator<ContrasenasCoinciden, ContrasenaConfirmada> {
 
 	@Override
-	public boolean isValid(RegistroDto registro, ConstraintValidatorContext context) {
-		if (registro == null || registro.contrasena() == null || registro.confirmacion() == null
-				|| registro.contrasena().isBlank() || registro.confirmacion().isBlank()
-				|| Objects.equals(registro.contrasena(), registro.confirmacion())) {
+	public boolean isValid(ContrasenaConfirmada formulario, ConstraintValidatorContext context) {
+		if (formulario == null || formulario.contrasena() == null || formulario.confirmacion() == null
+				|| formulario.contrasena().isBlank() || formulario.confirmacion().isBlank()
+				|| Objects.equals(formulario.contrasena(), formulario.confirmacion())) {
 			return true;
 		}
 

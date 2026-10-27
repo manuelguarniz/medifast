@@ -25,6 +25,7 @@ import pe.edu.utp.medifast.model.Tarifa;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.service.PagoService;
 
+/** Implementación transaccional del pago simulado; las constancias se guardan en {@code medifast.uploads-dir}. */
 @Service
 public class PagoServiceImpl implements PagoService {
 

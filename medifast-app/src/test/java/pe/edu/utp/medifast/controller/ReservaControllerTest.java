@@ -1,6 +1,7 @@
 package pe.edu.utp.medifast.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import pe.edu.utp.medifast.config.SecurityConfig;
+import pe.edu.utp.medifast.dao.HorarioDao;
 import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.dao.UsuarioDao;
 import pe.edu.utp.medifast.dto.BloqueHorarioDto;
@@ -36,8 +40,11 @@ import pe.edu.utp.medifast.dto.InicioDisponibleDto;
 import pe.edu.utp.medifast.exception.HorarioNoDisponibleException;
 import pe.edu.utp.medifast.model.Cita;
 import pe.edu.utp.medifast.model.Consultorio;
+import pe.edu.utp.medifast.model.Horario;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.Paciente;
+import pe.edu.utp.medifast.model.VistaCita;
+import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.security.EventosAutenticacion;
 import pe.edu.utp.medifast.security.IntentosLoginService;
@@ -64,6 +71,8 @@ class ReservaControllerTest {
 	private UsuarioActual usuarioActual;
 	@MockitoBean
 	private MedicoDao medicoDao;
+	@MockitoBean
+	private HorarioDao horarioDao;
 	@MockitoBean
 	private UsuarioDao usuarioDao;
 	@MockitoBean
@@ -101,6 +110,68 @@ class ReservaControllerTest {
 								java.time.LocalTime.of(11, 30), true, false, false)),
 				Optional.empty());
 		when(reservaService.disponibilidad(20L, 1L, FECHA)).thenReturn(disponibilidad);
+		Horario horario = mock(Horario.class);
+		when(horario.getFecha()).thenReturn(FECHA);
+		when(horarioDao.findAllByMedicoIdAndFechaBetween(eq(1L), any(), any())).thenReturn(List.of(horario));
+	}
+
+	private void conCitaActiva(EstadoCitaEnum estado, LocalDateTime expiraEn) {
+		VistaCita cita = mock(VistaCita.class);
+		when(cita.getIdCita()).thenReturn(44L);
+		when(cita.getEstado()).thenReturn(estado);
+		when(cita.getExpiraEn()).thenReturn(expiraEn);
+		when(cita.getFecha()).thenReturn(FECHA);
+		when(cita.getHoraInicio()).thenReturn(LocalTime.of(10, 30));
+		when(cita.getHoraFin()).thenReturn(LocalTime.of(11, 30));
+		when(cita.getTipoCita()).thenReturn(TipoCitaEnum.NUEVO);
+		DisponibilidadDto disponibilidad = new DisponibilidadDto(TipoCitaEnum.NUEVO, 60,
+				new BigDecimal("150.00"), FECHA.minusDays(1), FECHA.plusDays(28), FECHA, List.of(), List.of(),
+				Optional.of(cita));
+		when(reservaService.disponibilidad(20L, 1L, FECHA)).thenReturn(disponibilidad);
+	}
+
+	@Test
+	void muestraComoNoDisponibleElBloqueQueNoPuedeIniciarUnaCita() throws Exception {
+		mockMvc.perform(get("/paciente/reservar").param("fecha", FECHA.toString())
+				.with(user("70000001").roles("PACIENTE")))
+				.andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.matchesPattern(
+						"(?s).*class=\"reserva-slot\\s+unavailable\">\\s*<input[^>]*value=\"101\".*")));
+	}
+
+	@Test
+	void muestraElRangoSeleccionadoConUnSoloPeriodo() throws Exception {
+		mockMvc.perform(get("/paciente/reservar").param("fecha", FECHA.toString()).param("horarioId", "100")
+				.with(user("70000001").roles("PACIENTE")))
+				.andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("10:30 – 11:30 a. m.")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("10:30–11:30")));
+	}
+
+	@Test
+	void permiteContinuarElPagoDeUnaCitaPendienteVigente() throws Exception {
+		conCitaActiva(EstadoCitaEnum.PENDIENTE_PAGO, LocalDateTime.now(ZoneId.of("America/Lima")).plusMinutes(10));
+
+		mockMvc.perform(get("/paciente/reservar").param("fecha", FECHA.toString())
+				.with(user("70000001").roles("PACIENTE")))
+				.andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Ya tienes una cita activa.")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("reserva-status-pendiente")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("/paciente/pago?citaId=44")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("reserva-countdown")));
+	}
+
+	@Test
+	void muestraVerMisCitasSiLaCitaActivaEstaConfirmada() throws Exception {
+		conCitaActiva(EstadoCitaEnum.PROGRAMADA, null);
+
+		mockMvc.perform(get("/paciente/reservar").param("fecha", FECHA.toString())
+				.with(user("70000001").roles("PACIENTE")))
+				.andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("reserva-status-confirmada")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Ver mis citas")))
+				.andExpect(content().string(org.hamcrest.Matchers.not(
+						org.hamcrest.Matchers.containsString("/paciente/pago?citaId=44"))));
 	}
 
 	@Test

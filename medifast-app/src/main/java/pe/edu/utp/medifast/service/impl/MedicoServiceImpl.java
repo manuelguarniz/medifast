@@ -6,7 +6,8 @@ import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.service.MedicoService;
 
-@Service 
+/** Resuelve el médico autenticado a partir de su n.º de documento. */
+@Service
 public class MedicoServiceImpl implements MedicoService{
     private final MedicoDao medicoDao;
 

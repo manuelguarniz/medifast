@@ -1052,11 +1052,57 @@ body {
 
 .reserva-status {
     display: inline-flex;
-    padding: 2px 9px;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
     border-radius: 999px;
-    background: #ffedd5;
-    color: #9a3412;
     font-size: 12px;
+    font-weight: 700;
+}
+
+.reserva-status::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+}
+
+/* Badges de README §5.2: fondo / punto / texto del sistema de diseño */
+.reserva-status-pendiente {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.reserva-status-pendiente::before {
+    background: #f59e0b;
+}
+
+.reserva-status-confirmada {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.reserva-status-confirmada::before {
+    background: #0284c7;
+}
+
+.reserva-status-vencida {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.reserva-status-vencida::before {
+    background: #64748b;
+}
+
+.reserva-countdown {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #0f172a;
+    color: #fff;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
     font-weight: 700;
 }
 
@@ -1070,6 +1116,18 @@ body {
 
 .reserva-alert-action:hover {
     text-decoration: underline;
+}
+
+.reserva-alert-action-primary {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #0d5c4d;
+    color: #fff;
+}
+
+.reserva-alert-action-primary:hover {
+    background: #084b40;
+    text-decoration: none;
 }
 
 .reserva-layout {
@@ -1204,9 +1262,14 @@ body {
     text-decoration: none;
 }
 
-.reserva-week-arrow:hover {
+.reserva-week-arrow:hover:not(.disabled) {
     border-color: #0d5c4d;
     color: #0d5c4d;
+}
+
+.reserva-week-arrow.disabled {
+    color: #cbd5e1;
+    cursor: not-allowed;
 }
 
 .reserva-days {
@@ -1263,7 +1326,7 @@ body {
 .reserva-slots {
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));
-    gap: 7px;
+    gap: 8px;
 }
 
 .reserva-slot {
@@ -1325,6 +1388,20 @@ body {
 
 .reserva-slot.selected small {
     color: rgba(255, 255, 255, .8);
+}
+
+/* Los bloques de una misma cita se ven como uno solo (v3.1); en móvil pueden caer en filas distintas */
+@media (min-width: 768px) {
+    .reserva-slot.selected:has(+ .reserva-slot.selected) {
+        margin-right: -8px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .reserva-slot.selected + .reserva-slot.selected {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
 }
 
 .reserva-empty-slots {
@@ -1521,7 +1598,8 @@ body {
     text-align: center;
 }
 
-form[aria-disabled="true"] .reserva-selection-card {
+form[aria-disabled="true"] .reserva-selection-card,
+form[aria-disabled="true"] .reserva-summary {
     opacity: .55;
 }
 

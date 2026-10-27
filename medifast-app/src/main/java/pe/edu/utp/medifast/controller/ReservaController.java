@@ -3,7 +3,9 @@ package pe.edu.utp.medifast.controller;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pe.edu.utp.medifast.dao.HorarioDao;
 import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.dto.BloqueHorarioDto;
 import pe.edu.utp.medifast.dto.DisponibilidadDto;
@@ -31,9 +36,11 @@ import pe.edu.utp.medifast.exception.CitaActivaException;
 import pe.edu.utp.medifast.exception.FueraDeRangoException;
 import pe.edu.utp.medifast.exception.HorarioNoDisponibleException;
 import pe.edu.utp.medifast.model.Cita;
+import pe.edu.utp.medifast.model.Horario;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.Paciente;
 import pe.edu.utp.medifast.model.VistaCita;
+import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.ReservaService;
@@ -44,8 +51,7 @@ import pe.edu.utp.medifast.service.ReservaService;
 public class ReservaController {
 
 	private static final Locale LOCALE = Locale.forLanguageTag("es-PE");
-	private static final List<DayOfWeek> DIAS_ATENCION = List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
-			DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY);
+	private static final ZoneId ZONA = ZoneId.of("America/Lima");
 	private static final DateTimeFormatter MES_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy", LOCALE);
 	private static final DateTimeFormatter FECHA_FORMATTER =
 			DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", LOCALE);
@@ -56,11 +62,14 @@ public class ReservaController {
 	private final ReservaService reservaService;
 	private final UsuarioActual usuarioActual;
 	private final MedicoDao medicoDao;
+	private final HorarioDao horarioDao;
 
-	public ReservaController(ReservaService reservaService, UsuarioActual usuarioActual, MedicoDao medicoDao) {
+	public ReservaController(ReservaService reservaService, UsuarioActual usuarioActual, MedicoDao medicoDao,
+			HorarioDao horarioDao) {
 		this.reservaService = reservaService;
 		this.usuarioActual = usuarioActual;
 		this.medicoDao = medicoDao;
+		this.horarioDao = horarioDao;
 	}
 
 	@GetMapping
@@ -72,9 +81,11 @@ public class ReservaController {
 		Medico medico = medicoDao.findFirstByActivoTrueOrderByIdAsc()
 				.orElseThrow(() -> new IllegalStateException("No hay un médico activo configurado."));
 		Long idMedico = medico.getId();
-		LocalDate hoy = LocalDate.now(ZoneId.of("America/Lima"));
-		LocalDate fechaMin = hoy.plusDays(medico.getConsultorio().getDiasAnticipacionMin());
-		LocalDate fechaMax = hoy.plusDays(medico.getConsultorio().getDiasAnticipacionMax());
+		LocalDate hoy = LocalDate.now(ZONA);
+		int diasMin = medico.getConsultorio().getDiasAnticipacionMin();
+		int diasMax = medico.getConsultorio().getDiasAnticipacionMax();
+		LocalDate fechaMin = hoy.plusDays(diasMin);
+		LocalDate fechaMax = hoy.plusDays(diasMax);
 		LocalDate fechaSeleccionada = normalizarFecha(fecha, fechaMin, fechaMax);
 		DisponibilidadDto disponibilidad =
 				reservaService.disponibilidad(idPaciente, idMedico, fechaSeleccionada);
@@ -84,21 +95,36 @@ public class ReservaController {
 				.map(InicioDisponibleDto::idHorario)
 				.findFirst()
 				.orElse(null);
+		LocalDate lunes = fechaSeleccionada.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+		Set<LocalDate> diasConAtencion = horarioDao.findAllByMedicoIdAndFechaBetween(idMedico, lunes,
+				lunes.plusDays(6)).stream()
+				.filter(horario -> !horario.isBloqueado())
+				.map(Horario::getFecha)
+				.collect(Collectors.toSet());
+		Optional<VistaCita> citaActiva = disponibilidad.citaActiva();
+		boolean pagoPendiente = citaActiva
+				.filter(cita -> cita.getEstado() == EstadoCitaEnum.PENDIENTE_PAGO)
+				.map(VistaCita::getExpiraEn)
+				.filter(expiraEn -> expiraEn.isAfter(LocalDateTime.now(ZONA)))
+				.isPresent();
 
 		model.addAttribute("medico", medico);
 		model.addAttribute("nombrePaciente", paciente.getNombres() + " " + paciente.getApellidos());
 		model.addAttribute("nombreSaludo", primerNombre(paciente.getNombres()));
 		model.addAttribute("inicialesPaciente", iniciales(paciente.getNombres(), paciente.getApellidos()));
 		model.addAttribute("disponibilidad", disponibilidad);
-		model.addAttribute("dias", crearDias(fechaSeleccionada, fechaMin, fechaMax));
+		model.addAttribute("dias", crearDias(lunes, fechaSeleccionada, hoy, fechaMin, fechaMax, diasConAtencion));
+		model.addAttribute("hayAnterior", lunes.isAfter(fechaMin));
+		model.addAttribute("haySiguiente", !lunes.plusWeeks(1).isAfter(fechaMax));
 		model.addAttribute("semanaAnterior", normalizarFecha(fechaSeleccionada.minusWeeks(1), fechaMin, fechaMax));
 		model.addAttribute("semanaSiguiente", normalizarFecha(fechaSeleccionada.plusWeeks(1), fechaMin, fechaMax));
 		model.addAttribute("mesVisible", capitalizar(fechaSeleccionada.format(MES_FORMATTER)));
 		model.addAttribute("fechaCompleta", capitalizar(fechaSeleccionada.format(FECHA_FORMATTER)));
-		model.addAttribute("fechaCorta", capitalizar(fechaSeleccionada.format(FECHA_CORTA_FORMATTER)));
-		model.addAttribute("fechaMinTexto", capitalizar(fechaMin.format(FECHA_CORTA_FORMATTER)));
-		model.addAttribute("fechaMaxTexto", capitalizar(fechaMax.format(FECHA_CORTA_FORMATTER)));
+		model.addAttribute("fechaCorta", formatearFechaCorta(fechaSeleccionada));
+		model.addAttribute("ventanaDesde", describirAnticipacion(diasMin));
+		model.addAttribute("ventanaHasta", describirAnticipacion(diasMax));
 		model.addAttribute("nombreMedico", "Dr. " + medico.getNombres() + " " + medico.getApellidos());
+		model.addAttribute("inicialesMedico", iniciales(medico.getNombres(), medico.getApellidos()));
 		model.addAttribute("especialidad", medico.getEspecialidad());
 		model.addAttribute("monto", formatearMonto(disponibilidad.precio()));
 		model.addAttribute("minutos", disponibilidad.duracionMin());
@@ -111,20 +137,31 @@ public class ReservaController {
 				: "Consulta de control · " + disponibilidad.duracionMin() + " minutos");
 		model.addAttribute("slots", crearSlots(disponibilidad, idHorarioSeleccionado));
 		model.addAttribute("horarioId", idHorarioSeleccionado);
-		model.addAttribute("resumenHora", buscarRango(disponibilidad, idHorarioSeleccionado));
+		Optional<InicioDisponibleDto> inicioSeleccionado = disponibilidad.inicios().stream()
+				.filter(inicio -> inicio.idHorario().equals(idHorarioSeleccionado))
+				.findFirst();
+		model.addAttribute("resumenHora", inicioSeleccionado
+				.map(inicio -> formatearRango(inicio.horaInicio(), inicio.horaFin()))
+				.orElse("—"));
+		model.addAttribute("resumenMovil", formatearFechaCorta(fechaSeleccionada) + " · " + inicioSeleccionado
+				.map(inicio -> HORA_FORMATTER.format(inicio.horaInicio()) + "–"
+						+ HORA_FORMATTER.format(inicio.horaFin()))
+				.orElse("—"));
 		model.addAttribute("errorHorario", "horario".equals(error));
 		model.addAttribute("errorFecha", "fecha".equals(error));
-		model.addAttribute("citaActiva", disponibilidad.citaActiva().orElse(null));
-		model.addAttribute("etiquetaEstadoCita", disponibilidad.citaActiva()
-				.map(VistaCita::getEstado).map(Enum::name).map(ReservaController::etiquetaEstado)
+		model.addAttribute("citaActiva", citaActiva.orElse(null));
+		model.addAttribute("pagoPendiente", pagoPendiente);
+		model.addAttribute("segundosRestantes", pagoPendiente
+				? Duration.between(LocalDateTime.now(ZONA), citaActiva.get().getExpiraEn()).toSeconds()
+				: 0);
+		model.addAttribute("estadoActivo", citaActiva.map(cita -> claseEstado(cita, pagoPendiente)).orElse(""));
+		model.addAttribute("etiquetaEstadoCita", citaActiva.map(cita -> etiquetaEstado(cita, pagoPendiente))
 				.orElse(""));
-		model.addAttribute("fechaActiva", disponibilidad.citaActiva().map(VistaCita::getFecha)
+		model.addAttribute("fechaActiva", citaActiva.map(VistaCita::getFecha)
 				.map(ReservaController::formatearFechaCorta).orElse(""));
-		model.addAttribute("horaActiva", disponibilidad.citaActiva().map(VistaCita::getHoraInicio)
-				.map(ReservaController::formatearHora).orElse(""));
-		model.addAttribute("horaFinActiva", disponibilidad.citaActiva().map(VistaCita::getHoraFin)
-				.map(ReservaController::formatearHora).orElse(""));
-		model.addAttribute("tipoActivo", disponibilidad.citaActiva().map(VistaCita::getTipoCita)
+		model.addAttribute("rangoActivo", citaActiva
+				.map(cita -> formatearRango(cita.getHoraInicio(), cita.getHoraFin())).orElse(""));
+		model.addAttribute("tipoActivo", citaActiva.map(VistaCita::getTipoCita)
 				.map(tipo -> tipo == TipoCitaEnum.NUEVO ? "Nuevo" : "Control").orElse(""));
 		model.addAttribute("mensajeError", error);
 		return "paciente/reservar";
@@ -162,17 +199,25 @@ public class ReservaController {
 		return base;
 	}
 
-	private static List<DiaView> crearDias(LocalDate fechaSeleccionada, LocalDate fechaMin, LocalDate fechaMax) {
-		LocalDate lunes = fechaSeleccionada.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+	/** Semana visible: solo se habilitan los días dentro de la ventana con bloques sin bloquear en la BD (RN-08). */
+	private static List<DiaView> crearDias(LocalDate lunes, LocalDate fechaSeleccionada, LocalDate hoy,
+			LocalDate fechaMin, LocalDate fechaMax, Set<LocalDate> diasConAtencion) {
 		List<DiaView> dias = new ArrayList<>(7);
 		for (int indice = 0; indice < 7; indice++) {
 			LocalDate fecha = lunes.plusDays(indice);
-			boolean habilitado = !fecha.isBefore(fechaMin) && !fecha.isAfter(fechaMax)
-					&& DIAS_ATENCION.contains(fecha.getDayOfWeek());
+			boolean enVentana = !fecha.isBefore(fechaMin) && !fecha.isAfter(fechaMax);
+			boolean habilitado = enVentana && diasConAtencion.contains(fecha);
+			String etiqueta = null;
+			if (fecha.equals(hoy)) {
+				etiqueta = "Hoy";
+			} else if (enVentana && !habilitado) {
+				etiqueta = "Cerrado";
+			}
+			String descripcion = capitalizar(fecha.format(DateTimeFormatter.ofPattern("EEEE d MMMM", LOCALE)))
+					+ (etiqueta == null ? ", no disponible" : ", " + etiqueta.toLowerCase(LOCALE));
 			dias.add(new DiaView(fecha, fecha.getDayOfWeek().getDisplayName(TextStyle.SHORT, LOCALE)
-					.replace(".", "").toUpperCase(Locale.ROOT), fecha.getDayOfMonth(),
-					capitalizar(fecha.format(DateTimeFormatter.ofPattern("EEEE d MMMM", LOCALE))), habilitado,
-					fecha.equals(fechaSeleccionada)));
+					.replace(".", "").toUpperCase(Locale.ROOT), fecha.getDayOfMonth(), descripcion, etiqueta,
+					habilitado, fecha.equals(fechaSeleccionada)));
 		}
 		return dias;
 	}
@@ -198,28 +243,39 @@ public class ReservaController {
 							.orElse(HORA_FORMATTER.format(bloque.horaFin()));
 					return new SlotView(bloque.idHorario(), HORA_FORMATTER.format(bloque.horaInicio()),
 							horaFinCita, bloque.ocupado(),
-							!bloque.disponible() && !bloque.ocupado(), inicioValido, dentroDeSeleccion,
+							!bloque.ocupado() && !inicioValido, inicioValido, dentroDeSeleccion,
 							seleccionado.isPresent() && bloque.idHorario().equals(idSeleccionado));
 				})
 				.toList();
 	}
 
-	private static String buscarRango(DisponibilidadDto disponibilidad, Long idHorario) {
-		return disponibilidad.inicios().stream()
-				.filter(inicio -> inicio.idHorario().equals(idHorario))
-				.map(inicio -> formatearHora(inicio.horaInicio()) + "–" + formatearHora(inicio.horaFin()))
-				.findFirst()
-				.orElse("—");
-	}
-
+	/** "Mié 11 nov": el formato es-PE agrega puntos a las abreviaturas. */
 	private static String formatearFechaCorta(LocalDate fecha) {
-		return capitalizar(fecha.format(FECHA_CORTA_FORMATTER));
+		return capitalizar(fecha.format(FECHA_CORTA_FORMATTER).replace(".", ""));
 	}
 
-	private static String formatearHora(LocalTime hora) {
+	/** "10:30 – 11:30 a. m."; el periodo se repite solo si cambia ("11:30 a. m. – 12:30 p. m."). */
+	private static String formatearRango(LocalTime inicio, LocalTime fin) {
+		return periodo(inicio).equals(periodo(fin))
+				? hora12(inicio) + " – " + hora12(fin) + " " + periodo(fin)
+				: hora12(inicio) + " " + periodo(inicio) + " – " + hora12(fin) + " " + periodo(fin);
+	}
+
+	private static String hora12(LocalTime hora) {
 		int hora12 = hora.getHour() % 12 == 0 ? 12 : hora.getHour() % 12;
-		String periodo = hora.getHour() < 12 ? "a. m." : "p. m.";
-		return "%d:%02d %s".formatted(hora12, hora.getMinute(), periodo);
+		return "%d:%02d".formatted(hora12, hora.getMinute());
+	}
+
+	private static String periodo(LocalTime hora) {
+		return hora.getHour() < 12 ? "a. m." : "p. m.";
+	}
+
+	private static String describirAnticipacion(int dias) {
+		return switch (dias) {
+			case 0 -> "hoy";
+			case 1 -> "mañana";
+			default -> "dentro de " + dias + " días";
+		};
 	}
 
 	private static String formatearMonto(BigDecimal monto) {
@@ -245,16 +301,25 @@ public class ReservaController {
 		return nombres.trim().split("\\s+")[0].substring(0, 1);
 	}
 
-	private static String etiquetaEstado(String estado) {
-		return switch (estado) {
-			case "PENDIENTE_PAGO" -> "Pago pendiente";
-			case "PROGRAMADA" -> "Confirmada";
-			default -> estado;
+	/** Etiquetas de README §5.2; una cita PENDIENTE_PAGO vencida que RF16 aún no canceló se muestra "Vencida". */
+	private static String etiquetaEstado(VistaCita cita, boolean pagoPendiente) {
+		return switch (cita.getEstado()) {
+			case PENDIENTE_PAGO -> pagoPendiente ? "Pago pendiente" : "Vencida";
+			case PROGRAMADA -> "Confirmada";
+			default -> cita.getEstado().name();
 		};
 	}
 
-	public record DiaView(LocalDate fecha, String nombre, int numero, String descripcion, boolean habilitado,
-			boolean seleccionado) {
+	private static String claseEstado(VistaCita cita, boolean pagoPendiente) {
+		return switch (cita.getEstado()) {
+			case PENDIENTE_PAGO -> pagoPendiente ? "pendiente" : "vencida";
+			case PROGRAMADA -> "confirmada";
+			default -> "vencida";
+		};
+	}
+
+	public record DiaView(LocalDate fecha, String nombre, int numero, String descripcion, String etiqueta,
+			boolean habilitado, boolean seleccionado) {
 	}
 
 	public record SlotView(Long id, String hora, String horaFin, boolean ocupado, boolean bloqueado,

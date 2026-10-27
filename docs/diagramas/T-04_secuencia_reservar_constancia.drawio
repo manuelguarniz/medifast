@@ -1,0 +1,320 @@
+<mxfile host="65bd71144e">
+    <diagram id="T-04" name="T-04 Reservar y adjuntar la constancia">
+        <mxGraphModel dx="1785" dy="1636" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1835" pageHeight="1686" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="marco" parent="1" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;recursiveResize=0;container=1;collapsible=0;width=320;swimlaneFillColor=default;" value="sd Reservar y adjuntar la constancia" vertex="1">
+                    <mxGeometry height="1636" width="1785" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_pac" parent="1" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;verticalAlign=top;spacingTop=36;outlineConnect=0;size=50;fontSize=11;fontStyle=1;strokeColor=#475569;" value="Paciente" vertex="1">
+                    <mxGeometry height="1396" width="40" x="110" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_c" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;size=50;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value=":ReservaController" vertex="1">
+                    <mxGeometry height="1396" width="190" x="285" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_s" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;size=50;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value=":ReservaService" vertex="1">
+                    <mxGeometry height="1396" width="190" x="535" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_a" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;size=50;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value=":AlmacenamientoService" vertex="1">
+                    <mxGeometry height="1396" width="190" x="785" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_d" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;size=50;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value=":CitaDao / HorarioDao / PagoDao" vertex="1">
+                    <mxGeometry height="1396" width="190" x="1035" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_db" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;size=50;fontSize=11;fillColor=#f1f5f9;strokeColor=#64748b;fontColor=#0f172a;" value="«database»&lt;br&gt;MySQL" vertex="1">
+                    <mxGeometry height="1396" width="190" x="1285" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ll_j" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursiveResize=0;outlineConnect=0;size=50;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value=":VencimientoReservasJob" vertex="1">
+                    <mxGeometry height="1396" width="190" x="1535" y="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="frag0" parent="1" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;recursiveResize=0;container=0;collapsible=0;width=50;height=20;fontStyle=1;fontSize=10;strokeColor=#64748b;fillColor=#f1f5f9;swimlaneFillColor=none;" value="alt" vertex="1">
+                    <mxGeometry height="444" width="1420" x="45" y="522" as="geometry"/>
+                </mxCell>
+                <mxCell id="frag0_g0" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#334155;" value="[el paciente ya tiene una cita activa (UNIQUE paciente_activo)]" vertex="1">
+                    <mxGeometry height="20" width="460" x="103" y="523" as="geometry"/>
+                </mxCell>
+                <mxCell id="frag0_sep1" edge="1" parent="1" style="html=1;endArrow=none;dashed=1;strokeColor=#64748b;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="45" y="670" as="sourcePoint"/>
+                        <mxPoint x="1465" y="670" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="frag0_g1" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#334155;" value="[otro paciente tomó el bloque (UNIQUE horario_activo)]" vertex="1">
+                    <mxGeometry height="20" width="460" x="53" y="671" as="geometry"/>
+                </mxCell>
+                <mxCell id="frag0_sep2" edge="1" parent="1" style="html=1;endArrow=none;dashed=1;strokeColor=#64748b;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="45" y="820" as="sourcePoint"/>
+                        <mxPoint x="1465" y="820" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="frag0_g2" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#334155;" value="[reserva creada]" vertex="1">
+                    <mxGeometry height="20" width="460" x="53" y="821" as="geometry"/>
+                </mxCell>
+                <mxCell id="frag1" parent="1" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;recursiveResize=0;container=0;collapsible=0;width=50;height=20;fontStyle=1;fontSize=10;strokeColor=#64748b;fillColor=#f1f5f9;swimlaneFillColor=none;" value="loop" vertex="1">
+                    <mxGeometry height="144" width="1170" x="545" y="1272" as="geometry"/>
+                </mxCell>
+                <mxCell id="frag1_g0" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#334155;" value="[cada minuto]" vertex="1">
+                    <mxGeometry height="20" width="460" x="603" y="1273" as="geometry"/>
+                </mxCell>
+                <mxCell id="act0" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="20" width="12" x="1124" y="226" as="geometry"/>
+                </mxCell>
+                <mxCell id="act1" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="24" width="12" x="630" y="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="act2" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="20" width="12" x="1124" y="322" as="geometry"/>
+                </mxCell>
+                <mxCell id="act3" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="146" width="12" x="624" y="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="act4" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="216" width="12" x="374" y="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="act5" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="20" width="12" x="1374" y="482" as="geometry"/>
+                </mxCell>
+                <mxCell id="act6" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="456" width="12" x="624" y="446" as="geometry"/>
+                </mxCell>
+                <mxCell id="act7" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="536" width="12" x="374" y="406" as="geometry"/>
+                </mxCell>
+                <mxCell id="act8" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="40" width="12" x="874" y="1076" as="geometry"/>
+                </mxCell>
+                <mxCell id="act9" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="20" width="12" x="1374" y="1152" as="geometry"/>
+                </mxCell>
+                <mxCell id="act10" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="160" width="12" x="624" y="1036" as="geometry"/>
+                </mxCell>
+                <mxCell id="act11" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="240" width="12" x="374" y="996" as="geometry"/>
+                </mxCell>
+                <mxCell id="act12" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="20" width="12" x="1374" y="1348" as="geometry"/>
+                </mxCell>
+                <mxCell id="act13" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="20" width="12" x="1374" y="1388" as="geometry"/>
+                </mxCell>
+                <mxCell id="act14" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="90" width="12" x="624" y="1312" as="geometry"/>
+                </mxCell>
+                <mxCell id="act15" parent="1" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="96" width="12" x="1624" y="1306" as="geometry"/>
+                </mxCell>
+                <mxCell id="msg1" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="1. GET /paciente/reservar">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="150" as="sourcePoint"/>
+                        <mxPoint x="374.0" y="150" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg2" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="2. disponibilidad(idPaciente, idMedico)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="386.0" y="190" as="sourcePoint"/>
+                        <mxPoint x="624.0" y="190" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg3" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="3. citas ATENDIDA del paciente con el médico">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="230" as="sourcePoint"/>
+                        <mxPoint x="1130" y="230" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg4" edge="1" parent="1" style="html=1;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;rounded=0;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="270" as="sourcePoint"/>
+                        <mxPoint x="642.0" y="292" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="676.0" y="270"/>
+                            <mxPoint x="676.0" y="292"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg4_txt" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;whiteSpace=wrap;verticalAlign=top;" value="4. detectar tipo NUEVO o CONTROL y su tarifa" vertex="1">
+                    <mxGeometry height="32" width="230" x="682.0" y="266" as="geometry"/>
+                </mxCell>
+                <mxCell id="msg5" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="5. bloques libres de mañana a +30 días">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="326" as="sourcePoint"/>
+                        <mxPoint x="1130" y="326" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg6" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="6. P2 con horarios, tipo y monto">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="374.0" y="366" as="sourcePoint"/>
+                        <mxPoint x="130" y="366" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg7" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="7. POST /paciente/reservas (bloque elegido)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="406" as="sourcePoint"/>
+                        <mxPoint x="374.0" y="406" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg8" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="8. reservar(idPaciente, idHorario)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="386.0" y="446" as="sourcePoint"/>
+                        <mxPoint x="624.0" y="446" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg9" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="9. INSERT cita PENDIENTE_PAGO + cita_horario (transacción)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="486" as="sourcePoint"/>
+                        <mxPoint x="1380" y="486" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg10" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="10. clave duplicada">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1380" y="562" as="sourcePoint"/>
+                        <mxPoint x="636.0" y="562" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg11" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="11. CitaActivaException">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="624.0" y="602" as="sourcePoint"/>
+                        <mxPoint x="386.0" y="602" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg12" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="12. Muestra su cita activa">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="374.0" y="642" as="sourcePoint"/>
+                        <mxPoint x="130" y="642" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg13" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="13. clave duplicada">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1380" y="712" as="sourcePoint"/>
+                        <mxPoint x="636.0" y="712" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg14" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="14. HorarioNoDisponibleException">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="624.0" y="752" as="sourcePoint"/>
+                        <mxPoint x="386.0" y="752" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg15" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="15. Horario no disponible, elija otro">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="374.0" y="792" as="sourcePoint"/>
+                        <mxPoint x="130" y="792" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg16" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="16. OK">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1380" y="862" as="sourcePoint"/>
+                        <mxPoint x="636.0" y="862" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg17" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="17. cita con expira_en = ahora + 15 min">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="624.0" y="902" as="sourcePoint"/>
+                        <mxPoint x="386.0" y="902" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg18" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="18. P3 Pago Yape con contador">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="374.0" y="942" as="sourcePoint"/>
+                        <mxPoint x="130" y="942" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg19" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="19. POST /paciente/citas/{id}/constancia (archivo, n.º de operación)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="996" as="sourcePoint"/>
+                        <mxPoint x="374.0" y="996" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg20" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="20. adjuntarConstancia(idCita, archivo, nroOperacion)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="386.0" y="1036" as="sourcePoint"/>
+                        <mxPoint x="624.0" y="1036" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg21" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="21. guardar(archivo): valida tipo y 5 MB, nombre UUID">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="1076" as="sourcePoint"/>
+                        <mxPoint x="874.0" y="1076" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg22" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="22. ruta del archivo">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="874.0" y="1116" as="sourcePoint"/>
+                        <mxPoint x="636.0" y="1116" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg23" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="23. INSERT pago POR_VALIDAR y UPDATE cita PROGRAMADA">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="1156" as="sourcePoint"/>
+                        <mxPoint x="1380" y="1156" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg24" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="24. confirmación">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="624.0" y="1196" as="sourcePoint"/>
+                        <mxPoint x="386.0" y="1196" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg25" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="25. P4 Confirmación + Descargar PDF">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="374.0" y="1236" as="sourcePoint"/>
+                        <mxPoint x="130" y="1236" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg26" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="26. vencerReservas(ahora)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1624.0" y="1312" as="sourcePoint"/>
+                        <mxPoint x="636.0" y="1312" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg27" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="27. citas PENDIENTE_PAGO con expira_en vencido">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="1352" as="sourcePoint"/>
+                        <mxPoint x="1380" y="1352" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="msg28" edge="1" parent="1" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="28. UPDATE cita CANCELADA (SISTEMA) y cita_horario.activo = FALSE">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="636.0" y="1392" as="sourcePoint"/>
+                        <mxPoint x="1380" y="1392" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="nota" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=8;spacingRight=8;fontSize=10;fillColor=#fffbeb;strokeColor=#d6b656;" value="Cubre RF01, RF03 y RF16, y las reglas RN-01, RN-02, RN-04 y RN-09. Los mensajes siguen el orden de T-04 en tecnicos.md." vertex="1">
+                    <mxGeometry height="60" width="380" x="40" y="1486" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda" parent="1" style="swimlane;html=1;startSize=24;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#64748b;swimlaneFillColor=#ffffff;collapsible=0;" value="Leyenda" vertex="1">
+                    <mxGeometry height="110" width="560" x="460" y="1486" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_m" edge="1" parent="leyenda" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;labelBackgroundColor=default;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="16" y="44" as="sourcePoint"/>
+                        <mxPoint x="86" y="44" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ley_m_txt" parent="leyenda" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="Mensaje síncrono (llamada)" vertex="1">
+                    <mxGeometry height="22" width="180" x="96" y="33" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_r" edge="1" parent="leyenda" style="html=1;verticalAlign=bottom;fontSize=10;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;fontColor=#475569;labelBackgroundColor=default;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="16" y="74" as="sourcePoint"/>
+                        <mxPoint x="86" y="74" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ley_r_txt" parent="leyenda" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="Respuesta" vertex="1">
+                    <mxGeometry height="22" width="180" x="96" y="63" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_act" parent="leyenda" style="html=1;fillColor=#ffffff;strokeColor=#0284c7;" value="" vertex="1">
+                    <mxGeometry height="40" width="12" x="300" y="34" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_act_txt" parent="leyenda" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;whiteSpace=wrap;" value="Activación: el objeto está ejecutando" vertex="1">
+                    <mxGeometry height="40" width="220" x="322" y="34" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_frag" parent="leyenda" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;whiteSpace=wrap;" value="&lt;b&gt;alt&lt;/b&gt;: alternativas según la [guarda] · &lt;b&gt;loop&lt;/b&gt;: se repite" vertex="1">
+                    <mxGeometry height="22" width="250" x="300" y="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

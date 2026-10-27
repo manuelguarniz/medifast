@@ -4,6 +4,10 @@ import pe.edu.utp.medifast.dto.FiltroReporteDto;
 import pe.edu.utp.medifast.dto.ReporteCitasDto;
 import pe.edu.utp.medifast.dto.ResumenPagosDto;
 
+/**
+ * Consultas de los reportes del médico (RF09): citas por rango y estado (P9) y pagos validados por período (P10).
+ * La exportación a Excel la hace {@link pe.edu.utp.medifast.util.ExportadorReporte}.
+ */
 public interface ReporteService {
 
     /**

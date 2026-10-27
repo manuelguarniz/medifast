@@ -171,6 +171,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Javadoc: ./mvnw javadoc:javadoc genera la documentación en target/reports/apidocs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <release>${java.version}</release>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <charset>UTF-8</charset>
+                    <locale>es</locale>
+                    <show>private</show>
+                    <author>true</author>
+                    <version>true</version>
+                    <windowtitle>MEDIFAST ${project.version} API</windowtitle>
+                    <doctitle>MEDIFAST - Reserva de citas y simulación de pagos con Yape</doctitle>
+                    <!-- Evita que los comentarios incompletos rompan la generación -->
+                    <doclint>all,-missing</doclint>
+                    <links>
+                        <link>https://docs.oracle.com/en/java/javase/21/docs/api/</link>
+                    </links>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

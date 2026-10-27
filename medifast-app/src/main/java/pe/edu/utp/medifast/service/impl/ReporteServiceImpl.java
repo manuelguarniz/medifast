@@ -17,6 +17,7 @@ import pe.edu.utp.medifast.dto.ResumenPagosDto;
 import pe.edu.utp.medifast.model.VistaCita;
 import pe.edu.utp.medifast.service.ReporteService;
 
+/** Implementación de los reportes sobre la vista {@code v_cita} y los pagos validados. */
 @Service
 public class ReporteServiceImpl implements ReporteService {
 

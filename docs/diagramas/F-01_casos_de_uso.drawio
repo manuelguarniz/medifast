@@ -1,0 +1,103 @@
+<mxfile host="65bd71144e">
+    <diagram id="F-01" name="F-01 Casos de uso">
+        <mxGraphModel dx="1330" dy="871" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="aCWytcbw1n7FUI7UEC1z-3" parent="1" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;recursiveResize=0;container=1;collapsible=0;width=160;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fillStyle=solid;swimlaneFillColor=#FFFFFF;" value="Diagrama de Casos de Uso" vertex="1">
+                    <mxGeometry height="1370" width="640" as="geometry"/>
+                </mxCell>
+                <mxCell id="boundary" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" value="Sistema MEDIFAST" vertex="1">
+                    <mxGeometry height="1340" width="420" x="210" y="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="PAC" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Paciente" vertex="1">
+                    <mxGeometry height="80" width="40" x="50" y="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="MED" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Médico" vertex="1">
+                    <mxGeometry height="80" width="40" x="20" y="810" as="geometry"/>
+                </mxCell>
+                <mxCell id="SIS" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Sistema" vertex="1">
+                    <mxGeometry height="80" width="40" x="30" y="1220" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU02" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU02 Iniciar / cerrar sesión" vertex="1">
+                    <mxGeometry height="60" width="200" x="320" y="620" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU01" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU01 Registrarse" vertex="1">
+                    <mxGeometry height="60" width="200" x="320" y="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU06" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU06 Actualizar mis datos" vertex="1">
+                    <mxGeometry height="60" width="200" x="320" y="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU05" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU05 Ver historial y descargar PDF" vertex="1">
+                    <mxGeometry height="60" width="200" x="320" y="260" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU04" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU04 Reservar y adjuntar constancia" vertex="1">
+                    <mxGeometry height="60" width="200" x="320" y="350" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU03" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU03 Consultar disponibilidad" vertex="1">
+                    <mxGeometry height="60" width="200" x="320" y="500" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU08" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU08 Validar o rechazar pago" vertex="1">
+                    <mxGeometry height="60" width="200" x="330" y="740" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU07" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU07 Consultar agenda" vertex="1">
+                    <mxGeometry height="60" width="200" x="330" y="880" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU09" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU09 Atendida / no asistió / cancelar" vertex="1">
+                    <mxGeometry height="60" width="200" x="330" y="1020" as="geometry"/>
+                </mxCell>
+                <mxCell id="CU10" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="CU10 Generar y exportar reportes" vertex="1">
+                    <mxGeometry height="60" width="200" x="330" y="1130" as="geometry"/>
+                </mxCell>
+                <mxCell id="RF16" parent="1" style="ellipse;whiteSpace=wrap;html=1;dashed=1;" value="RF16 Cancelar reservas vencidas" vertex="1">
+                    <mxGeometry height="60" width="200" x="330" y="1230" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_pac_cu01" edge="1" parent="1" source="PAC" style="endArrow=none;html=1;" target="CU01">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_pac_cu02" edge="1" parent="1" source="PAC" style="endArrow=none;html=1;" target="CU02">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_pac_cu03" edge="1" parent="1" source="PAC" style="endArrow=none;html=1;" target="CU03">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_pac_cu04" edge="1" parent="1" source="PAC" style="endArrow=none;html=1;" target="CU04">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_pac_cu05" edge="1" parent="1" source="PAC" style="endArrow=none;html=1;" target="CU05">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_pac_cu06" edge="1" parent="1" source="PAC" style="endArrow=none;html=1;" target="CU06">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_med_cu02" edge="1" parent="1" source="MED" style="endArrow=none;html=1;" target="CU02">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_med_cu07" edge="1" parent="1" source="MED" style="endArrow=none;html=1;" target="CU07">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_med_cu08" edge="1" parent="1" source="MED" style="endArrow=none;html=1;" target="CU08">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_med_cu09" edge="1" parent="1" source="MED" style="endArrow=none;html=1;" target="CU09">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_med_cu10" edge="1" parent="1" source="MED" style="endArrow=none;html=1;" target="CU10">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_sis_rf16" edge="1" parent="1" source="SIS" style="endArrow=none;html=1;" target="RF16">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="i_cu04_cu03" edge="1" parent="1" source="CU04" style="endArrow=open;endSize=10;dashed=1;html=1;" target="CU03" value="«incluye»">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="x_cu08_cu07" edge="1" parent="1" source="CU08" style="endArrow=open;endSize=10;dashed=1;html=1;" target="CU07" value="«extiende»">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="x_cu09_cu07" edge="1" parent="1" source="CU09" style="endArrow=open;endSize=10;dashed=1;html=1;" target="CU07" value="«extiende»">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

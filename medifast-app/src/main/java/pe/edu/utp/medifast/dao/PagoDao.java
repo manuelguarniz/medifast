@@ -9,7 +9,16 @@ import org.springframework.data.repository.query.Param;
 
 import pe.edu.utp.medifast.model.Pago;
 
+/** DAO de {@link Pago}. */
 public interface PagoDao extends JpaRepository<Pago, Long>{
+    /**
+     * Pagos validados de un médico agrupados por día (reporte P10, RF09).
+     *
+     * @param idMedico médico autenticado
+     * @param desde inicio del período, inclusivo
+     * @param hastaExclusivo fin del período, exclusivo
+     * @return filas {@code [día, cantidad, total]} ordenadas por día
+     */
     @Query(value = """
             SELECT DATE(p.validado_en) AS dia,
                    COUNT(*) AS cantidad,

@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
+/** Exporta un {@link Reporte} a .xlsx con Apache POI (RF09). */
 @Component
 public class ExcelExportador implements ExportadorReporte {
 

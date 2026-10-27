@@ -1,0 +1,126 @@
+<mxfile host="65bd71144e">
+    <diagram id="F-06" name="F-06 Mapa de navegación">
+        <mxGraphModel dx="1144" dy="601" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="720" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="VDzOSE17P4SRr6ocBVrK-2" parent="1" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;recursiveResize=0;container=1;collapsible=0;width=160;swimlaneFillColor=default;" value="Mapa de navegación" vertex="1">
+                    <mxGeometry height="680" width="1020" as="geometry"/>
+                </mxCell>
+                <mxCell id="zMED" parent="VDzOSE17P4SRr6ocBVrK-2" style="swimlane;startSize=30;html=1;rounded=1;arcSize=4;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;swimlaneFillColor=#FBF7FC;" value="Médico — /medico/** (rol MEDICO)" vertex="1">
+                    <mxGeometry height="260" width="680" x="330" y="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="P7" parent="zMED" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;" value="&lt;b&gt;P7 Agenda&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;medico/agenda.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="40" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="P8" parent="zMED" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;" value="&lt;b&gt;P8 Detalle de cita&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;medico/cita.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="260" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="P9" parent="zMED" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;" value="&lt;b&gt;P9 Reporte de citas&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;medico/reporte-citas.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="480" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="mMED" parent="zMED" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;dashed=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="Menú del médico" vertex="1">
+                    <mxGeometry height="40" width="160" x="260" y="185" as="geometry"/>
+                </mxCell>
+                <mxCell id="P10" parent="zMED" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;" value="&lt;b&gt;P10 Reporte de pagos&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;medico/reporte-pagos.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="480" y="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="n10" edge="1" parent="zMED" source="P7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" target="P8" value="Ver cita">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n11" edge="1" parent="zMED" source="P8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" target="P7" value="Volver">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="k3" edge="1" parent="zMED" source="mMED" style="html=1;dashed=1;dashPattern=4 4;endArrow=none;strokeColor=#b39a3c;" target="P7" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="k4" edge="1" parent="zMED" source="mMED" style="html=1;dashed=1;dashPattern=4 4;endArrow=none;strokeColor=#b39a3c;" target="P9" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="k5" edge="1" parent="zMED" source="mMED" style="html=1;dashed=1;dashPattern=4 4;endArrow=none;strokeColor=#b39a3c;" target="P10" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="start" parent="VDzOSE17P4SRr6ocBVrK-2" style="ellipse;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" value="" vertex="1">
+                    <mxGeometry height="20" width="20" x="120" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="zPUB" parent="1" style="swimlane;startSize=30;html=1;rounded=1;arcSize=4;fontStyle=1;fillColor=#f5f5f5;strokeColor=#666666;swimlaneFillColor=#FAFAFA;" value="Público" vertex="1">
+                    <mxGeometry height="330" width="220" x="20" y="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="P0" parent="zPUB" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" value="&lt;b&gt;P0 Login&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;login.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="30" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="P1" parent="zPUB" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" value="&lt;b&gt;P1 Registro&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;registro.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="30" y="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="zPAC" parent="1" style="swimlane;startSize=30;html=1;rounded=1;arcSize=4;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;swimlaneFillColor=#F5F9FF;" value="Paciente — /paciente/** (rol PACIENTE)" vertex="1">
+                    <mxGeometry height="330" width="680" x="310" y="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="P2" parent="zPAC" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;P2 Reservar cita&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;paciente/reservar.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="40" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="P3" parent="zPAC" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;P3 Pago Yape (15 min)&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;paciente/pago.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="260" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="P4" parent="zPAC" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;P4 Confirmación + PDF&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;paciente/confirmacion.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="480" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="P6" parent="zPAC" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;P6 Mi perfil&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;paciente/perfil.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="40" y="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="mPAC" parent="zPAC" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;dashed=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="Menú del paciente" vertex="1">
+                    <mxGeometry height="40" width="160" x="260" y="235" as="geometry"/>
+                </mxCell>
+                <mxCell id="P5" parent="zPAC" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;P5 Mis citas&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;paciente/citas.html&lt;/font&gt;" vertex="1">
+                    <mxGeometry height="70" width="160" x="480" y="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="note" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;spacingLeft=6;verticalAlign=top;fillColor=#ffffff;strokeColor=#999999;fontSize=10;" value="&lt;b&gt;Notas&lt;/b&gt;&lt;br&gt;• Toda pantalla autenticada tiene «Cerrar sesión» → P0.&lt;br&gt;• Cada rol solo accede a su zona (RF07); al iniciar sesión llega a P2 o P7.&lt;br&gt;• Línea punteada = enlace del menú (bidireccional)." vertex="1">
+                    <mxGeometry height="110" width="250" x="10" y="510" as="geometry"/>
+                </mxCell>
+                <mxCell id="n00" edge="1" parent="1" source="start" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;" target="P0" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n01" edge="1" parent="1" source="P0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" target="P1" value="Crear cuenta">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n02" edge="1" parent="1" source="P1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.7;exitY=0;exitDx=0;exitDy=0;entryX=0.7;entryY=1;entryDx=0;entryDy=0;" target="P0" value="Cuenta creada / Volver">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n03" edge="1" parent="1" source="P0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="P2" value="Rol PACIENTE">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n04" edge="1" parent="1" source="P0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="P7" value="Rol MEDICO">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n05" edge="1" parent="1" source="P2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;" target="P3" value="Elige horario">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n06" edge="1" parent="1" source="P3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;" target="P4" value="Adjunta constancia">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n07" edge="1" parent="1" source="P4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.4;exitY=1;exitDx=0;exitDy=0;entryX=0.4;entryY=0;entryDx=0;entryDy=0;" target="P5" value="Mis citas">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n08" edge="1" parent="1" source="P5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.8;exitY=0;exitDx=0;exitDy=0;entryX=0.8;entryY=1;entryDx=0;entryDy=0;" target="P4" value="Descargar PDF">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="n09" edge="1" parent="1" source="P5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.15;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="P3" value="Continuar pago">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="814" y="190"/>
+                            <mxPoint x="650" y="190"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="k0" edge="1" parent="1" source="mPAC" style="html=1;dashed=1;dashPattern=4 4;endArrow=none;strokeColor=#b39a3c;" target="P2" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="k1" edge="1" parent="1" source="mPAC" style="html=1;dashed=1;dashPattern=4 4;endArrow=none;strokeColor=#b39a3c;" target="P5" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="k2" edge="1" parent="1" source="mPAC" style="html=1;dashed=1;dashPattern=4 4;endArrow=none;strokeColor=#b39a3c;" target="P6" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

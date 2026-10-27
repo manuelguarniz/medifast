@@ -1,0 +1,137 @@
+<mxfile host="65bd71144e">
+    <diagram id="T-01" name="T-01 Arquitectura MVC por capas">
+        <mxGraphModel dx="1320" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1370" pageHeight="950" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="marco" parent="1" style="shape=umlFrame;whiteSpace=wrap;html=1;pointerEvents=0;recursiveResize=0;container=1;collapsible=0;width=280;swimlaneFillColor=default;" value="T-01 Arquitectura MVC por capas" vertex="1">
+                    <mxGeometry height="900" width="1320" as="geometry"/>
+                </mxCell>
+                <!-- Externos -->
+                <mxCell id="NAV" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#ffffff;strokeColor=#0f172a;" value="&lt;b&gt;Navegador&lt;/b&gt;&lt;br&gt;&lt;i&gt;Paciente / Médico&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="60" width="300" x="370" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="DB" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fontSize=11;fillColor=#ffffff;strokeColor=#0f172a;" value="&lt;b&gt;MySQL 8.4&lt;/b&gt;&lt;br&gt;&lt;i&gt;InnoDB · utf8mb4&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="100" width="200" x="420" y="740" as="geometry"/>
+                </mxCell>
+                <mxCell id="FS" parent="1" style="shape=folder;whiteSpace=wrap;html=1;tabWidth=60;tabHeight=12;tabPosition=left;fontSize=11;fillColor=#ffffff;strokeColor=#0f172a;" value="&lt;b&gt;Carpeta local&lt;/b&gt;&lt;br&gt;&lt;i&gt;uploads/comprobantes&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="80" width="200" x="990" y="740" as="geometry"/>
+                </mxCell>
+                <!-- Aplicación -->
+                <mxCell id="APP" parent="1" style="swimlane;rounded=1;arcSize=2;html=1;startSize=30;fontStyle=1;fontSize=12;strokeColor=#334155;fillColor=#e2e8f0;swimlaneFillColor=#ffffff;collapsible=0;container=1;" value="Aplicación Spring Boot (monolito · localhost:8080)" vertex="1">
+                    <mxGeometry height="540" width="1200" x="60" y="150" as="geometry"/>
+                </mxCell>
+                <!-- Capas -->
+                <mxCell id="capa_seguridad" parent="APP" style="swimlane;horizontal=0;html=1;startSize=130;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#94a3b8;swimlaneFillColor=#ffffff;collapsible=0;container=1;" value="Seguridad" vertex="1">
+                    <mxGeometry height="110" width="800" x="20" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="SEC" parent="capa_seguridad" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#fee2e2;strokeColor=#dc2626;fontColor=#0f172a;" value="&lt;b&gt;Spring Security&lt;/b&gt;&lt;br&gt;&lt;i&gt;bcrypt · roles · CSRF · bloqueo por intentos (Guava)&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="60" width="560" x="160" y="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="capa_presentacion" parent="APP" style="swimlane;horizontal=0;html=1;startSize=130;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#94a3b8;swimlaneFillColor=#ffffff;collapsible=0;container=1;" value="Presentación" vertex="1">
+                    <mxGeometry height="130" width="800" x="20" y="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="MVC" parent="capa_presentacion" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#0284c7;verticalAlign=top;align=left;spacingLeft=8;fontStyle=1;fontSize=11;fontColor=#0369a1;container=1;collapsible=0;" value="MVC" vertex="1">
+                    <mxGeometry height="106" width="600" x="150" y="12" as="geometry"/>
+                </mxCell>
+                <mxCell id="C" parent="MVC" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value="&lt;b&gt;Controladores&lt;/b&gt;&lt;br&gt;&lt;i&gt;Spring MVC&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="56" width="260" x="20" y="36" as="geometry"/>
+                </mxCell>
+                <mxCell id="V" parent="MVC" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#e0f2fe;strokeColor=#0284c7;fontColor=#0f172a;" value="&lt;b&gt;Vistas&lt;/b&gt;&lt;br&gt;&lt;i&gt;Thymeleaf + Bootstrap 5 (P0 a P10)&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="56" width="260" x="320" y="36" as="geometry"/>
+                </mxCell>
+                <mxCell id="capa_negocio" parent="APP" style="swimlane;horizontal=0;html=1;startSize=130;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#94a3b8;swimlaneFillColor=#ffffff;collapsible=0;container=1;" value="Negocio" vertex="1">
+                    <mxGeometry height="110" width="800" x="20" y="290" as="geometry"/>
+                </mxCell>
+                <mxCell id="S" parent="capa_negocio" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#d1fae5;strokeColor=#059669;fontColor=#0f172a;" value="&lt;b&gt;Servicios&lt;/b&gt;&lt;br&gt;&lt;i&gt;Reglas de negocio · interfaces + impl · SOLID · TDD&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="80" width="560" x="160" y="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="capa_datos" parent="APP" style="swimlane;horizontal=0;html=1;startSize=130;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#94a3b8;swimlaneFillColor=#ffffff;collapsible=0;container=1;" value="Acceso a datos" vertex="1">
+                    <mxGeometry height="110" width="800" x="20" y="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="DAO" parent="capa_datos" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#fef3c7;strokeColor=#d97706;fontColor=#0f172a;" value="&lt;b&gt;DAO&lt;/b&gt;&lt;br&gt;&lt;i&gt;Interfaces *Dao que extienden JpaRepository&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="60" width="560" x="160" y="25" as="geometry"/>
+                </mxCell>
+                <!-- Componentes transversales -->
+                <mxCell id="soporte" parent="APP" style="swimlane;html=1;startSize=26;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#94a3b8;swimlaneFillColor=#ffffff;collapsible=0;container=1;dashed=1;" value="Componentes de soporte" vertex="1">
+                    <mxGeometry height="460" width="300" x="880" y="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="LOG" parent="soporte" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#64748b;fontColor=#0f172a;" value="&lt;b&gt;Logback&lt;/b&gt;&lt;br&gt;&lt;i&gt;Auditoría&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="56" width="240" x="30" y="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="JOB" parent="soporte" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#64748b;fontColor=#0f172a;" value="&lt;b&gt;Tareas programadas&lt;/b&gt;&lt;br&gt;&lt;i&gt;Vencimiento de 15 min · generación de bloques&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="60" width="240" x="30" y="265" as="geometry"/>
+                </mxCell>
+                <mxCell id="UT" parent="soporte" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#64748b;fontColor=#0f172a;" value="&lt;b&gt;Utilidades&lt;/b&gt;&lt;br&gt;&lt;i&gt;Excel (POI) · PDF (OpenPDF) · archivos (Commons IO)&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="60" width="240" x="30" y="375" as="geometry"/>
+                </mxCell>
+                <!-- Dependencias (la flecha apunta al componente que se usa) -->
+                <mxCell id="dep_nav_sec" edge="1" parent="1" source="NAV" target="SEC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" value="HTTP">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_sec_c" edge="1" parent="1" source="SEC" target="C" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" value="petición autenticada">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_c_v" edge="1" parent="1" source="C" target="V" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_c_s" edge="1" parent="1" source="C" target="S" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" value="invoca">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_job_s" edge="1" parent="1" source="JOB" target="S" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" value="invoca">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_s_dao" edge="1" parent="1" source="S" target="DAO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" value="usa">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_dao_db" edge="1" parent="1" source="DAO" target="DB" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" value="JPA / Hibernate">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="dep_s_log" edge="1" parent="1" source="S" target="LOG" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="registra">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="870" y="471"/>
+                            <mxPoint x="870" y="268"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="dep_s_ut" edge="1" parent="1" source="S" target="UT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="usa">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="870" y="519"/>
+                            <mxPoint x="870" y="605"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="dep_ut_fs" edge="1" parent="1" source="UT" target="FS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=10;fontColor=#475569;labelBackgroundColor=default;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" value="lee / escribe">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Nota y leyenda -->
+                <mxCell id="nota" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=4;fontSize=10;fillColor=#fffbeb;strokeColor=#d6b656;" value="Cada capa solo usa la capa inferior: controlador → servicio → DAO. Los controladores no acceden a los DAO ni a MySQL; las reglas de negocio viven solo en los servicios. Las tareas programadas reutilizan los mismos servicios." vertex="1">
+                    <mxGeometry height="100" width="330" x="60" y="740" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda" parent="1" style="swimlane;html=1;startSize=24;fontStyle=1;fontSize=11;fillColor=#f1f5f9;strokeColor=#64748b;swimlaneFillColor=#ffffff;collapsible=0;" value="Leyenda" vertex="1">
+                    <mxGeometry height="100" width="270" x="680" y="740" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_dep" edge="1" parent="leyenda" style="html=1;endArrow=block;endFill=1;endSize=8;strokeColor=#0f172a;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="16" y="46" as="sourcePoint"/>
+                        <mxPoint x="76" y="46" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ley_dep_txt" parent="leyenda" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="Invoca o depende de" vertex="1">
+                    <mxGeometry height="22" width="170" x="86" y="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="ley_log" edge="1" parent="leyenda" style="html=1;endArrow=open;endFill=0;endSize=8;dashed=1;strokeColor=#475569;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="16" y="78" as="sourcePoint"/>
+                        <mxPoint x="76" y="78" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ley_log_txt" parent="leyenda" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;" value="Registro de auditoría" vertex="1">
+                    <mxGeometry height="22" width="170" x="86" y="67" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -52,6 +52,7 @@
 Confirmada con el usuario el 2026-10-26:
 
 - **P4 como detalle desde P5:** el README enlaza "Ver detalle / PDF" de P5 a P4. Al llegar desde P3 se muestran el titular "Cita reservada" y la alerta de éxito; al llegar desde P5, el titular "Detalle de la cita", sin alerta, y los badges del estado real (Pago pendiente, Atendida, Cancelada con su motivo, etc.). La variante se pide en un prompt aparte cuando se diseñe P5, para tener sus estados a la vista.
+- **Constancia en el detalle** (decidido en [P5](../P5-mis-citas/iteraciones.md#decisiones-de-flujo), 2026-10-27): en modo detalle, P4 agrega la fila "Constancia" con el nombre del archivo y el enlace "Ver constancia ↗", que abre el archivo en una pestaña nueva. El prompt de la variante está en la bitácora de P5.
 
 ---
 

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.Cita;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 

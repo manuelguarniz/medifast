@@ -3,25 +3,34 @@ package pe.edu.utp.medifast.service.impl;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import pe.edu.utp.medifast.dao.CitaDao;
+import pe.edu.utp.medifast.dao.CitaHorarioDao;
 import pe.edu.utp.medifast.dao.HorarioDao;
+import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.dao.PacienteDao;
 import pe.edu.utp.medifast.dao.TarifaDao;
 import pe.edu.utp.medifast.dao.VistaCitaDao;
-import pe.edu.utp.medifast.dto.validacion.DisponibilidadDto;
-import pe.edu.utp.medifast.dto.validacion.InicioDisponibleDto;
+import pe.edu.utp.medifast.dto.DisponibilidadDto;
+import pe.edu.utp.medifast.dto.BloqueHorarioDto;
+import pe.edu.utp.medifast.dto.InicioDisponibleDto;
 import pe.edu.utp.medifast.exception.CitaActivaException;
 import pe.edu.utp.medifast.exception.FueraDeRangoException;
 import pe.edu.utp.medifast.exception.HorarioNoDisponibleException;
 import pe.edu.utp.medifast.model.Cita;
+import pe.edu.utp.medifast.model.Consultorio;
 import pe.edu.utp.medifast.model.Horario;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.Paciente;
@@ -31,176 +40,225 @@ import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.Auditoria;
+import pe.edu.utp.medifast.util.Auditoria.Evento;
 
+/** Implementación transaccional de disponibilidad y reserva (RN-01 a RN-09). */
 @Service
 public class ReservaServiceImpl implements ReservaService {
 
-    private static final int MINUTOS_BLOQUE = 30;
-    private static final int MINUTOS_APARTADO = 15;
-    private static final int DIAS_ANTICIPACION_MIN = 1;
-    private static final int DIAS_ANTICIPACION_MAX = 30;
+	private static final List<EstadoCitaEnum> ESTADOS_ACTIVOS =
+			List.of(EstadoCitaEnum.PENDIENTE_PAGO, EstadoCitaEnum.PROGRAMADA);
 
-    private final CitaDao citaDao;
-    private final HorarioDao horarioDao;
-    private final TarifaDao tarifaDao;
-    private final PacienteDao pacienteDao;
-    private final VistaCitaDao vistaCitaDao;
-    private final Auditoria auditoria;
-    private final Clock clock;
+	private final PacienteDao pacienteDao;
+	private final MedicoDao medicoDao;
+	private final CitaDao citaDao;
+	private final CitaHorarioDao citaHorarioDao;
+	private final HorarioDao horarioDao;
+	private final TarifaDao tarifaDao;
+	private final VistaCitaDao vistaCitaDao;
+	private final Auditoria auditoria;
+	private final Clock clock;
 
-    public ReservaServiceImpl(
-            CitaDao citaDao,
-            HorarioDao horarioDao,
-            TarifaDao tarifaDao,
-            PacienteDao pacienteDao,
-            VistaCitaDao vistaCitaDao,
-            Auditoria auditoria,
-            Clock clock) {
-        this.citaDao = citaDao;
-        this.horarioDao = horarioDao;
-        this.tarifaDao = tarifaDao;
-        this.pacienteDao = pacienteDao;
-        this.vistaCitaDao = vistaCitaDao;
-        this.auditoria = auditoria;
-        this.clock = clock;
-    }
+	@Autowired
+	public ReservaServiceImpl(PacienteDao pacienteDao, MedicoDao medicoDao, CitaDao citaDao,
+			CitaHorarioDao citaHorarioDao, HorarioDao horarioDao, TarifaDao tarifaDao, VistaCitaDao vistaCitaDao,
+			Auditoria auditoria) {
+		this(pacienteDao, medicoDao, citaDao, citaHorarioDao, horarioDao, tarifaDao, vistaCitaDao, auditoria,
+				Clock.system(ZoneId.of("America/Lima")));
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public DisponibilidadDto disponibilidad(Long idPaciente, Long idMedico, LocalDate fecha) {
-        LocalDate hoy = LocalDate.now(clock);
+	ReservaServiceImpl(PacienteDao pacienteDao, MedicoDao medicoDao, CitaDao citaDao, CitaHorarioDao citaHorarioDao,
+			HorarioDao horarioDao, TarifaDao tarifaDao, VistaCitaDao vistaCitaDao, Auditoria auditoria, Clock clock) {
+		this.pacienteDao = pacienteDao;
+		this.medicoDao = medicoDao;
+		this.citaDao = citaDao;
+		this.citaHorarioDao = citaHorarioDao;
+		this.horarioDao = horarioDao;
+		this.tarifaDao = tarifaDao;
+		this.vistaCitaDao = vistaCitaDao;
+		this.auditoria = auditoria;
+		this.clock = clock;
+	}
 
-        if (fecha.isBefore(hoy.plusDays(DIAS_ANTICIPACION_MIN)) || fecha.isAfter(hoy.plusDays(DIAS_ANTICIPACION_MAX))) {
-            throw new FueraDeRangoException("La fecha está fuera de la ventana de reserva permitida (1 a 30 días).");
-        }
+	@Override
+	@Transactional(readOnly = true)
+	public DisponibilidadDto disponibilidad(Long idPaciente, Long idMedico, LocalDate fecha) {
+		requirePaciente(idPaciente);
+		Medico medico = requireMedico(idMedico);
+		Consultorio consultorio = medico.getConsultorio();
+		LocalDate fechaMin = fechaMin(consultorio);
+		LocalDate fechaMax = fechaMax(consultorio);
+		validarFecha(fecha, fechaMin, fechaMax);
 
-        List<Horario> libres = horarioDao.bloquesLibres(idMedico, fecha);
-        
-        TipoCitaEnum tipo = detectarTipo(idPaciente, idMedico);
-        Tarifa tarifa = tarifaDao.findByMedicoIdAndTipoCita(idMedico, tipo)
-            .orElseThrow(() -> new IllegalArgumentException("Tarifa no configurada para el médico"));
+		TipoCitaEnum tipo = detectarTipo(idPaciente, idMedico);
+		Tarifa tarifa = requireTarifa(idMedico, tipo);
+		int bloquesNecesarios = bloquesNecesarios(tarifa, consultorio.getMinutosBloque());
+		List<Horario> bloquesDelDia = horarioDao.bloquesDelDia(idMedico, fecha);
+		List<Long> horariosOcupados = citaHorarioDao.findIdsActivosByMedicoAndFecha(idMedico, fecha);
+		List<Horario> bloquesLibres = bloquesDelDia.stream()
+				.filter(bloque -> !bloque.isBloqueado() && !horariosOcupados.contains(bloque.getId()))
+				.toList();
+		List<InicioDisponibleDto> inicios = buscarInicios(bloquesLibres, bloquesNecesarios);
+		List<BloqueHorarioDto> bloques = bloquesDelDia.stream()
+				.map(bloque -> {
+					boolean ocupado = horariosOcupados.contains(bloque.getId());
+					return new BloqueHorarioDto(bloque.getId(), bloque.getHoraInicio(), bloque.getHoraFin(),
+							!bloque.isBloqueado() && !ocupado, ocupado, bloque.isBloqueado());
+				})
+				.toList();
+		Optional<VistaCita> citaActiva = citaDao.findFirstByPacienteIdAndEstadoIn(idPaciente, ESTADOS_ACTIVOS)
+				.map(cita -> vistaCitaDao.findById(cita.getId()).orElseThrow(
+						() -> new EntityNotFoundException("No se encontró el detalle de la cita activa.")));
 
-        int bloquesNecesarios = tarifa.getDuracionMin() / MINUTOS_BLOQUE;
-        List<InicioDisponibleDto> inicios = calcularIniciosValidos(libres, bloquesNecesarios);
+		return new DisponibilidadDto(tipo, tarifa.getDuracionMin(), tarifa.getPrecio(), fechaMin, fechaMax, fecha,
+				inicios, bloques, citaActiva);
+	}
 
-        // Búsqueda tipo-safe de cita activa usando enums y mapeando la vista
-        List<EstadoCitaEnum> estadosActivos = List.of(EstadoCitaEnum.PENDIENTE_PAGO, EstadoCitaEnum.PROGRAMADA);
-        Optional<Cita> citaEntidad = citaDao.findFirstByPacienteIdAndEstadoIn(idPaciente, estadosActivos);
-        Optional<VistaCita> citaActiva = citaEntidad.flatMap(c -> vistaCitaDao.findById(c.getId()));
+	@Override
+	@Transactional(readOnly = true)
+	public TipoCitaEnum detectarTipo(Long idPaciente, Long idMedico) {
+		requirePaciente(idPaciente);
+		requireMedico(idMedico);
+		boolean tieneAtendida = citaDao.existsByPacienteIdAndMedicoIdAndEstado(idPaciente, idMedico,
+				EstadoCitaEnum.ATENDIDA);
+		return tieneAtendida ? TipoCitaEnum.CONTROL : TipoCitaEnum.NUEVO;
+	}
 
-        return new DisponibilidadDto(
-            tipo,
-            tarifa.getDuracionMin(),
-            tarifa.getPrecio(),
-            hoy.plusDays(DIAS_ANTICIPACION_MIN),
-            hoy.plusDays(DIAS_ANTICIPACION_MAX),
-            fecha,
-            inicios,
-            citaActiva
-        );
-    }
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public Cita reservar(Long idPaciente, Long idHorario) {
+		Paciente paciente = requirePaciente(idPaciente);
+		citaDao.findFirstByPacienteIdAndEstadoIn(idPaciente, ESTADOS_ACTIVOS)
+				.ifPresent(cita -> {
+					throw new CitaActivaException(cita);
+				});
 
-    @Override
-    @Transactional(readOnly = true)
-    public TipoCitaEnum detectarTipo(Long idPaciente, Long idMedico) {
-        boolean tieneAtendida = citaDao.existsByPacienteIdAndMedicoIdAndEstado(idPaciente, idMedico, EstadoCitaEnum.ATENDIDA);
-        return tieneAtendida ? TipoCitaEnum.CONTROL : TipoCitaEnum.NUEVO;
-    }
+		Horario inicio = horarioDao.findById(idHorario)
+				.orElseThrow(HorarioNoDisponibleException::new);
+		Long idMedico = inicio.getMedico().getId();
+		Medico medico = requireMedico(idMedico);
+		Consultorio consultorio = medico.getConsultorio();
+		LocalDate fecha = inicio.getFecha();
+		validarFecha(fecha, fechaMin(consultorio), fechaMax(consultorio));
+		if (inicio.isBloqueado()) {
+			throw new HorarioNoDisponibleException();
+		}
 
-    @Override
-    @Transactional
-    public Cita reservar(Long idPaciente, Long idHorario) {
-        citaDao.findFirstByPacienteIdAndEstadoIn(idPaciente, List.of(EstadoCitaEnum.PENDIENTE_PAGO, EstadoCitaEnum.PROGRAMADA))
-            .ifPresent(c -> {
-                VistaCita vista = vistaCitaDao.findById(c.getId()).orElse(null);
-                throw new CitaActivaException("El paciente ya posee una cita activa.", vista);
-            });
+		TipoCitaEnum tipo = detectarTipo(idPaciente, idMedico);
+		Tarifa tarifa = requireTarifa(idMedico, tipo);
+		int cantidadBloques = bloquesNecesarios(tarifa, consultorio.getMinutosBloque());
+		List<Horario> libres = horarioDao.bloquesLibres(idMedico, fecha);
+		int indiceInicio = indiceBloque(libres, idHorario);
+		if (indiceInicio < 0 || !inicio.getHoraInicio().equals(libres.get(indiceInicio).getHoraInicio())) {
+			throw new HorarioNoDisponibleException();
+		}
+		List<Horario> seleccionados = seleccionarConsecutivos(libres, indiceInicio, cantidadBloques);
+		if (seleccionados.isEmpty()) {
+			throw new HorarioNoDisponibleException();
+		}
 
-        Horario hInicio = horarioDao.findById(idHorario)
-            .orElseThrow(() -> new HorarioNoDisponibleException("El bloque de horario no existe."));
+		LocalDateTime expiraEn = LocalDateTime.now(clock).plusMinutes(consultorio.getMinutosApartado());
+		Cita cita = new Cita(paciente, medico, tipo, expiraEn);
+		seleccionados.forEach(cita::agregarBloque);
+		try {
+			Cita guardada = citaDao.saveAndFlush(cita);
+			auditoria.registrar(Evento.RESERVA, "id_cita=" + guardada.getId());
+			return guardada;
+		} catch (DataIntegrityViolationException ex) {
+			if (contieneRestriccion(ex, "uq_cita_paciente_activo")) {
+				Cita activa = citaDao.findFirstByPacienteIdAndEstadoIn(idPaciente, ESTADOS_ACTIVOS)
+						.orElseThrow(() -> ex);
+				throw new CitaActivaException(activa);
+			}
+			if (contieneRestriccion(ex, "uq_cita_horario_activo")) {
+				throw new HorarioNoDisponibleException();
+			}
+			throw ex;
+		}
+	}
 
-        Medico medico = hInicio.getMedico();
-        LocalDate hoy = LocalDate.now(clock);
+	private Paciente requirePaciente(Long idPaciente) {
+		return pacienteDao.findById(idPaciente)
+				.orElseThrow(() -> new EntityNotFoundException("No se encontró el paciente solicitado."));
+	}
 
-        if (hInicio.getFecha().isBefore(hoy.plusDays(DIAS_ANTICIPACION_MIN)) ||
-            hInicio.getFecha().isAfter(hoy.plusDays(DIAS_ANTICIPACION_MAX))) {
-            throw new FueraDeRangoException("Fecha fuera del rango permitido.");
-        }
+	private Medico requireMedico(Long idMedico) {
+		return medicoDao.findById(idMedico)
+				.orElseThrow(() -> new EntityNotFoundException("No se encontró el médico solicitado."));
+	}
 
-        if (hInicio.isBloqueado()) {
-            throw new HorarioNoDisponibleException("El horario seleccionado está bloqueado.");
-        }
+	private Tarifa requireTarifa(Long idMedico, TipoCitaEnum tipo) {
+		return tarifaDao.findByMedicoIdAndTipoCita(idMedico, tipo)
+				.orElseThrow(() -> new EntityNotFoundException("No se encontró la tarifa para el tipo de cita."));
+	}
 
-        TipoCitaEnum tipo = detectarTipo(idPaciente, medico.getId());
-        Tarifa tarifa = tarifaDao.findByMedicoIdAndTipoCita(medico.getId(), tipo)
-            .orElseThrow(() -> new IllegalArgumentException("Tarifa no configurada."));
+	private LocalDate fechaMin(Consultorio consultorio) {
+		return LocalDate.now(clock).plusDays(consultorio.getDiasAnticipacionMin());
+	}
 
-        int bloquesNecesarios = tarifa.getDuracionMin() / MINUTOS_BLOQUE;
-        List<Horario> bloquesTomados = obtenerBloquesConsecutivos(medico.getId(), hInicio.getFecha(), hInicio, bloquesNecesarios);
+	private LocalDate fechaMax(Consultorio consultorio) {
+		return LocalDate.now(clock).plusDays(consultorio.getDiasAnticipacionMax());
+	}
 
-        Paciente paciente = pacienteDao.findById(idPaciente)
-            .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado."));
+	private static void validarFecha(LocalDate fecha, LocalDate fechaMin, LocalDate fechaMax) {
+		if (fecha == null || fecha.isBefore(fechaMin) || fecha.isAfter(fechaMax)) {
+			throw new FueraDeRangoException();
+		}
+	}
 
-        LocalDateTime expiraEn = LocalDateTime.now(clock).plusMinutes(MINUTOS_APARTADO);
-        Cita cita = new Cita(paciente, medico, tipo, expiraEn);
+	private static int bloquesNecesarios(Tarifa tarifa, int minutosBloque) {
+		if (minutosBloque <= 0 || tarifa.getDuracionMin() <= 0) {
+			throw new IllegalStateException("La duración de la tarifa y del bloque debe ser positiva.");
+		}
+		return (tarifa.getDuracionMin() + minutosBloque - 1) / minutosBloque;
+	}
 
-        for (Horario b : bloquesTomados) {
-            cita.agregarBloque(b);
-        }
+	private static List<InicioDisponibleDto> buscarInicios(List<Horario> libres, int cantidadBloques) {
+		List<InicioDisponibleDto> inicios = new ArrayList<>();
+		for (int indice = 0; indice + cantidadBloques <= libres.size(); indice++) {
+			List<Horario> consecutivos = seleccionarConsecutivos(libres, indice, cantidadBloques);
+			if (!consecutivos.isEmpty()) {
+				Horario primero = consecutivos.getFirst();
+				Horario ultimo = consecutivos.getLast();
+				inicios.add(new InicioDisponibleDto(primero.getId(), primero.getHoraInicio(), ultimo.getHoraFin()));
+			}
+		}
+		return inicios;
+	}
 
-        try {
-            Cita guardada = citaDao.saveAndFlush(cita);
-            auditoria.reserva(guardada.getId());
-            return guardada;
-        } catch (DataIntegrityViolationException e) {
-            String msg = e.getMessage() != null ? e.getMessage() : "";
-            if (msg.contains("uq_cita_paciente_activo")) {
-                throw new CitaActivaException("Ya cuenta con una cita activa.", null);
-            }
-            if (msg.contains("uq_cita_horario_activo")) {
-                throw new HorarioNoDisponibleException("El horario ya fue reservado por otro paciente.");
-            }
-            throw e;
-        }
-    }
+	private static List<Horario> seleccionarConsecutivos(List<Horario> libres, int indiceInicio, int cantidad) {
+		if (cantidad <= 0 || indiceInicio < 0 || indiceInicio + cantidad > libres.size()) {
+			return List.of();
+		}
+		List<Horario> seleccionados = new ArrayList<>(cantidad);
+		for (int indice = indiceInicio; indice < indiceInicio + cantidad; indice++) {
+			Horario actual = libres.get(indice);
+			if (actual.isBloqueado()
+					|| (indice > indiceInicio
+							&& !libres.get(indice - 1).getHoraFin().equals(actual.getHoraInicio()))) {
+				return List.of();
+			}
+			seleccionados.add(actual);
+		}
+		return seleccionados;
+	}
 
-    private List<InicioDisponibleDto> calcularIniciosValidos(List<Horario> libres, int n) {
-        List<InicioDisponibleDto> result = new ArrayList<>();
-        for (int i = 0; i <= libres.size() - n; i++) {
-            boolean esConsecutivo = true;
-            for (int j = 0; j < n - 1; j++) {
-                if (!libres.get(i + j).getHoraFin().equals(libres.get(i + j + 1).getHoraInicio())) {
-                    esConsecutivo = false;
-                    break;
-                }
-            }
-            if (esConsecutivo) {
-                Horario primero = libres.get(i);
-                Horario ultimo = libres.get(i + n - 1);
-                result.add(new InicioDisponibleDto(primero.getId(), primero.getHoraInicio(), ultimo.getHoraFin()));
-            }
-        }
-        return result;
-    }
+	private static int indiceBloque(List<Horario> libres, Long idHorario) {
+		for (int indice = 0; indice < libres.size(); indice++) {
+			if (libres.get(indice).getId().equals(idHorario)) {
+				return indice;
+			}
+		}
+		return -1;
+	}
 
-    private List<Horario> obtenerBloquesConsecutivos(Long idMedico, LocalDate fecha, Horario hInicio, int n) {
-        List<Horario> libres = horarioDao.bloquesLibres(idMedico, fecha);
-        int idx = libres.indexOf(hInicio);
-        if (idx == -1 || idx + n > libres.size()) {
-            throw new HorarioNoDisponibleException("El horario ya no se encuentra disponible.");
-        }
-
-        List<Horario> tomados = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            Horario actual = libres.get(idx + i);
-            if (i > 0) {
-                Horario previo = libres.get(idx + i - 1);
-                if (!previo.getHoraFin().equals(actual.getHoraInicio())) {
-                    throw new HorarioNoDisponibleException("No existen bloques consecutivos suficientes.");
-                }
-            }
-            tomados.add(actual);
-        }
-        return tomados;
-    }
+	private static boolean contieneRestriccion(DataIntegrityViolationException ex, String nombre) {
+		for (Throwable causa = ex; causa != null; causa = causa.getCause()) {
+			String mensaje = causa.getMessage();
+			if (mensaje != null && mensaje.toLowerCase(Locale.ROOT).contains(nombre)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

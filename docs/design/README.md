@@ -60,6 +60,6 @@ Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](..
 | P6 | Mi perfil | [P6-perfil](P6-perfil/iteraciones.md) | v3 | ✅ Aprobada (3 ajustes pendientes en Figma) |
 | P7 | Agenda | [P7-agenda](P7-agenda/iteraciones.md) | v3 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P8 | Detalle de cita | [P8-detalle-cita](P8-detalle-cita/iteraciones.md) | v3 | ✅ Aprobada (7 ajustes pendientes en Figma) |
-| P9 | Reporte de citas | — | — | ⏳ Pendiente |
+| P9 | Reporte de citas | [P9-reporte-citas](P9-reporte-citas/iteraciones.md) | v3 | ✅ Aprobada (5 ajustes pendientes en Figma) |
 | P10 | Reporte de pagos | — | — | ⏳ Pendiente |
 | — | Errores 403 / 404 | — | — | ⏳ Pendiente |

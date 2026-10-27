@@ -137,6 +137,7 @@ P9 – Reporte de citas:
 - Filtros: rango de fechas, atajos Día/Semana/Mes y estado.
 - 4 KPI cards: total de citas, atendidas, canceladas y no asistieron.
 - Tabla de resultados y el botón "Exportar Excel" (ícono de hoja de cálculo).
+- Sin buscador ni comparación con otros períodos; indicadores calculados sobre el resultado filtrado. Prompt detallado en P9-reporte-citas/iteraciones.md.
 ```
 
 ## P10 – Reporte de pagos

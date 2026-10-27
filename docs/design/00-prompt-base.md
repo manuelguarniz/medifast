@@ -36,6 +36,7 @@ SISTEMA DE DISEÑO (respetar estrictamente)
 - Badges tipo píldora con punto de color:
   - Estados de cita: "Pago pendiente" (ámbar), "Confirmada" (azul info), "Atendida" (verde), "No asistió" (gris), "Cancelada" (rojo)
   - Estados de pago: "Por validar" (ámbar), "Verificado" (verde), "Rechazado" (rojo)
+  - Colores exactos (fondo / punto / texto): ámbar #fef3c7 / #f59e0b / #b45309; azul info #e0f2fe / #0284c7 / #0369a1; verde #d1fae5 / #10b981 / #047857; gris #f1f5f9 / #64748b / #475569; rojo #fee2e2 / #ef4444 / #b91c1c
 - Alertas flash: éxito, error, información y advertencia, con fondo tenue, borde de 1px del mismo color, radio de 8px, ícono a la izquierda y texto en negrita al inicio.
 - Slots de horario: botones cuadrados con la hora en tres estados (Disponible, Seleccionado relleno primario, Ocupado gris tachado). Los slots no se mueven de lugar.
 - Contador regresivo mm:ss en una píldora oscura dentro de un aviso verde claro: "Tu horario está bloqueado temporalmente para completar el pago".
@@ -88,3 +89,4 @@ NO INCLUIR (fuera de alcance)
 | 2026-10-26 | Se excluyen la barra de pestañas inferior, el avatar en la navbar, los sellos de confianza y los fondos lavanda | Feedback de [P2 v1](P2-reservar/iteraciones.md) |
 | 2026-10-27 | Se excluye explícitamente la cancelación por el paciente | Feedback de [P5 v3](P5-mis-citas/iteraciones.md) |
 | 2026-10-26 | Se extiende la exclusión de los fondos lavanda a los rellenos de controles y se agrega #f1f5f9 como neutro | Feedback de [P7 v1](P7-agenda/iteraciones.md) |
+| 2026-10-26 | Se agregan los hex de fondo, punto y texto de cada badge | Feedback de [P9 v1](P9-reporte-citas/iteraciones.md) |

@@ -35,6 +35,7 @@ import pe.edu.utp.medifast.dao.PacienteDao;
 import pe.edu.utp.medifast.dao.TarifaDao;
 import pe.edu.utp.medifast.dao.VistaCitaDao;
 import pe.edu.utp.medifast.dto.DisponibilidadDto;
+import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.exception.CitaActivaException;
 import pe.edu.utp.medifast.exception.FueraDeRangoException;
 import pe.edu.utp.medifast.exception.HorarioNoDisponibleException;
@@ -44,7 +45,9 @@ import pe.edu.utp.medifast.model.Horario;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.Paciente;
 import pe.edu.utp.medifast.model.Tarifa;
+import pe.edu.utp.medifast.model.VistaCita;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
+import pe.edu.utp.medifast.model.enums.EstadoPagoEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.util.Auditoria;
 import pe.edu.utp.medifast.util.Auditoria.Evento;
@@ -251,6 +254,81 @@ class ReservaServiceImplTest {
 				.isInstanceOf(CitaActivaException.class)
 				.satisfies(excepcion -> assertThat(((CitaActivaException) excepcion).getCitaActiva())
 						.isSameAs(citaActiva));
+	}
+
+	@Test
+	void historialSeparaLaCitaActivaDelRestoManteniendoElOrden() {
+		VistaCita programada = vista(124L, EstadoCitaEnum.PROGRAMADA, null, EstadoPagoEnum.POR_VALIDAR, "150.00");
+		VistaCita cancelada = vista(117L, EstadoCitaEnum.CANCELADA, null, EstadoPagoEnum.RECHAZADO, "150.00");
+		VistaCita noAsistio = vista(96L, EstadoCitaEnum.NO_ASISTIO, null, EstadoPagoEnum.VALIDADO, "150.00");
+		when(vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(ID_PACIENTE))
+				.thenReturn(List.of(programada, cancelada, noAsistio));
+
+		MisCitasDto citas = servicio.historial(ID_PACIENTE);
+
+		assertThat(citas.proxima()).get().extracting(dto -> dto.cita()).isSameAs(programada);
+		assertThat(citas.historial()).extracting(dto -> dto.cita()).containsExactly(cancelada, noAsistio);
+		assertThat(citas.proxima().get().permiteDetalle()).isTrue();
+		assertThat(citas.proxima().get().tieneConstancia()).isTrue();
+	}
+
+	@Test
+	void historialCalculaElTiempoRestanteYUsaLaTarifaSiAunNoHayPago() {
+		LocalDateTime expira = LocalDateTime.now(RELOJ_FIJO).plusMinutes(12).plusSeconds(48);
+		VistaCita pendiente = vista(124L, EstadoCitaEnum.PENDIENTE_PAGO, expira, null, null);
+		when(vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(ID_PACIENTE))
+				.thenReturn(List.of(pendiente));
+
+		MisCitasDto citas = servicio.historial(ID_PACIENTE);
+
+		assertThat(citas.historial()).isEmpty();
+		assertThat(citas.proxima()).hasValueSatisfying(dto -> {
+			assertThat(dto.pagoPendiente()).isTrue();
+			assertThat(dto.vencida()).isFalse();
+			assertThat(dto.segundosRestantes()).isEqualTo(12 * 60 + 48);
+			assertThat(dto.monto()).isEqualByComparingTo("150.00");
+			assertThat(dto.permiteDetalle()).isFalse();
+			assertThat(dto.tieneConstancia()).isFalse();
+		});
+	}
+
+	@Test
+	void historialMarcaComoVencidaLaPendienteCuyoPlazoPasoYLaPasaAlHistorial() {
+		VistaCita vencida = vista(130L, EstadoCitaEnum.PENDIENTE_PAGO,
+				LocalDateTime.now(RELOJ_FIJO).minusMinutes(1), null, null);
+		when(vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(ID_PACIENTE))
+				.thenReturn(List.of(vencida));
+
+		MisCitasDto citas = servicio.historial(ID_PACIENTE);
+
+		assertThat(citas.proxima()).isEmpty();
+		assertThat(citas.historial()).singleElement().satisfies(dto -> {
+			assertThat(dto.vencida()).isTrue();
+			assertThat(dto.pagoPendiente()).isFalse();
+			assertThat(dto.segundosRestantes()).isZero();
+		});
+	}
+
+	@Test
+	void historialRechazaPacienteInexistente() {
+		when(pacienteDao.findById(99L)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> servicio.historial(99L))
+				.isInstanceOf(jakarta.persistence.EntityNotFoundException.class);
+	}
+
+	private static VistaCita vista(long id, EstadoCitaEnum estado, LocalDateTime expiraEn, EstadoPagoEnum estadoPago,
+			String monto) {
+		VistaCita vista = org.mockito.Mockito.mock(VistaCita.class);
+		when(vista.getIdCita()).thenReturn(id);
+		when(vista.getIdMedico()).thenReturn(ID_MEDICO);
+		when(vista.getTipoCita()).thenReturn(TipoCitaEnum.NUEVO);
+		when(vista.getEstado()).thenReturn(estado);
+		when(vista.getExpiraEn()).thenReturn(expiraEn);
+		when(vista.getEstadoPago()).thenReturn(estadoPago);
+		when(vista.getIdPago()).thenReturn(estadoPago == null ? null : id + 1000);
+		when(vista.getMonto()).thenReturn(monto == null ? null : new BigDecimal(monto));
+		return vista;
 	}
 
 	private static Horario horario(long id, String inicio, String fin) {

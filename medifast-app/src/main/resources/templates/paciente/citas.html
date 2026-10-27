@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mis citas')}"></head>
+<body class="perfil-page">
+<nav th:replace="~{fragments/layout :: navbarPaciente('citas')}"></nav>
+
+<main class="perfil-main citas-main">
+    <header class="perfil-heading citas-heading">
+        <div>
+            <p class="perfil-eyebrow">TU HISTORIAL</p>
+            <h1>Mis citas</h1>
+            <p>Revisa tu próxima cita y el historial de tus citas.</p>
+        </div>
+        <!-- RN-09: solo se ofrece reservar si no hay cita activa. En móvil, con el estado vacío visible, basta su botón -->
+        <a th:if="${proxima == null}" class="registro-submit citas-reservar" th:href="@{/paciente/reservar}"
+           th:classappend="${pestana == 'proximas'} ? 'citas-reservar-escritorio'">
+            Reservar cita <span aria-hidden="true">→</span>
+        </a>
+    </header>
+
+    <nav class="citas-tabs" aria-label="Citas">
+        <a th:href="@{/paciente/citas(tab='proximas')}" th:classappend="${pestana == 'proximas'} ? 'active'"
+           th:attr="aria-current=${pestana == 'proximas' ? 'page' : null}">
+            Próximas <span class="citas-contador" th:if="${proxima != null}">1</span>
+        </a>
+        <a th:href="@{/paciente/citas(tab='historial')}" th:classappend="${pestana == 'historial'} ? 'active'"
+           th:attr="aria-current=${pestana == 'historial' ? 'page' : null}">
+            Historial <span class="citas-contador" th:unless="${historial.isEmpty()}"
+                            th:text="${historial.size()}">3</span>
+        </a>
+    </nav>
+
+    <!-- Pestaña "Próximas": como máximo una cita (RN-09) -->
+    <section th:if="${pestana == 'proximas'}" aria-label="Próximas citas">
+        <article th:if="${proxima != null}" th:with="cita=${proxima}" class="citas-card"
+                 th:classappend="${cita.continuarPago} ? 'citas-card-pendiente'">
+            <div class="citas-fecha" aria-hidden="true">
+                <span th:text="${cita.mes}">NOV</span>
+                <strong th:text="${cita.dia}">11</strong>
+                <small th:text="${cita.diaSemana}">Miércoles</small>
+            </div>
+
+            <div class="citas-card-body">
+                <p class="citas-card-top">
+                    <span class="reserva-status" th:classappend="'citas-badge-' + ${cita.claseEstado}"
+                          th:text="${cita.etiquetaEstado}">Confirmada</span>
+                    <span class="citas-numero" th:text="${cita.numero}">#000124</span>
+                </p>
+                <h2 th:text="${cita.tipo + ' · ' + cita.minutos + ' min'}">Nuevo · 60 min</h2>
+                <p class="citas-medico">
+                    <span th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</span><span
+                        th:if="${especialidad != null}" th:text="${' · ' + especialidad}"> · Medicina Interna y Reumatología</span>
+                </p>
+                <p class="citas-meta">
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                        <span th:text="${cita.horaCard}">10:30–11:30 a. m.</span>
+                    </span>
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>
+                        <span th:text="${cita.monto}">S/ 150.00</span>
+                    </span>
+                </p>
+                <p class="citas-pago" th:if="${cita.etiquetaPago != null}">
+                    Pago:
+                    <span class="citas-badge" th:classappend="'citas-badge-' + ${cita.clasePago}"
+                          th:text="${cita.etiquetaPago}">Por validar</span>
+                </p>
+            </div>
+
+            <div class="citas-card-actions" th:if="${cita.continuarPago}">
+                <span class="citas-tiempo-label">Tiempo para pagar</span>
+                <span class="citas-countdown" role="timer" aria-label="Tiempo restante para pagar">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    <span th:attr="data-segundos=${cita.segundosRestantes}"
+                          th:text="${#numbers.formatInteger(cita.segundosRestantes / 60, 2) + ':' + #numbers.formatInteger(cita.segundosRestantes % 60, 2)}">12:48</span>
+                </span>
+                <a class="registro-submit citas-boton" th:href="@{/paciente/pago(citaId=${cita.id})}">
+                    Continuar pago <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="citas-card-actions" th:if="${cita.permiteDetalle}">
+                <a class="citas-boton-secundario" th:href="@{/paciente/citas/{id}/pdf(id=${cita.id})}">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>
+                    Descargar PDF
+                </a>
+                <div class="citas-enlaces">
+                    <a th:href="@{/paciente/confirmacion(citaId=${cita.id})}">Ver detalle</a>
+                    <a th:if="${cita.tieneConstancia}" th:href="@{/paciente/citas/{id}/constancia(id=${cita.id})}"
+                       target="_blank" rel="noopener">Ver constancia <span aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+        </article>
+
+        <p th:if="${proxima != null}" class="citas-nota">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+            Solo puedes tener una cita activa. Cuando termine, la verás en Historial.
+        </p>
+
+        <div th:if="${proxima == null}" class="citas-vacio">
+            <span class="citas-vacio-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+            </span>
+            <h2 th:text="${historial.isEmpty()} ? 'No tienes citas registradas' : 'No tienes citas próximas'">No tienes citas próximas</h2>
+            <p th:text="|Reserva una cita con el ${nombreMedico}.|">Reserva una cita con el Dr. Moisés Barrantes Cabrera.</p>
+            <a class="registro-submit citas-boton" th:href="@{/paciente/reservar}">Reservar cita <span aria-hidden="true">→</span></a>
+        </div>
+    </section>
+
+    <!-- Pestaña "Historial": atendidas, no asistió, canceladas y vencidas (RF10) -->
+    <section th:if="${pestana == 'historial'}" aria-label="Historial de citas">
+        <th:block th:unless="${historial.isEmpty()}">
+            <p class="citas-ayuda">De la más reciente a la más antigua.</p>
+
+            <div class="citas-tabla-card">
+                <table class="citas-tabla">
+                    <thead>
+                    <tr>
+                        <th scope="col">N.º</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Cita</th>
+                        <th scope="col">Pago</th>
+                        <th scope="col" class="citas-col-acciones">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="cita : ${historial}">
+                        <tr th:classappend="${cita.motivo != null} ? 'citas-fila-con-motivo'">
+                            <td class="citas-numero" th:text="${cita.numero}">#000117</td>
+                            <td class="citas-fuerte" th:text="${cita.fechaTabla}">Lun 2 nov 2026</td>
+                            <td th:text="${cita.horaTabla}">09:00–10:00</td>
+                            <td th:text="${cita.tipo}">Nuevo</td>
+                            <td class="citas-fuerte" th:text="${cita.monto}">S/ 150.00</td>
+                            <td><span class="citas-badge" th:classappend="'citas-badge-' + ${cita.claseEstado}"
+                                      th:text="${cita.etiquetaEstado}">Cancelada</span></td>
+                            <td>
+                                <span th:if="${cita.etiquetaPago != null}" class="citas-badge"
+                                      th:classappend="'citas-badge-' + ${cita.clasePago}"
+                                      th:text="${cita.etiquetaPago}">Rechazado</span>
+                                <span th:if="${cita.etiquetaPago == null}" class="citas-guion">—</span>
+                            </td>
+                            <td class="citas-col-acciones">
+                                <div th:replace="~{fragments/citas :: accionesHistorial(${cita})}"></div>
+                            </td>
+                        </tr>
+                        <tr th:if="${cita.motivo != null}" class="citas-motivo-fila">
+                            <td colspan="8">
+                                <p class="citas-motivo">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+                                    <span th:text="|Motivo: ${cita.motivo}|">Motivo: Tiempo de reserva vencido.</span>
+                                </p>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Móvil (360 px): una tarjeta por cita -->
+            <ul class="citas-lista">
+                <li th:each="cita : ${historial}" class="citas-item">
+                    <div class="citas-item-top">
+                        <span class="citas-numero" th:text="${cita.numero}">#000117</span>
+                        <span>
+                            <span class="citas-badge" th:classappend="'citas-badge-' + ${cita.claseEstado}"
+                                  th:text="${cita.etiquetaEstado}">Cancelada</span>
+                            <span th:if="${cita.etiquetaPago != null}" class="citas-badge"
+                                  th:classappend="'citas-badge-' + ${cita.clasePago}"
+                                  th:text="${cita.etiquetaPago}">Rechazado</span>
+                        </span>
+                    </div>
+                    <dl class="citas-item-datos">
+                        <div><dt>Fecha:</dt><dd th:text="${cita.fechaTabla}">Lun 2 nov 2026</dd></div>
+                        <div><dt>Hora:</dt><dd th:text="${cita.horaTabla}">09:00–10:00</dd></div>
+                        <div><dt>Tipo:</dt><dd th:text="${cita.tipo}">Nuevo</dd></div>
+                        <div><dt>Monto:</dt><dd th:text="${cita.monto}">S/ 150.00</dd></div>
+                    </dl>
+                    <p th:if="${cita.motivo != null}" class="citas-motivo citas-motivo-caja">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+                        <span th:text="|Motivo: ${cita.motivo}|">Motivo: Tiempo de reserva vencido.</span>
+                    </p>
+                    <div class="citas-item-acciones" th:if="${cita.tieneAcciones()}">
+                        <div th:replace="~{fragments/citas :: accionesHistorial(${cita})}"></div>
+                    </div>
+                </li>
+            </ul>
+        </th:block>
+
+        <div th:if="${historial.isEmpty()}" class="citas-vacio">
+            <span class="citas-vacio-icono" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg>
+            </span>
+            <h2>Aún no tienes citas en tu historial</h2>
+            <p>Aquí verás tus citas atendidas, canceladas o vencidas.</p>
+        </div>
+    </section>
+</main>
+
+<footer class="perfil-footer">Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú</footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    // Mismo contador que P2: al llegar a 0 se recarga y la cita aparece como "Vencida" en Historial.
+    const contador = document.querySelector("[data-segundos]");
+    if (contador) {
+        let restantes = Number(contador.dataset.segundos);
+        const intervalo = setInterval(() => {
+            restantes = Math.max(restantes - 1, 0);
+            const minutos = String(Math.floor(restantes / 60)).padStart(2, "0");
+            contador.textContent = `${minutos}:${String(restantes % 60).padStart(2, "0")}`;
+            if (restantes === 0) {
+                clearInterval(intervalo);
+                window.location.reload();
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>

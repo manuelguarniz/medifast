@@ -171,6 +171,8 @@ class ReservaControllerTest {
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("reserva-status-confirmada")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Ver mis citas")))
 				.andExpect(content().string(org.hamcrest.Matchers.not(
+						org.hamcrest.Matchers.containsString("reserva-mobile-continue"))))
+				.andExpect(content().string(org.hamcrest.Matchers.not(
 						org.hamcrest.Matchers.containsString("/paciente/pago?citaId=44"))));
 	}
 
@@ -181,10 +183,11 @@ class ReservaControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(view().name("paciente/reservar"))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Reserva tu cita")))
-				.andExpect(content().string(org.hamcrest.Matchers.containsString("Hola, ")))
-				.andExpect(content().string(org.hamcrest.Matchers.containsString("<span>Ana</span>")))
-				.andExpect(content().string(org.hamcrest.Matchers.containsString("Ana María Salazar Rojas")))
-				.andExpect(content().string(org.hamcrest.Matchers.containsString("AS")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("paciente-nav")))
+				.andExpect(content().string(org.hamcrest.Matchers.not(
+						org.hamcrest.Matchers.containsString("PORTAL DEL PACIENTE"))))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("2 bloques")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("Total: <b>S/ 150.00</b>")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Paciente nuevo")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("10:30")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Continuar al pago")));
@@ -207,7 +210,10 @@ class ReservaControllerTest {
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Paciente de control")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Control · 30 min")))
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("S/ 80.00")))
-				.andExpect(content().string(org.hamcrest.Matchers.containsString("30 minutos")));
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("30 minutos")))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("1 bloque")))
+				.andExpect(content().string(org.hamcrest.Matchers.not(
+						org.hamcrest.Matchers.containsString("1 bloques"))));
 	}
 
 	@Test

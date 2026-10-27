@@ -24,4 +24,7 @@ public interface VistaCitaDao extends JpaRepository<VistaCita, Long> {
             ORDER BY v.fecha ASC, v.horaInicio ASC
             """)
     List<VistaCita> reporteCitas(@Param("idMedico") Long idMedico, @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta, @Param("estado") EstadoCitaEnum estado);
+
+    /** Historial del paciente (P5, RF10): de la más reciente a la más antigua. */
+    List<VistaCita> findAllByIdPacienteOrderByFechaDescHoraInicioDesc(Long idPaciente);
 }

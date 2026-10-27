@@ -305,10 +305,10 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 | ------- | ------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | P0      | Login                    | `login.html`                 | 🟡 Existe, pero aún requiere completar todo el flujo funcional                                                        |
 | P1      | Registro                 | `registro.html`              | 🟡 Implementada: registro transaccional, validaciones y formulario responsive; falta completar la verificación manual |
-| P2      | Reservar cita / horarios | `paciente/reservar.html`     | ❌ No implementada                                                                                                     |
+| P2      | Reservar cita / horarios | `paciente/reservar.html`     | ✅ Implementada: tipo y tarifa detectados (RN-02/RN-03), semana con ventana de 1 a 30 días, bloques de la BD, aviso de cita activa con "Continuar pago", "Horario no disponible, elija otro" y navbar superior del diseño aprobado |
 | P3      | Pago Yape simulado       | `paciente/pago.html`         | ❌ No implementada                                                                                                     |
 | P4      | Confirmación            | `paciente/confirmacion.html` | ❌ No implementada                                                                                                     |
-| P5      | Mis citas                | `paciente/mis-citas.html`    | ❌ No implementada                                                                                                     |
+| P5      | Mis citas                | `paciente/citas.html`        | ✅ Implementada: pestañas Próximas / Historial, "Continuar pago" con contador, PDF de la confirmación (OpenPDF), constancia solo para el dueño y estado "Vencida" |
 | P6      | Mi perfil                | `paciente/perfil.html`       | ✅ Implementada: datos personales y contraseña en formularios independientes, documento en solo lectura, validación en servidor y auditoría |
 | P7      | Agenda                   | `medico/agenda.html`         | ❌ No implementada                                                                                                     |
 | P8      | Detalle de cita          | `medico/detalle-cita.html`   | ❌ No implementada                                                                                                     |
@@ -350,7 +350,7 @@ medifast-app/
                 │   ├── reservar.html
                 │   ├── pago.html
                 │   ├── confirmacion.html
-                │   ├── mis-citas.html
+                │   ├── citas.html
                 │   └── perfil.html
                 ├── medico/
                 │   ├── agenda.html
@@ -672,9 +672,9 @@ sequenceDiagram
 sequenceDiagram
     autonumber
     actor Pac as Paciente
-    participant C as ReservaController
+    participant C as MisCitasController
     participant P as ConfirmacionPdfService (OpenPDF)
-    participant D as CitaDao
+    participant D as VistaCitaDao
 
     Pac->>C: GET /paciente/citas/{id}/pdf
     C->>P: generar(idCita)
@@ -745,7 +745,7 @@ flowchart TB
     SEC --> CTRL
 
     subgraph CTRL["Controladores — Spring MVC"]
-        AC["AuthController"] ~~~ PC["PerfilController"] ~~~ RC["ReservaController"] ~~~ AGC["AgendaController"] ~~~ RPC["ReporteController"]
+        AC["AuthController"] ~~~ PC["PerfilController"] ~~~ RC["ReservaController"] ~~~ MC["MisCitasController"] ~~~ AGC["AgendaController"] ~~~ RPC["ReporteController"]
     end
 
     CTRL -->|modelo| VIEW["Vistas Thymeleaf<br/>P0–P10"]
@@ -841,7 +841,7 @@ medifast/
         ├── main/java/pe/edu/utp/medifast/
         │   ├── MedifastAppApplication.java
         │   ├── config/           # SecurityConfig, TiempoConfig (ckckClock America/Lima)
-        │   ├── controller/       # AuthController, PerfilController, ReservaController, AgendaController, ReporteController, ManejadorErrores
+        │   ├── controller/       # AuthController, PerfilController, ReservaController, MisCitasController, AgendaController, ReporteController, ManejadorErrores
         │   ├── service/          # interfaces de servicio (reglas de negocio)
         │   │   └── impl/         # implementaciones
         │   ├── dao/              # interfaces que extienden JpaRepository (incluye VistaCitaDao sobre v_cita)

@@ -2,64 +2,10 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Reservar cita')}"></head>
-<body class="reserva-page">
-<div class="reserva-shell">
-<nav class="reserva-nav" aria-label="Navegación del paciente">
-    <div class="reserva-nav-inner">
-        <a class="reserva-brand" th:href="@{/paciente/reservar}" aria-label="MEDIFAST, Consultorio Medifast">
-            <span class="reserva-brand-mark" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M3 12h4l2.2-6 4.1 12 2.1-6H21" />
-                </svg>
-            </span>
-            <span class="reserva-brand-copy"><strong>MEDIFAST</strong><small>Consultorio Medifast</small></span>
-        </a>
-        <button class="reserva-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#reservaMenu"
-                aria-controls="reservaMenu" aria-expanded="false" aria-label="Menú">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-            <span>Menú</span>
-        </button>
-        <div class="reserva-nav-menu collapse" id="reservaMenu">
-            <span class="reserva-nav-label">MENÚ PRINCIPAL</span>
-            <a class="active" th:href="@{/paciente/reservar}" aria-current="page">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
-            Reservar cita
-            </a>
-            <a th:href="@{/paciente/citas}">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 13h7M9 17h7"></path></svg>
-            Mis citas
-            </a>
-            <a th:href="@{/paciente/perfil}">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
-            Mi perfil
-            </a>
-            <form class="reserva-logout" th:action="@{/logout}" method="post">
-            <button type="submit">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M13 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg>
-                Salir
-            </button>
-            </form>
-        </div>
-    </div>
-</nav>
+<body class="perfil-page">
+<nav th:replace="~{fragments/layout :: navbarPaciente('reservar')}"></nav>
 
-<main class="reserva-main">
-    <div class="reserva-topbar">
-        <div class="reserva-topbar-greeting">
-            <p>PORTAL DEL PACIENTE</p>
-            <strong>Hola, <span th:text="${nombreSaludo}"></span></strong>
-        </div>
-        <div class="reserva-patient" th:attr="aria-label='Sesión de ' + ${nombrePaciente}">
-            <span class="reserva-patient-avatar" aria-hidden="true" th:text="${inicialesPaciente}"></span>
-            <span class="reserva-patient-copy">
-            <strong th:text="${nombrePaciente}"></strong>
-            <small>Paciente</small>
-            </span>
-        </div>
-    </div>
-    <div class="reserva-content">
+<main class="reserva-content">
     <header class="reserva-heading">
         <p class="reserva-eyebrow">NUEVA RESERVA</p>
         <h1>Reserva tu cita</h1>
@@ -171,7 +117,7 @@
                     <p class="reserva-step-description">
                         <span th:text="${fechaCompleta}">Miércoles 11 de noviembre</span>
                         · tu cita dura <span th:text="${minutos}">60</span> min
-                        (<span th:text="${cantidadBloques}">2</span> bloques).
+                        (<span th:text="${cantidadBloques == 1 ? '1 bloque' : cantidadBloques + ' bloques'}">2 bloques</span>).
                     </p>
                     <div class="reserva-alert reserva-alert-error" th:if="${errorHorario}" role="alert">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -203,17 +149,32 @@
         </section>
 
         <aside class="reserva-card reserva-summary" aria-label="Resumen de tu cita">
-            <p class="reserva-summary-eyebrow">RESUMEN DE TU CITA</p>
+            <p class="reserva-summary-eyebrow">
+                RESUMEN DE TU CITA
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"></rect><path d="M9 3v4M15 3v4M9 14l2 2 4-4"></path></svg>
+            </p>
             <div class="reserva-doctor">
                 <span class="reserva-doctor-avatar" aria-hidden="true" th:text="${inicialesMedico}">MB</span>
                 <span><strong th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</strong>
                     <small th:text="${especialidad}">Medicina Interna y Reumatología</small></span>
             </div>
             <dl class="reserva-summary-list">
-                <div><dt>Fecha</dt><dd th:text="${citaActiva != null ? '—' : fechaCompleta}">Miércoles 11 de noviembre</dd></div>
-                <div><dt>Hora</dt><dd id="resumenHora" th:text="${citaActiva != null ? '—' : resumenHora}">—</dd></div>
-                <div><dt>Tipo</dt><dd th:text="${(tipoNombre == 'Paciente nuevo' ? 'Nuevo' : 'Control') + ' · ' + minutos + ' min'}">Nuevo · 60 min</dd></div>
-                <div><dt>Monto</dt><dd class="reserva-summary-amount" th:text="${monto}">S/ 150.00</dd></div>
+                <div>
+                    <dt><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>Fecha</dt>
+                    <dd th:text="${citaActiva != null ? '—' : fechaCompleta}">Miércoles 11 de noviembre</dd>
+                </div>
+                <div>
+                    <dt><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Hora</dt>
+                    <dd id="resumenHora" th:text="${citaActiva != null ? '—' : resumenHora}">—</dd>
+                </div>
+                <div>
+                    <dt><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h4l2.2-6 4.1 12 2.1-6H21"></path></svg>Tipo</dt>
+                    <dd th:text="${tipoCorto + ' · ' + minutos + ' min'}">Nuevo · 60 min</dd>
+                </div>
+                <div>
+                    <dt><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"></rect><circle cx="12" cy="12" r="2.5"></circle></svg>Monto</dt>
+                    <dd class="reserva-summary-amount" th:text="${monto}">S/ 150.00</dd>
+                </div>
             </dl>
             <div class="reserva-hold-notice">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -227,9 +188,15 @@
             </button>
         </aside>
 
-        <div class="reserva-mobile-continue">
-            <span><small>Tu cita</small><strong id="resumenMovil"
-                  th:text="${resumenMovil}">Mié 11 nov · —</strong></span>
+        <!-- Con una cita activa (RN-09) no se ofrece continuar: la alerta ya lleva a P3 o a P5 -->
+        <div class="reserva-mobile-continue" th:if="${citaActiva == null}">
+            <span class="reserva-mobile-info">
+                <strong>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+                    <span id="resumenMovil" th:text="${resumenMovil}">Mié 11 nov · —</span>
+                </strong>
+                <small>Total: <b th:text="${monto}">S/ 150.00</b></small>
+            </span>
             <button class="reserva-continue" type="submit"
                     th:disabled="${citaActiva != null or horarioId == null}">
                 Continuar al pago <span aria-hidden="true">→</span>
@@ -238,9 +205,7 @@
     </form>
 
     <footer class="reserva-footer">Consultorio Medifast · <span th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</span> · Trujillo, Perú</footer>
-    </div>
 </main>
-</div>
 
 <script th:inline="javascript">
     (() => {

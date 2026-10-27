@@ -1457,6 +1457,34 @@ body {
     font-size: 11px;
 }
 
+.reserva-summary-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.reserva-summary-eyebrow svg,
+.reserva-summary-list dt svg,
+.reserva-mobile-info svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    stroke: #0d5c4d;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.reserva-summary-list dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reserva-summary-list dt svg {
+    stroke: #64748b;
+}
+
 .reserva-doctor {
     display: flex;
     align-items: center;
@@ -2171,11 +2199,19 @@ form[aria-disabled="true"] .reserva-summary {
     }
 
     .reserva-mobile-continue strong {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         overflow: hidden;
         color: #0f172a;
-        font-size: 10px;
+        font-size: 11px;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .reserva-mobile-info b {
+        color: #0d5c4d;
+        font-size: 11px;
     }
 
     .reserva-mobile-continue .reserva-continue {
@@ -2653,5 +2689,597 @@ form[aria-disabled="true"] .reserva-summary {
 
     .perfil-footer {
         font-size: 12px;
+    }
+}
+
+/* P5 — Mis citas (pestañas Próximas / Historial; reutiliza la página y la navbar de P6) */
+.citas-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.citas-heading > div > p:last-child {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.citas-reservar,
+.citas-boton {
+    padding: 0 24px;
+    text-decoration: none;
+}
+
+.citas-reservar:hover,
+.citas-boton:hover {
+    color: #fff;
+}
+
+.citas-tabs {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.citas-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: -1px;
+    padding: 0 0 14px;
+    border-bottom: 2px solid transparent;
+    color: #64748b;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.citas-tabs a:hover {
+    color: #0d5c4d;
+}
+
+.citas-tabs a.active {
+    border-bottom-color: #0d5c4d;
+    color: #0d5c4d;
+    font-weight: 600;
+}
+
+.citas-contador {
+    display: inline-grid;
+    min-width: 24px;
+    height: 22px;
+    place-items: center;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.citas-tabs a.active .citas-contador {
+    background: #9fe0c4;
+    color: #0d5c4d;
+}
+
+.citas-card {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 24px 32px;
+    padding: 32px;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #0d5c4d;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+}
+
+.citas-fecha {
+    display: grid;
+    width: 96px;
+    height: 96px;
+    place-content: center;
+    border: 1px solid #a7f3d0;
+    border-radius: 12px;
+    background: #ecfdf5;
+    color: #0d5c4d;
+    text-align: center;
+}
+
+.citas-fecha span {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.citas-fecha strong {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.citas-fecha small {
+    color: #475569;
+    font-size: 13px;
+}
+
+.citas-card-pendiente .citas-fecha {
+    border-color: #fde68a;
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.citas-card-body {
+    display: grid;
+    gap: 8px;
+}
+
+.citas-card-body p {
+    margin: 0;
+}
+
+.citas-card-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.citas-numero {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.citas-card-body h2 {
+    margin: 4px 0 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.citas-medico {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.citas-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin-top: 6px !important;
+    font-size: 15px;
+}
+
+.citas-meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.citas-meta svg,
+.citas-countdown svg,
+.citas-boton-secundario svg,
+.citas-nota svg,
+.citas-motivo svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.citas-meta svg {
+    color: #0d5c4d;
+}
+
+.citas-pago {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #475569;
+    font-size: 14px;
+}
+
+.citas-card-actions {
+    display: grid;
+    justify-items: end;
+    gap: 12px;
+}
+
+.citas-tiempo-label {
+    color: #475569;
+    font-size: 13px;
+}
+
+.citas-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #0d5c4d;
+    color: #fff;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.citas-boton-secundario {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color .15s ease;
+}
+
+.citas-boton-secundario:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.citas-enlaces {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px 20px;
+}
+
+.citas-card-actions .citas-enlaces {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.citas-enlaces a {
+    color: #0d5c4d;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.citas-enlaces a:hover {
+    text-decoration: underline;
+}
+
+.citas-nota,
+.citas-motivo {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 16px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Badges de README §5.2 (citas-badge sin punto; con .reserva-status lleva el punto de P2) */
+.citas-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.citas-badge-pendiente {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.citas-badge-confirmada {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.citas-badge-atendida {
+    background: #dcfce7;
+    color: #047857;
+}
+
+.citas-badge-no-asistio,
+.citas-badge-vencida {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.citas-badge-cancelada {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.reserva-status.citas-badge-pendiente::before {
+    background: #f59e0b;
+}
+
+.reserva-status.citas-badge-confirmada::before {
+    background: #0284c7;
+}
+
+.citas-vacio {
+    display: grid;
+    justify-items: center;
+    padding: 56px 24px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    text-align: center;
+}
+
+.citas-vacio-icono {
+    display: grid;
+    width: 72px;
+    height: 72px;
+    place-items: center;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #0d5c4d;
+}
+
+.citas-vacio-icono svg {
+    width: 32px;
+    height: 32px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.citas-vacio h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.citas-vacio p {
+    margin: 0 0 24px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.citas-vacio p:last-child {
+    margin-bottom: 0;
+}
+
+.citas-ayuda {
+    margin: 0 0 16px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.citas-tabla-card {
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+}
+
+.citas-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.citas-tabla th {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.citas-tabla td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.citas-tabla td.citas-col-acciones,
+.citas-tabla .citas-motivo-fila td {
+    white-space: normal;
+}
+
+.citas-tabla tbody tr:last-child td,
+.citas-tabla .citas-fila-con-motivo td {
+    border-bottom: 0;
+}
+
+.citas-tabla .citas-col-acciones {
+    text-align: right;
+}
+
+.citas-tabla .citas-motivo-fila td {
+    padding: 10px 20px;
+    background: #f8fafc;
+}
+
+.citas-tabla .citas-motivo {
+    margin: 0;
+}
+
+.citas-fuerte {
+    font-weight: 600;
+}
+
+.citas-guion {
+    color: #94a3b8;
+}
+
+.citas-lista {
+    display: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+@media (max-width: 991.98px) {
+    .citas-card {
+        grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    .citas-card-actions {
+        grid-column: 1 / -1;
+        justify-items: stretch;
+    }
+
+    .citas-card-actions .citas-enlaces {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .citas-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .citas-reservar-escritorio {
+        display: none;
+    }
+
+    .citas-tabs {
+        gap: 0;
+        margin-bottom: 20px;
+    }
+
+    .citas-tabs a {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .citas-card {
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 16px;
+        padding: 20px 16px;
+    }
+
+    .citas-fecha {
+        width: 76px;
+        height: 84px;
+    }
+
+    .citas-fecha strong {
+        font-size: 26px;
+    }
+
+    .citas-card-top {
+        justify-content: space-between;
+    }
+
+    .citas-card-body h2 {
+        font-size: 18px;
+    }
+
+    .citas-card-actions {
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .citas-card-actions .citas-tiempo-label {
+        display: none;
+    }
+
+    .citas-boton,
+    .citas-boton-secundario {
+        justify-content: center;
+    }
+
+    .citas-nota {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .citas-nota svg {
+        display: none;
+    }
+
+    .citas-vacio {
+        padding: 36px 20px;
+    }
+
+    .citas-vacio .citas-boton {
+        width: 100%;
+    }
+
+    .citas-tabla-card {
+        display: none;
+    }
+
+    .citas-lista {
+        display: grid;
+        gap: 16px;
+    }
+
+    .citas-item {
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #fff;
+    }
+
+    .citas-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .citas-item-top > span:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+
+    .citas-item-datos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin: 16px 0 0;
+    }
+
+    .citas-item-datos dt {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    .citas-item-datos dd {
+        margin: 2px 0 0;
+        font-weight: 600;
+    }
+
+    .citas-motivo-caja {
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+    .citas-item-acciones {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid #e2e8f0;
     }
 }

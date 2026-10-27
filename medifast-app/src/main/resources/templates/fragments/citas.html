@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Acciones de RF10 según el estado: detalle y PDF (Confirmada/Atendida), constancia (si hay pago) -->
+<th:block th:fragment="accionesHistorial(cita)">
+    <span class="citas-enlaces" th:if="${cita.tieneAcciones()}">
+        <a th:if="${cita.permiteDetalle}" th:href="@{/paciente/confirmacion(citaId=${cita.id})}">Ver detalle</a>
+        <a th:if="${cita.permiteDetalle}" th:href="@{/paciente/citas/{id}/pdf(id=${cita.id})}">Descargar PDF</a>
+        <a th:if="${cita.tieneConstancia}" th:href="@{/paciente/citas/{id}/constancia(id=${cita.id})}"
+           target="_blank" rel="noopener">Ver constancia <span aria-hidden="true">↗</span></a>
+    </span>
+    <span class="citas-guion" th:unless="${cita.tieneAcciones()}">—</span>
+</th:block>
+</body>
+</html>

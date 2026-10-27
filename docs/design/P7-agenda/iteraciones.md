@@ -18,7 +18,7 @@
 | --- | --- | --- | --- |
 | v1 | 2026-10-26 | [v1.png](v1.png) | Revisada: contenido correcto, requiere 2 correcciones de estilo |
 | v2 | 2026-10-26 | [v2.png](v2.png) | ✅ Estado principal aprobado |
-| v3 | 2026-10-26 | [v3.1](v3.1.png) · [v3.2](v3.2.png) · [v3.3](v3.3.png) | ✅ Aprobada, con 5 ajustes a completar en Figma |
+| v3 | 2026-10-26 | [v3.1](v3.1.png) · [v3.2](v3.2.png) · [v3.3](v3.3.png) | ✅ Aprobada, con 6 ajustes a completar en Figma |
 
 ### Decisiones de flujo
 
@@ -246,6 +246,7 @@ Se aprueba v3. Frames base para Figma: [v2](v2.png) (Día, todos los estados), [
 2. **Indicadores de la semana (v3.1):** "Citas de la semana" **9**, "Por validar" **1**, "Confirmadas" **2**, "Atendidas" **4**, para que coincidan con las filas. Corrige #7.
 3. **Cabecera de día (v3.1):** fondo #f8fafc en móvil (corrige #8) y el contador "2 citas" / "1 cita" / "6 citas" alineado a la derecha también en escritorio (corrige #9).
 4. **Resumen del filtro (v3.2):** usar "2 citas · Confirmada" y "Quitar filtro ×" en ambos dispositivos. Corrige #10.
-5. **Componentes nuevos:** fila de cita (escritorio) y tarjeta de cita (móvil), con variantes para los 5 estados de la cita y los 3 del pago más "—"; tarjeta de indicador; control segmentado Día / Semana; navegación de fecha.
+5. **Fila "Pago pendiente" (v2, v3.1, v3.2):** una cita del mismo día no puede estar en "Pago pendiente" (se reserva desde mañana y vence a los 15 min, RN-04/RN-06). En Figma, cambiar la fila de las 12:00 de María Rojas Vega a "Confirmada" · "Por validar" y ajustar los indicadores (Por validar 2, Confirmadas 3); el ejemplo de "Pago pendiente" queda en P8 (cita #000131 del viernes 13). Detectado al preparar P8.
+6. **Componentes nuevos:** fila de cita (escritorio) y tarjeta de cita (móvil), con variantes para los 5 estados de la cita y los 3 del pago más "—"; tarjeta de indicador; control segmentado Día / Semana; navegación de fecha.
 
 **Aprendizaje para las siguientes pantallas:** en P9 y P10, calcular los indicadores a partir de las filas de ejemplo antes de escribir el prompt.

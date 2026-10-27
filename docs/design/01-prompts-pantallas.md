@@ -125,8 +125,9 @@ P7 – Agenda (médico):
 P8 – Detalle de cita (médico):
 - Card con los datos del paciente y de la cita.
 - Visor de la constancia (imagen/PDF) con el n.º de operación.
-- Barra de acciones según el estado: "Validar pago" (éxito), "Rechazar pago" (peligro), "Marcar atendida", "No asistió" y "Cancelar cita". Los botones no aplicables aparecen deshabilitados con un tooltip.
-- Modal "Motivo de cancelación" / "Motivo del rechazo" con un textarea obligatorio (mín. 20 caracteres) y los botones "Cancelar" y "Confirmar".
+- Barra de acciones según el estado: "Validar pago" (éxito), "Rechazar pago" (peligro), "Marcar atendida", "No asistió" y "Cancelar cita". Ver la tabla de acciones según el estado en P8-detalle-cita/iteraciones.md.
+- Modal "Rechazar pago" / "Cancelar cita" con el textarea obligatorio del motivo (hasta 500 caracteres) y los botones "Volver" y la acción en rojo.
+- "Marcar atendida" y "No asistió" deshabilitados con una ayuda visible; los botones de pago se ocultan si no hay pago por validar. Prompt detallado en P8-detalle-cita/iteraciones.md.
 ```
 
 ## P9 – Reporte de citas

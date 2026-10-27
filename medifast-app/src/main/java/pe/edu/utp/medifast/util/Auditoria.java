@@ -45,8 +45,4 @@ public class Auditoria {
 		}
 		return SIN_DATO;
 	}
-
-	public void reserva(Long idCita) {
-    // Registro de auditoría para la reserva realizada (RNF13)
-}
 }

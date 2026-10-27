@@ -28,12 +28,13 @@ import pe.edu.utp.medifast.config.SecurityConfig;
 import pe.edu.utp.medifast.dto.FiltroReporteDto;
 import pe.edu.utp.medifast.dto.ReporteCitasDto;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
+import pe.edu.utp.medifast.security.RedireccionPorRol;
 import pe.edu.utp.medifast.service.MedicoService;
 import pe.edu.utp.medifast.service.ReporteService;
 import pe.edu.utp.medifast.util.ExportadorReporte;
 
 @WebMvcTest(ReporteController.class)
-@Import(SecurityConfig.class)
+@Import({ SecurityConfig.class, RedireccionPorRol.class })
 class ReporteControllerTest {
 
     private static final String XLSX =

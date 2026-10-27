@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Pago Yape')}"></head>
+<body class="reserva-page">
+<div class="reserva-shell">
+    <nav class="reserva-nav" aria-label="Navegación del paciente">
+        <div class="reserva-nav-inner">
+            <a class="reserva-brand" th:href="@{/paciente/reservar}" aria-label="MEDIFAST, Consultorio Medifast">
+                <span class="reserva-brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12h4l2.2-6 4.1 12 2.1-6H21" />
+                    </svg>
+                </span>
+                <span class="reserva-brand-copy"><strong>MEDIFAST</strong><small>Consultorio Medifast</small></span>
+            </a>
+            <button class="reserva-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#reservaMenu"
+                    aria-controls="reservaMenu" aria-expanded="false" aria-label="Menú">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+                <span>Menú</span>
+            </button>
+            <div class="reserva-nav-menu collapse" id="reservaMenu">
+                <span class="reserva-nav-label">MENÚ PRINCIPAL</span>
+                <a th:href="@{/paciente/reservar}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>Reservar cita</a>
+                <a th:href="@{/paciente/citas}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 13h7M9 17h7"></path></svg>Mis citas</a>
+                <a th:href="@{/paciente/perfil}"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Mi perfil</a>
+                <form class="reserva-logout" th:action="@{/logout}" method="post">
+                    <button type="submit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M13 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path></svg>Salir</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="reserva-main">
+        <div class="reserva-topbar">
+            <div class="reserva-topbar-greeting">
+                <p>PORTAL DEL PACIENTE</p>
+                <strong>Hola, <span th:text="${nombreSaludo}">Paciente</span></strong>
+            </div>
+            <div class="reserva-patient" th:attr="aria-label='Sesión de ' + ${nombrePaciente}">
+                <span class="reserva-patient-avatar" aria-hidden="true" th:text="${inicialesPaciente}">PP</span>
+                <span class="reserva-patient-copy">
+                    <strong th:text="${nombrePaciente}">Paciente</strong>
+                    <small>Paciente</small>
+                </span>
+            </div>
+        </div>
+
+        <div class="reserva-content">
+            <header class="reserva-heading">
+                <p class="reserva-eyebrow">PAGO YAPE</p>
+                <h1>Completa tu pago</h1>
+                <p>Adjunta la constancia y confirma la reserva de tu cita.</p>
+            </header>
+
+            <div class="reserva-alert reserva-alert-error" th:if="${error}" role="alert">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 3 2.8 19h18.4L12 3Z"></path><path d="M12 9v4m0 3h.01"></path>
+                </svg>
+                <strong th:text="${error}">Error</strong>
+            </div>
+
+            <div class="reserva-layout">
+                <section class="reserva-card reserva-selection-card">
+                    <div class="reserva-step" style="grid-template-columns: 1fr; gap: 16px;">
+                        <div class="reserva-type-card" style="display:block; padding:20px; background: linear-gradient(135deg, #fef3c7, #fff7ed); border-color: #f59e0b;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 14px;">
+                                <div>
+                                    <small style="color:#92400e; font-weight:700; letter-spacing:.08em;">MONTO A PAGAR</small>
+                                    <h2 style="margin:8px 0 0; font-size: clamp(28px, 4vw, 42px); color:#111827;">S/ 150.00</h2>
+                                </div>
+                                <div style="width: 120px; height: 120px; border-radius: 18px; background: #fff; border: 2px solid rgba(17,24,39,.08); display:grid; place-items:center; box-shadow: inset 0 0 0 8px rgba(15,118,110,.06);">
+                                    <div style="width: 88px; height: 88px; background: repeating-linear-gradient(0deg,#0f172a 0 10px,#fff 10px 20px), repeating-linear-gradient(90deg,#0f172a 0 10px,#fff 10px 20px); border-radius: 12px; opacity: .18;"></div>
+                                </div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:#374151; font-size:14px; font-weight:600;">
+                                <span>Yape</span>
+                                <span>+51 999 888 777</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reserva-step">
+                        <span class="reserva-step-number">1</span>
+                        <div class="reserva-step-body">
+                            <h2>Constancia de pago</h2>
+                            <p class="reserva-step-description">Adjunta la captura del comprobante o la imagen del pago simulado.</p>
+
+                            <form method="post" th:action="@{/paciente/pago}" enctype="multipart/form-data" class="login-form" style="gap:16px;">
+                                <input type="hidden" name="citaId" th:value="${cita.id}" />
+                                <div class="login-field">
+                                    <label for="metodoPago">Método de pago</label>
+                                    <input id="metodoPago" name="metodoPago" type="text" value="YAPE_SIMULADO" readonly />
+                                </div>
+
+                                <div class="login-field">
+                                    <label for="nroOperacion">Número de operación</label>
+                                    <input id="nroOperacion" name="nroOperacion" type="text" placeholder="Ej. 12345678" maxlength="30" />
+                                </div>
+
+                                <div class="login-field">
+                                    <label for="comprobante">Comprobante</label>
+                                    <input id="comprobante" name="comprobante" type="file" accept="image/jpeg,image/png,application/pdf" required />
+                                </div>
+
+                                <button class="registro-submit" type="submit">Confirmar pago</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="reserva-card reserva-summary" aria-label="Resumen de la cita">
+                    <p class="reserva-summary-eyebrow">RESUMEN DE LA CITA</p>
+                    <div class="reserva-doctor">
+                        <span class="reserva-doctor-avatar" aria-hidden="true">MB</span>
+                        <span>
+                            <strong th:text="${nombreMedico}">Dr. Moisés Barrantes Cabrera</strong>
+                            <small th:text="${especialidad}">Medicina Interna</small>
+                        </span>
+                    </div>
+                    <dl class="reserva-summary-list">
+                        <div><dt>N.º de cita</dt><dd th:text="${cita.id}">-</dd></div>
+                        <div><dt>Fecha</dt><dd th:text="${fecha}">-</dd></div>
+                        <div><dt>Hora</dt><dd th:text="${hora}">-</dd></div>
+                        <div><dt>Tipo</dt><dd th:text="${tipoTexto}">-</dd></div>
+                        <div><dt>Monto</dt><dd class="reserva-summary-amount" th:text="${monto}">S/ 150.00</dd></div>
+                    </dl>
+                    <div class="reserva-hold-notice">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>
+                        </svg>
+                        <span>Tu horario queda apartado por 15 minutos mientras completas la constancia.</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

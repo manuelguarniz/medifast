@@ -24,4 +24,6 @@ public interface PagoDao extends JpaRepository<Pago, Long>{
             ORDER BY dia
             """, nativeQuery = true)
     List<Object[]> resumenValidados(@Param("idMedico") Long idMedico, @Param("desde") LocalDateTime desde, @Param("hastaExclusivo") LocalDateTime hastaExclusivo);
+
+    java.util.Optional<Pago> findByCitaId(Long idCita);
 }

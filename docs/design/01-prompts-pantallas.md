@@ -147,6 +147,7 @@ P10 – Reporte de pagos:
 - Filtro de período (rango de fechas y atajo de mes). Muestra solo pagos Verificados.
 - 3 KPI cards: cantidad de pagos, total en S/ y ticket promedio.
 - Tabla con una fila de total al final y el botón "Exportar Excel".
+- Se genera duplicando el frame aprobado de P9; sin filtro ni columna de estado. Prompt detallado en P10-reporte-pagos/iteraciones.md.
 ```
 
 ## Errores 403 / 404

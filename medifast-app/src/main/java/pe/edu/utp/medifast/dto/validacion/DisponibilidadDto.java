@@ -16,4 +16,4 @@ public record DisponibilidadDto(
     LocalDate fecha,
     List<InicioDisponibleDto> inicios,
     Optional<VistaCita> citaActiva
-) {}z
+) {}

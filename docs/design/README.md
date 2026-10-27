@@ -36,6 +36,7 @@ Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](..
 - **Indicadores calculados de las filas:** si el prompt pide totales que no salen de las filas de ejemplo, Stitch los copia tal cual (P7 mostró 18 citas con 9 filas). Calcularlos antes de escribir el prompt.
 - **Rellenos neutros con hex:** excluir el lavanda no basta; hay que dar el color del relleno de cada control (#f1f5f9 o #f8fafc). En P7 volvió a aparecer en el control segmentado, el select y las cabeceras.
 - **Títulos literales en los duplicados:** al generar estados, Stitch cambia los títulos de las cards en cada copia (P8: cuatro títulos distintos para la misma card). Escribir el título de cada card en cada estado, aunque no cambie.
+- **Pantallas hermanas por duplicado:** si una pantalla es casi igual a otra aprobada (P10 y P9), duplicar el frame aprobado y cambiar solo el contenido resuelve el escritorio a la primera. En el móvil, listar las secciones en orden: "copia los contenidos de escritorio" dejó secciones faltantes y duplicadas.
 - **Límite de iteraciones:** si un detalle no se corrige en 2–3 iteraciones, se ajusta en Figma y se anota en `iteraciones.md`.
 
 ## Checklist de revisión
@@ -61,5 +62,5 @@ Con Claude Code, este flujo está automatizado en la skill [`/diseno-stitch`](..
 | P7 | Agenda | [P7-agenda](P7-agenda/iteraciones.md) | v3 | ✅ Aprobada (6 ajustes pendientes en Figma) |
 | P8 | Detalle de cita | [P8-detalle-cita](P8-detalle-cita/iteraciones.md) | v3 | ✅ Aprobada (7 ajustes pendientes en Figma) |
 | P9 | Reporte de citas | [P9-reporte-citas](P9-reporte-citas/iteraciones.md) | v3 | ✅ Aprobada (5 ajustes pendientes en Figma) |
-| P10 | Reporte de pagos | — | — | ⏳ Pendiente |
+| P10 | Reporte de pagos | [P10-reporte-pagos](P10-reporte-pagos/iteraciones.md) | v2 | ✅ Aprobada (4 ajustes pendientes en Figma) |
 | — | Errores 403 / 404 | — | — | ⏳ Pendiente |

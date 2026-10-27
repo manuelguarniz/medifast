@@ -2221,3 +2221,437 @@ form[aria-disabled="true"] .reserva-summary {
         transition: none;
     }
 }
+
+/* P6 — Mi perfil (navbar superior de paciente, dos cards: datos personales y seguridad) */
+.perfil-page {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background: #f8fafc;
+    color: #0f172a;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.paciente-nav {
+    background: #0d5c4d;
+}
+
+.paciente-nav-inner {
+    display: flex;
+    max-width: 1200px;
+    min-height: 72px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.paciente-nav .reserva-brand-copy small {
+    color: rgba(255, 255, 255, .8);
+    font-size: 13px;
+}
+
+.paciente-nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.paciente-nav-menu.collapse:not(.show) {
+    display: flex;
+}
+
+.paciente-nav-menu a,
+.paciente-nav-menu form button {
+    position: relative;
+    padding: 24px 0;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, .85);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.paciente-nav-menu a:hover,
+.paciente-nav-menu form button:hover,
+.paciente-nav-menu a.active {
+    color: #9fe0c4;
+}
+
+.paciente-nav-menu a.active::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: #9fe0c4;
+    content: "";
+}
+
+.paciente-nav-toggle {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.paciente-nav-toggle svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+}
+
+.perfil-main {
+    width: 100%;
+    max-width: 1200px;
+    flex: 1;
+    margin: 0 auto;
+    padding: 40px 24px 32px;
+}
+
+.perfil-heading {
+    margin-bottom: 32px;
+}
+
+.perfil-eyebrow {
+    margin: 0 0 6px;
+    color: #0d5c4d;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .08em;
+}
+
+.perfil-heading h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.perfil-heading > p:last-child {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.perfil-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 32px;
+}
+
+.perfil-card {
+    padding: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+}
+
+.perfil-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.perfil-card-header > span:last-child {
+    display: grid;
+    gap: 2px;
+}
+
+.perfil-card-header strong {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.perfil-card-header small {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.perfil-identidad {
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.perfil-avatar {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    place-items: center;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #0d5c4d;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.perfil-seguridad {
+    margin-bottom: 24px;
+}
+
+.perfil-seguridad-icono {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    place-items: center;
+    border-radius: 10px;
+    background: #ecfdf5;
+}
+
+.perfil-seguridad-icono svg {
+    width: 24px;
+    height: 24px;
+    stroke: #0d5c4d;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.perfil-form {
+    display: grid;
+    gap: 20px;
+}
+
+.perfil-form .registro-grid {
+    gap: 20px 24px;
+}
+
+.perfil-field label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.perfil-field input {
+    font-size: 15px;
+}
+
+.perfil-readonly {
+    position: relative;
+}
+
+.perfil-field .perfil-readonly input {
+    padding-right: 44px;
+    border-color: #e2e8f0;
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+.perfil-readonly svg {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 20px;
+    height: 20px;
+    transform: translateY(-50%);
+    stroke: #64748b;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+    pointer-events: none;
+}
+
+.perfil-ayuda {
+    grid-column: 1 / -1;
+    margin: -8px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.perfil-field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    color: #ef4444;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.perfil-field-error svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    margin-top: 2px;
+}
+
+.perfil-field-error svg circle {
+    fill: #ef4444;
+}
+
+.perfil-field-error svg path {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-width: 2.2;
+}
+
+.perfil-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid #10b981;
+    border-radius: 8px;
+    background: #ecfdf5;
+    color: #065f46;
+    font-size: 14px;
+}
+
+.perfil-alert svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+}
+
+.perfil-alert svg circle {
+    fill: #10b981;
+}
+
+.perfil-alert svg path {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.2;
+}
+
+.perfil-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.perfil-submit {
+    padding: 0 36px;
+}
+
+.perfil-secundario {
+    min-height: 48px;
+    margin-top: 4px;
+    border: 1px solid #0d5c4d;
+    border-radius: 8px;
+    background: #fff;
+    color: #0d5c4d;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+.perfil-secundario:hover {
+    background: #ecfdf5;
+}
+
+.perfil-footer {
+    padding: 8px 16px 32px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+@media (max-width: 991.98px) {
+    .perfil-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .paciente-nav-inner {
+        min-height: 64px;
+        padding: 10px 16px;
+    }
+
+    .paciente-nav-toggle {
+        display: inline-flex;
+    }
+
+    .paciente-nav-menu,
+    .paciente-nav-menu.collapse:not(.show) {
+        display: none;
+    }
+
+    .paciente-nav-menu.collapse.show,
+    .paciente-nav-menu.collapsing {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding-bottom: 8px;
+    }
+
+    .paciente-nav-menu a,
+    .paciente-nav-menu form button {
+        width: 100%;
+        padding: 12px 0;
+        text-align: left;
+    }
+
+    .paciente-nav-menu a.active::after {
+        display: none;
+    }
+
+    .perfil-main {
+        padding: 24px 16px;
+    }
+
+    .perfil-heading {
+        margin-bottom: 24px;
+    }
+
+    .perfil-heading h1 {
+        font-size: 28px;
+    }
+
+    .perfil-layout {
+        gap: 20px;
+    }
+
+    .perfil-card {
+        padding: 20px;
+    }
+
+    .perfil-card-header strong {
+        font-size: 18px;
+    }
+
+    .perfil-form .registro-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .perfil-form .registro-field-wide {
+        grid-column: auto;
+    }
+
+    .perfil-actions {
+        display: grid;
+        justify-content: stretch;
+    }
+
+    .perfil-submit {
+        padding: 0;
+    }
+
+    .perfil-footer {
+        font-size: 12px;
+    }
+}

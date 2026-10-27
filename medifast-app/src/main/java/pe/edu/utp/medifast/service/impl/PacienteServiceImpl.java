@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import pe.edu.utp.medifast.dao.PacienteDao;
 import pe.edu.utp.medifast.dao.UsuarioDao;
+import pe.edu.utp.medifast.dto.PerfilDto;
 import pe.edu.utp.medifast.dto.RegistroDto;
+import pe.edu.utp.medifast.exception.ContrasenaIncorrectaException;
 import pe.edu.utp.medifast.exception.CorreoDuplicadoException;
 import pe.edu.utp.medifast.exception.DocumentoDuplicadoException;
 import pe.edu.utp.medifast.model.Paciente;
@@ -20,7 +22,7 @@ import pe.edu.utp.medifast.service.PacienteService;
 import pe.edu.utp.medifast.util.Auditoria;
 import pe.edu.utp.medifast.util.Auditoria.Evento;
 
-/** Implementación transaccional del registro de pacientes (RF02). */
+/** Implementación transaccional del registro (RF02) y de la actualización de datos de pacientes (RF11). */
 @Service
 public class PacienteServiceImpl implements PacienteService {
 
@@ -70,6 +72,45 @@ public class PacienteServiceImpl implements PacienteService {
 			}
 			throw ex;
 		}
+	}
+
+	@Override
+	@Transactional
+	public Paciente actualizar(Long idPaciente, PerfilDto dto) {
+		PerfilDto datos = dto.normalizado();
+		Paciente paciente = pacienteDao.findById(idPaciente)
+				.orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado: " + idPaciente));
+
+		if (pacienteDao.existsByCorreoIgnoreCaseAndIdNot(datos.correo(), idPaciente)) {
+			throw new CorreoDuplicadoException();
+		}
+
+		paciente.actualizarDatos(datos);
+		try {
+			Paciente pacienteGuardado = pacienteDao.saveAndFlush(paciente);
+			auditoria.registrar(Evento.PERFIL, "id_paciente=" + idPaciente);
+			return pacienteGuardado;
+		} catch (DataIntegrityViolationException ex) {
+			if (contieneRestriccion(ex, "uq_paciente_correo")) {
+				throw new CorreoDuplicadoException();
+			}
+			throw ex;
+		}
+	}
+
+	@Override
+	@Transactional
+	public void cambiarContrasena(Long idUsuario, String actual, String nueva) {
+		Usuario usuario = usuarioDao.findById(idUsuario)
+				.orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + idUsuario));
+
+		if (!passwordEncoder.matches(actual, usuario.getContrasenaHash())) {
+			throw new ContrasenaIncorrectaException();
+		}
+
+		usuario.setContrasenaHash(passwordEncoder.encode(nueva));
+		usuarioDao.save(usuario);
+		auditoria.registrar(Evento.CONTRASENA, "id_usuario=" + idUsuario);
 	}
 
 	private static boolean contieneRestriccion(DataIntegrityViolationException ex, String nombre) {

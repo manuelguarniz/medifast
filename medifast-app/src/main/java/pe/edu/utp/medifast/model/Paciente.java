@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import pe.edu.utp.medifast.dto.PerfilDto;
+
 /**
  * Datos administrativos del paciente (tabla {@code paciente}, RN-10).
  */
@@ -63,5 +65,14 @@ public class Paciente extends EntidadAuditable {
 		this.fechaNacimiento = fechaNacimiento;
 		this.celular = celular;
 		this.correo = correo;
+	}
+
+	/** Reemplaza los datos personales editables en "Mi perfil" (RF11); el usuario y su documento no cambian. */
+	public void actualizarDatos(PerfilDto datos) {
+		this.nombres = datos.nombres();
+		this.apellidos = datos.apellidos();
+		this.fechaNacimiento = datos.fechaNacimiento();
+		this.celular = datos.celular();
+		this.correo = datos.correo();
 	}
 }

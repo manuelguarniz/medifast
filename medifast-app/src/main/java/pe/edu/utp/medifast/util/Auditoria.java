@@ -22,7 +22,7 @@ public class Auditoria {
 	private static final String SIN_DATO = "-";
 
 	public enum Evento {
-		LOGIN_OK, LOGIN_FALLIDO, LOGOUT, REGISTRO, RESERVA, PAGO_VALIDADO, PAGO_RECHAZADO, CANCELACION
+		LOGIN_OK, LOGIN_FALLIDO, LOGOUT, REGISTRO, RESERVA, PAGO_VALIDADO, PAGO_RECHAZADO, CANCELACION, PERFIL, CONTRASENA
 	}
 
 	/** Registra un evento del usuario autenticado en la petición actual. */

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mi perfil')}"></head>
+<body class="perfil-page">
+<nav th:replace="~{fragments/layout :: navbarPaciente('perfil')}"></nav>
+
+<main class="perfil-main">
+    <header class="perfil-heading">
+        <p class="perfil-eyebrow">CONFIGURACIÓN</p>
+        <h1>Mi perfil</h1>
+        <p>Mantén tus datos personales y tu contraseña actualizados.</p>
+    </header>
+
+    <div class="perfil-layout">
+        <section class="perfil-card" aria-labelledby="perfil-nombre">
+            <header class="perfil-card-header perfil-identidad">
+                <span class="perfil-avatar" aria-hidden="true" th:text="${inicialesPaciente}">AS</span>
+                <span>
+                    <strong id="perfil-nombre" th:text="${nombrePaciente}">Andrea Sofía Salazar Pérez</strong>
+                    <small>Paciente</small>
+                </span>
+            </header>
+
+            <form th:action="@{/paciente/perfil}" th:object="${perfil}" method="post" class="perfil-form" novalidate>
+                <div class="perfil-alert" role="status" th:if="${datosActualizados}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="m7.5 12.5 3 3 6-6.5"/>
+                    </svg>
+                    <strong>Datos actualizados.</strong>
+                </div>
+
+                <div class="registro-grid">
+                    <div th:replace="~{fragments/formulario :: soloLectura('Tipo de documento', 'tipoDocumento', ${tipoDocumento})}"></div>
+                    <div th:replace="~{fragments/formulario :: soloLectura('Número de documento', 'numeroDocumento', ${numeroDocumento})}"></div>
+                    <p class="perfil-ayuda" id="documento-ayuda">El documento no se puede modificar.</p>
+
+                    <div th:replace="~{fragments/formulario :: campoPerfil('Nombres', 'nombres', 'text', 'Ej. Andrea', 100, 'given-name')}"></div>
+                    <div th:replace="~{fragments/formulario :: campoPerfil('Apellidos', 'apellidos', 'text', 'Ej. Salazar Pérez', 100, 'family-name')}"></div>
+
+                    <div class="registro-field perfil-field">
+                        <label for="fechaNacimiento">Fecha de nacimiento</label>
+                        <input id="fechaNacimiento" name="fechaNacimiento" type="date" autocomplete="bday"
+                               th:value="${perfil.fechaNacimiento == null ? '' : #temporals.format(perfil.fechaNacimiento, 'yyyy-MM-dd')}"
+                               th:attr="max=${hoy},
+                                   aria-invalid=${#fields.hasErrors('fechaNacimiento')},
+                                   aria-describedby=${#fields.hasErrors('fechaNacimiento') ? 'fechaNacimiento-error' : null}"
+                               th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid' : ''" required>
+                        <div th:replace="~{fragments/formulario :: errorPerfil('fechaNacimiento')}"></div>
+                    </div>
+                    <div th:replace="~{fragments/formulario :: campoPerfil('Celular', 'celular', 'tel', '9 dígitos, empieza con 9', 9, 'tel-national')}"></div>
+                    <div th:replace="~{fragments/formulario :: campoPerfil('Correo electrónico', 'correo', 'email', 'correo@ejemplo.com', 150, 'email')}"></div>
+                </div>
+
+                <div class="perfil-actions">
+                    <button class="registro-submit perfil-submit" type="submit">Guardar cambios</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="perfil-card perfil-card-seguridad" aria-labelledby="seguridad-titulo">
+            <header class="perfil-card-header perfil-seguridad">
+                <span class="perfil-seguridad-icono" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3 19 6v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </span>
+                <span>
+                    <strong id="seguridad-titulo">Cambiar contraseña</strong>
+                    <small>Usa al menos 8 caracteres.</small>
+                </span>
+            </header>
+
+            <form th:action="@{/paciente/perfil/contrasena}" th:object="${cambioContrasena}" method="post"
+                  class="perfil-form" novalidate>
+                <div class="perfil-alert" role="status" th:if="${contrasenaActualizada}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="m7.5 12.5 3 3 6-6.5"/>
+                    </svg>
+                    <strong>Contraseña actualizada.</strong>
+                </div>
+
+                <div th:replace="~{fragments/formulario :: campoPerfil('Contraseña actual', 'contrasenaActual', 'password', '', null, 'current-password')}"></div>
+                <div th:replace="~{fragments/formulario :: campoPerfil('Nueva contraseña', 'contrasena', 'password', 'Mínimo 8 caracteres', null, 'new-password')}"></div>
+                <div th:replace="~{fragments/formulario :: campoPerfil('Confirmar nueva contraseña', 'confirmacion', 'password', 'Repite la nueva contraseña', null, 'new-password')}"></div>
+
+                <button class="perfil-secundario" type="submit">Cambiar contraseña</button>
+            </form>
+        </section>
+    </div>
+</main>
+
+<footer class="perfil-footer">Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú</footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    document.querySelectorAll(".registro-password-toggle").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            const password = document.getElementById(this.getAttribute("aria-controls"));
+            const visible = password.type === "password";
+            password.type = visible ? "text" : "password";
+            this.setAttribute("aria-label", (visible ? "Ocultar " : "Mostrar ") + this.dataset.etiqueta);
+        });
+    });
+</script>
+</body>
+</html>

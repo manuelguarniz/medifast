@@ -109,9 +109,6 @@ public class ReservaController {
 				.isPresent();
 
 		model.addAttribute("medico", medico);
-		model.addAttribute("nombrePaciente", paciente.getNombres() + " " + paciente.getApellidos());
-		model.addAttribute("nombreSaludo", primerNombre(paciente.getNombres()));
-		model.addAttribute("inicialesPaciente", iniciales(paciente.getNombres(), paciente.getApellidos()));
 		model.addAttribute("disponibilidad", disponibilidad);
 		model.addAttribute("dias", crearDias(lunes, fechaSeleccionada, hoy, fechaMin, fechaMax, diasConAtencion));
 		model.addAttribute("hayAnterior", lunes.isAfter(fechaMin));
@@ -132,6 +129,7 @@ public class ReservaController {
 				(disponibilidad.duracionMin() + medico.getConsultorio().getMinutosBloque() - 1)
 						/ medico.getConsultorio().getMinutosBloque());
 		model.addAttribute("tipoNombre", disponibilidad.tipo() == TipoCitaEnum.NUEVO ? "Paciente nuevo" : "Paciente de control");
+		model.addAttribute("tipoCorto", disponibilidad.tipo() == TipoCitaEnum.NUEVO ? "Nuevo" : "Control");
 		model.addAttribute("tipoDescripcion", disponibilidad.tipo() == TipoCitaEnum.NUEVO
 				? "Primera consulta · " + disponibilidad.duracionMin() + " minutos"
 				: "Consulta de control · " + disponibilidad.duracionMin() + " minutos");
@@ -291,10 +289,6 @@ public class ReservaController {
 
 	private static String iniciales(String nombres, String apellidos) {
 		return (primeraInicial(nombres) + primeraInicial(apellidos)).toUpperCase(Locale.ROOT);
-	}
-
-	private static String primerNombre(String nombres) {
-		return nombres.trim().split("\\s+")[0];
 	}
 
 	private static String primeraInicial(String nombres) {

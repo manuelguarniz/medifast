@@ -343,3 +343,12 @@ El usuario solicitó que P2 adopte la composición del prototipo publicado en [F
 ![Referencia del portal del paciente solicitada](referencia-portal-paciente.png)
 
 El nombre e iniciales se obtienen del paciente autenticado, no de datos de demostración. Se conserva el resumen de la cita y su monto/duración desde la tarifa configurada por tipo; CONTROL aparece como 30 min / S/ 80 solo cuando aplica RN-02/RN-03. No se incorpora la tarjeta de ayuda con teléfono y horario del prototipo porque esos datos no están definidos por el proyecto.
+
+## Alineación con los diseños aprobados (2026-10-27)
+
+Se revierte el ajuste anterior: P2 vuelve a la composición aprobada en v3 (frames [v3.1](v3.1.png), [v2.2](v2.2.png) y [v3.3](v3.3.png)) para quedar igual que P5 y P6, que ya usan la navbar superior de paciente.
+
+- Navbar superior compartida (`fragments/layout :: navbarPaciente('reservar')`) con "Reservar cita" activo, "Mis citas", "Mi perfil" y "Salir"; en móvil, el botón "Menú". Se quitan el menú lateral, el encabezado "PORTAL DEL PACIENTE / Hola, [nombre]" y el perfil de la esquina.
+- Resumen: ícono de calendario con check en la cabecera e íconos en las filas Fecha, Hora, Tipo y Monto, como en v3.1.
+- Barra fija móvil: fecha y hora con ícono de calendario y "Total: S/ …" (tarifa de RN-03). No se muestra si el paciente ya tiene una cita activa (RN-09; pendiente #18 de v1).
+- Paso 3: "1 bloque" / "2 bloques" según la duración de la tarifa (CONTROL = 30 min, 1 bloque).

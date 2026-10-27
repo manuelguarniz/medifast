@@ -3,6 +3,7 @@ package pe.edu.utp.medifast.service;
 import java.time.LocalDate;
 
 import pe.edu.utp.medifast.dto.DisponibilidadDto;
+import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.model.Cita;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 
@@ -41,4 +42,15 @@ public interface ReservaService {
 	 * @throws pe.edu.utp.medifast.exception.HorarioNoDisponibleException si el bloque no está libre o la BD detecta una colisión
 	 */
 	Cita reservar(Long idPaciente, Long idHorario);
+
+	/**
+	 * Citas del paciente para "Mis citas" (P5, RF10): separa la cita activa del resto y marca como vencidas las
+	 * {@code PENDIENTE_PAGO} cuyo plazo pasó y que RF16 aún no canceló. Si la cita no tiene pago, el monto sale de
+	 * la tarifa de su tipo (RN-03).
+	 *
+	 * @param idPaciente paciente autenticado
+	 * @return cita activa, si existe, y el historial de la más reciente a la más antigua
+	 * @throws jakarta.persistence.EntityNotFoundException si no existe el paciente o la tarifa de una cita sin pago
+	 */
+	MisCitasDto historial(Long idPaciente);
 }

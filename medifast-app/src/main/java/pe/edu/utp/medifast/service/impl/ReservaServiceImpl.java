@@ -1,12 +1,16 @@
 package pe.edu.utp.medifast.service.impl;
 
+import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -25,7 +29,9 @@ import pe.edu.utp.medifast.dao.TarifaDao;
 import pe.edu.utp.medifast.dao.VistaCitaDao;
 import pe.edu.utp.medifast.dto.DisponibilidadDto;
 import pe.edu.utp.medifast.dto.BloqueHorarioDto;
+import pe.edu.utp.medifast.dto.CitaPacienteDto;
 import pe.edu.utp.medifast.dto.InicioDisponibleDto;
+import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.exception.CitaActivaException;
 import pe.edu.utp.medifast.exception.FueraDeRangoException;
 import pe.edu.utp.medifast.exception.HorarioNoDisponibleException;
@@ -175,6 +181,36 @@ public class ReservaServiceImpl implements ReservaService {
 			}
 			throw ex;
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public MisCitasDto historial(Long idPaciente) {
+		requirePaciente(idPaciente);
+		LocalDateTime ahora = LocalDateTime.now(clock);
+		Map<String, BigDecimal> preciosPorTarifa = new HashMap<>();
+		CitaPacienteDto proxima = null;
+		List<CitaPacienteDto> historial = new ArrayList<>();
+		for (VistaCita cita : vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(idPaciente)) {
+			boolean pendiente = cita.getEstado() == EstadoCitaEnum.PENDIENTE_PAGO;
+			boolean vencida = pendiente && (cita.getExpiraEn() == null || !cita.getExpiraEn().isAfter(ahora));
+			long segundosRestantes = pendiente && !vencida
+					? Duration.between(ahora, cita.getExpiraEn()).toSeconds()
+					: 0;
+			BigDecimal monto = cita.getMonto() != null
+					? cita.getMonto()
+					: preciosPorTarifa.computeIfAbsent(cita.getIdMedico() + ":" + cita.getTipoCita(),
+							clave -> requireTarifa(cita.getIdMedico(), cita.getTipoCita()).getPrecio());
+			CitaPacienteDto dto = new CitaPacienteDto(cita, monto, vencida, segundosRestantes);
+			// RN-09 garantiza una sola activa; si la BD tuviera más, las demás quedan en el historial.
+			boolean activa = cita.getEstado() == EstadoCitaEnum.PROGRAMADA || (pendiente && !vencida);
+			if (activa && proxima == null) {
+				proxima = dto;
+			} else {
+				historial.add(dto);
+			}
+		}
+		return new MisCitasDto(Optional.ofNullable(proxima), List.copyOf(historial));
 	}
 
 	private Paciente requirePaciente(Long idPaciente) {

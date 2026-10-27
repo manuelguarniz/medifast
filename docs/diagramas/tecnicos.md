@@ -72,6 +72,7 @@ classDiagram
     }
     class PerfilController
     class ReservaController
+    class MisCitasController
     class AgendaController
     class ReporteController
 
@@ -87,7 +88,7 @@ classDiagram
         +detectarTipo(Long idPaciente, Long idMedico) TipoCita
         +reservar(Long idPaciente, Long idHorario) Cita
         +adjuntarConstancia(Long idCita, MultipartFile archivo, String nroOperacion) Pago
-        +historial(Long idPaciente) List~Cita~
+        +historial(Long idPaciente) MisCitasDto
         +vencerReservas(LocalDateTime ahora) int
     }
     class GestionCitaService {
@@ -125,7 +126,11 @@ classDiagram
     }
     class ConfirmacionPdfService {
         <<interface>>
-        +generar(Long idCita) byte[]
+        +generar(Long idCita, Long idPaciente) byte[]
+    }
+    class ConstanciaService {
+        <<interface>>
+        +paraPaciente(Long idCita, Long idPaciente) ConstanciaDto
     }
     class AlmacenamientoService {
         <<interface>>
@@ -199,7 +204,12 @@ classDiagram
     UsuarioActual ..> MedicoDao
     PerfilController --> PacienteService
     ReservaController --> ReservaService
-    ReservaController --> ConfirmacionPdfService
+    MisCitasController --> ReservaService
+    MisCitasController --> ConfirmacionPdfService
+    MisCitasController --> ConstanciaService
+    ConfirmacionPdfService ..> VistaCitaDao
+    ConstanciaService ..> CitaDao
+    ConstanciaService ..> PagoDao
     AgendaController --> GestionCitaService
     AgendaController --> AlmacenamientoService
     ReporteController --> ReporteService

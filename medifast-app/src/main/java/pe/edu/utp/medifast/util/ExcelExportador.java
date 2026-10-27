@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -35,6 +36,7 @@ public class ExcelExportador implements ExportadorReporte {
             CellStyle estiloEncabezado = crearEstiloEncabezado(workbook);
             CellStyle estiloFecha = crearEstiloFecha(workbook, helper);
             CellStyle estiloHora = crearEstiloHora(workbook, helper);
+            CellStyle estiloFechaHora = crearEstiloFechaHora(workbook, helper);
             CellStyle estiloMoneda = crearEstiloMoneda(workbook, helper);
             CellStyle estiloTotales = crearEstiloTotales(workbook);
 
@@ -64,6 +66,7 @@ public class ExcelExportador implements ExportadorReporte {
                             valores.get(columna),
                             estiloFecha,
                             estiloHora,
+                            estiloFechaHora,
                             estiloMoneda);
                 }
             }
@@ -77,8 +80,30 @@ public class ExcelExportador implements ExportadorReporte {
                             reporte.totales().get(columna),
                             estiloFecha,
                             estiloHora,
+                            estiloFechaHora,
                             estiloMoneda);
                     celda.setCellStyle(combinarConNegrita(workbook, celda, estiloTotales));
+                }
+                numeroFila++;
+            }
+
+            // Indicadores de RF09 debajo de la tabla, separados por una fila en blanco; el rótulo va en negrita.
+            if (!reporte.resumen().isEmpty()) {
+                numeroFila++;
+                Row filaRotulo = hoja.createRow(numeroFila++);
+                Cell celdaRotulo = filaRotulo.createCell(0);
+                celdaRotulo.setCellValue("Resumen");
+                celdaRotulo.setCellStyle(estiloEncabezado);
+                for (var valores : reporte.resumen()) {
+                    Row fila = hoja.createRow(numeroFila++);
+                    for (int columna = 0; columna < valores.size(); columna++) {
+                        Cell celda = fila.createCell(columna);
+                        escribirValor(celda, valores.get(columna), estiloFecha, estiloHora, estiloFechaHora,
+                                estiloMoneda);
+                        if (columna == 0) {
+                            celda.setCellStyle(estiloTotales);
+                        }
+                    }
                 }
             }
 
@@ -100,10 +125,17 @@ public class ExcelExportador implements ExportadorReporte {
             Object valor,
             CellStyle estiloFecha,
             CellStyle estiloHora,
+            CellStyle estiloFechaHora,
             CellStyle estiloMoneda) {
 
         if (valor == null) {
             celda.setBlank();
+            return;
+        }
+
+        if (valor instanceof LocalDateTime fechaHora) {
+            celda.setCellValue(fechaHora);
+            celda.setCellStyle(estiloFechaHora);
             return;
         }
 
@@ -167,6 +199,12 @@ public class ExcelExportador implements ExportadorReporte {
     private CellStyle crearEstiloHora(Workbook workbook, CreationHelper helper) {
         CellStyle estilo = workbook.createCellStyle();
         estilo.setDataFormat(helper.createDataFormat().getFormat("HH:mm"));
+        return estilo;
+    }
+
+    private CellStyle crearEstiloFechaHora(Workbook workbook, CreationHelper helper) {
+        CellStyle estilo = workbook.createCellStyle();
+        estilo.setDataFormat(helper.createDataFormat().getFormat("dd/MM/yyyy HH:mm"));
         return estilo;
     }
 

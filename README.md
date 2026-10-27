@@ -310,10 +310,10 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 | P4      | Confirmación            | `paciente/confirmacion.html` | ❌ No implementada                                                                                                     |
 | P5      | Mis citas                | `paciente/citas.html`        | ✅ Implementada: pestañas Próximas / Historial, "Continuar pago" con contador, PDF de la confirmación (OpenPDF), constancia solo para el dueño y estado "Vencida" |
 | P6      | Mi perfil                | `paciente/perfil.html`       | ✅ Implementada: datos personales y contraseña en formularios independientes, documento en solo lectura, validación en servidor y auditoría |
-| P7      | Agenda                   | `medico/agenda.html`         | ❌ No implementada                                                                                                     |
+| P7      | Agenda                   | `medico/agenda.html`         | ✅ Implementada: vista Día / Semana (agrupada por día), navegación de fecha y "Hoy", filtro por los 5 estados, indicadores del período (total, por validar, confirmadas, atendidas) con el horario de la BD, DNI parcial, estado vacío y navbar superior del diseño aprobado. "Ver detalle" apunta a P8 (`/medico/citas/{id}`), aún pendiente |
 | P8      | Detalle de cita          | `medico/detalle-cita.html`   | ❌ No implementada                                                                                                     |
-| P9      | Reporte de citas         | `medico/reporte-citas.html`  | ❌ No implementada                                                                                                     |
-| P10     | Reporte de pagos         | `medico/reporte-pagos.html`  | ❌ No implementada                                                                                                     |
+| P9      | Reporte de citas         | `medico/reporte-citas.html`  | ✅ Implementada: rango Desde / Hasta con atajos "Hoy", "Esta semana" (por defecto, lunes a sábado) y "Este mes", filtro por estado, validación de fechas en cliente y servidor, indicadores (total, atendidas, canceladas y no asistieron con %) y total por cada uno de los 5 estados, tabla con DNI parcial y etiquetas de §5.2, estado vacío y "Exportar Excel" con los mismos filtros y el resumen |
+| P10     | Reporte de pagos         | `medico/reporte-pagos.html`  | ✅ Implementada: período por fecha de validación con atajos, solo pagos `VALIDADO` (un pago por fila: validado el, n.º de cita, paciente, tipo, n.º de operación y monto), fila de total, indicadores (cantidad, total en S/ y ticket promedio), estado vacío y "Exportar Excel" con filas, total e indicadores |
 
 En el proyecto también existe actualmente:
 
@@ -651,19 +651,24 @@ sequenceDiagram
     participant DB as MySQL
 
     Med->>C: GET /medico/reportes/citas?desde&hasta&estado
-    C->>R: citas(filtro)
-    R->>D: citas por rango y estado
-    D->>DB: SELECT sobre v_cita
-    R->>R: totales para los 5 estados de la cita
-    C-->>Med: P9 con indicadores y tabla
+    C->>C: sin fechas: "Esta semana"; valida Desde / Hasta (obligatorias, Hasta ≥ Desde)
+    alt fechas inválidas
+        C-->>Med: P9 con el error bajo el campo, sin consultar
+    else fechas válidas
+        C->>R: citas(idMedico, filtro)
+        R->>D: citas por rango y estado
+        D->>DB: SELECT sobre v_cita
+        R->>R: totales para los 5 estados de la cita
+        C-->>Med: P9 con indicadores (con %), total por estado y tabla
+    end
 
     Med->>C: GET /medico/reportes/citas.xlsx?desde&hasta&estado
-    C->>R: citas(filtro)
-    C->>E: exportar(reporte)
+    C->>R: citas(idMedico, filtro)
+    C->>E: exportar(reporte: filas, total y resumen de indicadores)
     E-->>C: bytes .xlsx
     C-->>Med: descarga reporte-citas-<desde>-<hasta>.xlsx
 
-    Note over Med,DB: El reporte de pagos (P10) sigue el mismo flujo con pagos(filtro) y PagoDao.resumenValidados (cantidad, total y ticket promedio)
+    Note over Med,DB: El reporte de pagos (P10) sigue el mismo flujo con pagos(idMedico, filtro) y PagoDao.pagosValidados: un pago VALIDADO por fila, filtrado por validado_en; cantidad, total y ticket promedio salen de esas filas
 ```
 
 ### SD-08 — Descargar la confirmación en PDF (RF15)
@@ -687,6 +692,39 @@ sequenceDiagram
         P-->>C: bytes PDF
         C-->>Pac: descarga cita-{id}.pdf
     end
+```
+
+### SD-09 — Consultar la agenda (RF04, RF07, RNF08)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Med as Médico
+    participant C as AgendaController
+    participant UA as UsuarioActual
+    participant G as GestionCitaService
+    participant D as VistaCitaDao / HorarioSemanalDao
+    participant DB as MySQL
+
+    Med->>C: GET /medico/agenda?vista&fecha&estado
+    C->>C: valores por defecto: Día, hoy (America/Lima), todos los estados
+    C->>UA: medico(authentication)
+    UA-->>C: médico autenticado
+    C->>G: agenda(idMedico, FiltroAgendaDto)
+    G->>D: citas del médico entre desde y hasta (día o lunes–domingo)
+    D->>DB: SELECT sobre v_cita ORDER BY fecha, hora_inicio
+    G->>G: indicadores sobre todo el período (total, por validar, confirmadas, atendidas)
+    G->>G: filtra la lista por estado, si se eligió
+    G->>D: horario semanal del médico (RN-08)
+    G-->>C: AgendaDto
+    C->>C: agrupa por día, etiquetas de §5.2, DNI parcial (RNF07)
+    alt hay citas
+        C-->>Med: P7 con indicadores y lista (tabla o tarjetas en móvil)
+    else sin citas
+        C-->>Med: P7 con indicadores y estado vacío
+    end
+    Med->>C: clic en la fila o "Ver detalle"
+    C-->>Med: GET /medico/citas/{id}?vista&fecha&estado (P8, conserva los filtros)
 ```
 
 ---

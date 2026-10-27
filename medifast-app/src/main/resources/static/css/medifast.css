@@ -3283,3 +3283,983 @@ form[aria-disabled="true"] .reserva-summary {
         border-top: 1px solid #e2e8f0;
     }
 }
+
+/* P7 — Agenda del médico (diseño aprobado v2/v3; reutiliza la página, la navbar, la tabla y los badges de P5/P6) */
+.medico-nav-menu {
+    gap: 24px;
+}
+
+.medico-nav-separador {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, .3);
+}
+
+.medico-nav-nombre {
+    color: rgba(255, 255, 255, .8);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.agenda-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px 24px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+}
+
+.agenda-segmentado {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 8px;
+    background: #f1f5f9;
+}
+
+.agenda-segmentado a {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    border-radius: 6px;
+    color: #0d5c4d;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.agenda-segmentado a.active {
+    background: #0d5c4d;
+    color: #fff;
+}
+
+.agenda-fecha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.agenda-icono-boton,
+.agenda-fecha-boton {
+    display: inline-flex;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #0f172a;
+    text-decoration: none;
+}
+
+.agenda-icono-boton {
+    width: 40px;
+}
+
+.agenda-icono-boton:hover,
+.agenda-fecha-boton:hover {
+    border-color: #0d5c4d;
+    color: #0d5c4d;
+}
+
+.agenda-fecha-boton {
+    position: relative;
+    gap: 8px;
+    margin: 0;
+    padding: 0 16px;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.agenda-icono-boton svg,
+.agenda-fecha-boton svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+/* El selector nativo queda bajo el botón: lo abre el clic (showPicker) sin mostrar el input */
+.agenda-fecha-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.agenda-hoy {
+    padding: 0 8px;
+    color: #0d5c4d;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.agenda-hoy:hover {
+    text-decoration: underline;
+}
+
+.agenda-estado {
+    min-width: 232px;
+    height: 40px;
+    padding: 0 40px 0 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center / 16px;
+    color: #0f172a;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    appearance: none;
+}
+
+.agenda-estado:focus,
+.agenda-estado-activo {
+    border-color: #0d5c4d;
+    outline: none;
+}
+
+.agenda-estado:focus-visible,
+.agenda-icono-boton:focus-visible,
+.agenda-fecha-boton:focus-within,
+.agenda-segmentado a:focus-visible {
+    box-shadow: 0 0 0 3px rgba(13, 92, 77, .2);
+}
+
+.agenda-resumen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: -8px 0 24px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.agenda-resumen a {
+    color: #0d5c4d;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.agenda-resumen a:hover {
+    text-decoration: underline;
+}
+
+.agenda-indicadores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.agenda-indicador {
+    display: grid;
+    gap: 6px;
+    padding: 20px 24px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+}
+
+.agenda-indicador-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 4px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.agenda-indicador strong {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.agenda-indicador small {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.agenda-indicador-icono {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    place-items: center;
+    border-radius: 8px;
+}
+
+.agenda-indicador-icono svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.agenda-icono-neutro {
+    background: #f1f5f9;
+    color: #0d5c4d;
+}
+
+.agenda-icono-ambar {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.agenda-icono-azul {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.agenda-icono-verde {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.agenda-indicador .agenda-nota-ambar {
+    color: #b45309;
+}
+
+.agenda-indicador .agenda-nota-azul {
+    color: #0284c7;
+}
+
+.agenda-indicador .agenda-nota-verde {
+    color: #047857;
+}
+
+.agenda-tabla tbody tr:last-child td {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.agenda-tabla tbody:last-child tr:last-child td {
+    border-bottom: 0;
+}
+
+.agenda-tabla td {
+    padding: 14px 20px;
+}
+
+.agenda-fila {
+    cursor: pointer;
+}
+
+.agenda-fila:hover td {
+    background: #f8fafc;
+}
+
+.agenda-dia-fila th {
+    padding: 10px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #0d5c4d;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.agenda-dia-fila th > span:first-child {
+    float: left;
+}
+
+.agenda-dia-contador {
+    float: right;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.agenda-hora,
+.agenda-duracion {
+    display: block;
+}
+
+.agenda-hora {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.agenda-duracion {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.agenda-paciente {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.agenda-paciente > span:last-child {
+    display: grid;
+    min-width: 0;
+}
+
+.agenda-paciente strong {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: normal;
+}
+
+.agenda-paciente small {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.agenda-iniciales {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #0d5c4d;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.agenda-detalle {
+    color: #0d5c4d;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.agenda-detalle:hover {
+    text-decoration: underline;
+}
+
+.agenda-secundario {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    border: 1px solid #0d5c4d;
+    border-radius: 8px;
+    background: #fff;
+    color: #0d5c4d;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.agenda-secundario:hover {
+    background: #ecfdf5;
+    color: #0d5c4d;
+}
+
+.agenda-footer {
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.agenda-lista {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .agenda-filtros {
+        justify-content: flex-start;
+    }
+
+    .agenda-indicadores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .medico-nav-separador {
+        display: none;
+    }
+
+    .medico-nav-nombre {
+        padding: 12px 0 4px;
+        border-top: 1px solid rgba(255, 255, 255, .2);
+    }
+
+    .agenda-filtros {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .agenda-segmentado {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .agenda-segmentado a {
+        min-height: 40px;
+    }
+
+    .agenda-fecha {
+        justify-content: space-between;
+    }
+
+    .agenda-fecha-boton {
+        flex: 1;
+        padding: 0 10px;
+    }
+
+    .agenda-estado {
+        width: 100%;
+        min-width: 0;
+        height: 48px;
+    }
+
+    .agenda-indicadores {
+        gap: 12px;
+    }
+
+    .agenda-indicador {
+        padding: 16px;
+    }
+
+    .agenda-indicador-top {
+        align-items: flex-start;
+        font-size: 13px;
+    }
+
+    .agenda-indicador strong {
+        font-size: 26px;
+    }
+
+    .agenda-tabla-card {
+        display: none;
+    }
+
+    .agenda-lista {
+        display: grid;
+        gap: 16px;
+    }
+
+    .agenda-lista > section {
+        display: grid;
+        gap: 12px;
+    }
+
+    .agenda-dia-titulo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 4px 0 0;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+        color: #0d5c4d;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .agenda-dia-titulo > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .agenda-dia-titulo svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-width: 1.8;
+    }
+
+    .agenda-dia-titulo small {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .agenda-item {
+        display: grid;
+        gap: 14px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #fff;
+    }
+
+    .agenda-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0;
+        font-size: 15px;
+    }
+
+    .agenda-tipo {
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .agenda-item-estados {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 8px;
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .agenda-item .agenda-detalle {
+        justify-self: end;
+    }
+
+    .agenda-vacio .agenda-secundario {
+        width: 100%;
+    }
+}
+
+/* P9 y P10 — Reportes (diseño aprobado P9 v2/v3 y P10 v2; reutiliza los indicadores de P7 y la tabla de P5) */
+.reporte-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.reporte-heading > div > p:last-child {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.reporte-exportar {
+    display: inline-flex;
+    min-height: 48px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 24px;
+    border: 1px solid #0d5c4d;
+    border-radius: 8px;
+    background: #fff;
+    color: #0d5c4d;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.reporte-exportar:hover {
+    background: #ecfdf5;
+    color: #0d5c4d;
+}
+
+.reporte-exportar svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.reporte-exportar-deshabilitado,
+.reporte-exportar-deshabilitado:hover {
+    border-color: #e2e8f0;
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.reporte-filtros {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 20px 24px 24px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+}
+
+.reporte-atajos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.reporte-atajo {
+    min-height: 36px;
+    padding: 0 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.reporte-atajo:hover {
+    border-color: #0d5c4d;
+}
+
+.reporte-atajo.active {
+    border-color: #0d5c4d;
+    background: #ecfdf5;
+    color: #0d5c4d;
+    font-weight: 600;
+}
+
+.reporte-ayuda {
+    margin: 0 0 -8px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.reporte-campos {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 16px;
+}
+
+.reporte-campos-pagos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.reporte-campo {
+    display: grid;
+    gap: 6px;
+}
+
+.reporte-campo label {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.reporte-input,
+.reporte-campo .agenda-estado {
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #0f172a;
+    font: inherit;
+    font-size: 15px;
+}
+
+.reporte-campo .agenda-estado {
+    padding-right: 40px;
+}
+
+.reporte-input:focus {
+    border-color: #0d5c4d;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 92, 77, .2);
+}
+
+.reporte-input-error,
+.reporte-input-error:focus {
+    border-color: #ef4444;
+}
+
+.reporte-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0;
+    color: #b91c1c;
+    font-size: 14px;
+}
+
+.reporte-error[hidden] {
+    display: none;
+}
+
+.reporte-error svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    margin-top: 2px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 2;
+}
+
+/* "Aplicar filtros" alineado con los inputs (bajo la etiqueta de 14px + 6px de separación) */
+.reporte-aplicar {
+    margin-top: 27px;
+    padding: 0 20px;
+}
+
+.reporte-aplicar svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 2;
+}
+
+.reporte-indicadores-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.reporte-por-estado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: -8px 0 24px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.reporte-icono-rojo {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.agenda-indicador .reporte-nota-rojo {
+    color: #b91c1c;
+}
+
+.reporte-tabla td {
+    padding: 12px 20px;
+}
+
+.reporte-numero {
+    color: #0f172a;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.reporte-numero:hover {
+    color: #0d5c4d;
+    text-decoration: underline;
+}
+
+.reporte-gris {
+    color: #64748b;
+}
+
+.reporte-paciente {
+    display: grid;
+}
+
+.reporte-paciente strong {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: normal;
+}
+
+.reporte-paciente small {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Badge con punto (§5.2): mismo tamaño que .reserva-status, colores de .citas-badge-* */
+.reporte-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.reporte-status::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+}
+
+.reporte-status.citas-badge-pendiente::before {
+    background: #f59e0b;
+}
+
+.reporte-status.citas-badge-confirmada::before {
+    background: #0284c7;
+}
+
+.reporte-status.citas-badge-atendida::before {
+    background: #10b981;
+}
+
+.reporte-status.citas-badge-no-asistio::before {
+    background: #64748b;
+}
+
+.reporte-status.citas-badge-cancelada::before {
+    background: #ef4444;
+}
+
+.reporte-tabla .reporte-monto {
+    font-weight: 700;
+    text-align: right;
+}
+
+.reporte-tabla tfoot td {
+    border-bottom: 0;
+}
+
+.reporte-contador {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.reporte-tabla .reporte-total td {
+    border-top: 1px solid #cbd5e1;
+    background: #f8fafc;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.reporte-lista {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .reporte-campos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reporte-campos-pagos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reporte-aplicar {
+        grid-column: 1 / -1;
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .reporte-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reporte-filtros {
+        padding: 16px;
+    }
+
+    .reporte-atajos {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .reporte-atajo {
+        padding: 0 4px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .reporte-campos,
+    .reporte-campos-pagos {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .reporte-indicadores-3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .reporte-lista {
+        display: grid;
+        gap: 12px;
+    }
+
+    .reporte-item {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #fff;
+        color: #0f172a;
+        text-decoration: none;
+    }
+
+    .reporte-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 16px;
+    }
+
+    .reporte-item-fecha {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .reporte-item-fecha svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-width: 2;
+    }
+
+    .reporte-item-estados,
+    .reporte-item-pie {
+        padding-top: 10px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .reporte-item-pie {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .reporte-total-movil {
+        display: flex;
+        justify-content: space-between;
+        background: #f8fafc;
+        font-size: 16px;
+    }
+
+    .reporte-lista > .reporte-contador {
+        margin: 4px 0 0;
+        text-align: center;
+    }
+}

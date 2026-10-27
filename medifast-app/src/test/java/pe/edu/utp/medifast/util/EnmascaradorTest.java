@@ -13,6 +13,14 @@ class EnmascaradorTest {
 	}
 
 	@Test
+	void documentoEnPantallaMuestraCuatroPuntosYLosUltimosCuatro() {
+		assertThat(Enmascarador.documentoEnPantalla("70009452")).isEqualTo("••••9452");
+		assertThat(Enmascarador.documentoEnPantalla("001000026")).isEqualTo("••••0026");
+		assertThat(Enmascarador.documentoEnPantalla("123")).isEqualTo("••••");
+		assertThat(Enmascarador.documentoEnPantalla(null)).isEqualTo("-");
+	}
+
+	@Test
 	void valorCortoSeOcultaCompleto() {
 		assertThat(Enmascarador.documento("1234")).isEqualTo("****");
 	}

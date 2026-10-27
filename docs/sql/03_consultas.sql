@@ -88,6 +88,26 @@ WHERE c.id_medico = 1
   AND pg.validado_en < @hasta + INTERVAL 1 DAY
 GROUP BY DATE(pg.validado_en) WITH ROLLUP;
 
+-- Detalle que muestra P10 (PagoDao.pagosValidados): un pago verificado por fila, por fecha de validación.
+-- La aplicación calcula cantidad, total y ticket promedio (total ÷ cantidad) sobre estas filas.
+SELECT pg.validado_en,
+       c.id_cita,
+       CONCAT(p.nombres, ' ', p.apellidos) AS paciente,
+       u.tipo_documento,
+       u.numero_documento,
+       c.tipo_cita,
+       pg.nro_operacion,
+       pg.monto
+FROM pago pg
+         JOIN cita c ON c.id_cita = pg.id_cita
+         JOIN paciente p ON p.id_paciente = c.id_paciente
+         JOIN usuario u ON u.id_usuario = p.id_usuario
+WHERE c.id_medico = 1
+  AND pg.estado = 'VALIDADO'
+  AND pg.validado_en >= @desde
+  AND pg.validado_en < @hasta + INTERVAL 1 DAY
+ORDER BY pg.validado_en, c.id_cita;
+
 -- -----------------------------------------------------------------------------
 -- 5. Disponibilidad (RF05): bloques libres de un médico en una fecha
 --    Libre = no bloqueado y sin cita activa (RN-01). Por defecto, el próximo día hábil.

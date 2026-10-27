@@ -69,6 +69,7 @@ classDiagram
     class UsuarioActual {
         +idPaciente(Authentication) Long
         +idMedico(Authentication) Long
+        +medico(Authentication) Medico
     }
     class PerfilController
     class ReservaController
@@ -93,7 +94,7 @@ classDiagram
     }
     class GestionCitaService {
         <<interface>>
-        +agenda(FiltroAgendaDto filtro) List~Cita~
+        +agenda(Long idMedico, FiltroAgendaDto filtro) AgendaDto
         +validarPago(Long idCita)
         +rechazarPago(Long idCita, String observacion)
         +marcarAtendida(Long idCita)
@@ -188,9 +189,30 @@ classDiagram
         +existeAtendida(Long idPaciente, Long idMedico) boolean
         +pendientesVencidas(LocalDateTime ahora) List~Cita~
     }
+    class VistaCitaDao {
+        <<interface>>
+        +findAllByIdMedicoAndFechaBetweenOrderByFechaAscHoraInicioAsc(Long idMedico, LocalDate desde, LocalDate hasta) List~VistaCita~
+    }
+    class FiltroAgendaDto {
+        <<record>>
+        +Vista vista
+        +LocalDate fecha
+        +EstadoCitaEnum estado
+        +desde() LocalDate
+        +hasta() LocalDate
+    }
+    class AgendaDto {
+        <<record>>
+        +List~VistaCita~ citas
+        +long total
+        +long porValidar
+        +long confirmadas
+        +long atendidas
+        +List~HorarioSemanal~ horario
+    }
     class PagoDao {
         <<interface>>
-        +resumenValidados(LocalDate desde, LocalDate hasta) ResumenPagosDto
+        +pagosValidados(Long idMedico, LocalDateTime desde, LocalDateTime hastaExclusivo) List~PagoValidadoDto~
     }
 
     SecurityConfig ..> UsuarioDetailsService
@@ -211,8 +233,12 @@ classDiagram
     ConstanciaService ..> CitaDao
     ConstanciaService ..> PagoDao
     AgendaController --> GestionCitaService
+    AgendaController --> UsuarioActual
+    AgendaController ..> FiltroAgendaDto
+    GestionCitaService ..> AgendaDto
     AgendaController --> AlmacenamientoService
     ReporteController --> ReporteService
+    ReporteController --> UsuarioActual
     ReporteController --> ExportadorReporte
     VencimientoReservasJob --> ReservaService
     GeneracionHorarioJob --> GeneracionHorarioService
@@ -234,6 +260,8 @@ classDiagram
     ReservaService ..> AlmacenamientoService
     GestionCitaService ..> CitaDao
     GestionCitaService ..> PagoDao
+    GestionCitaService ..> VistaCitaDao
+    GestionCitaService ..> HorarioSemanalDao
     ReporteService ..> VistaCitaDao
     ReporteService ..> PagoDao
 
@@ -246,6 +274,7 @@ classDiagram
     ConsultorioDao --|> JpaRepository
     CitaDao --|> JpaRepository
     PagoDao --|> JpaRepository
+    VistaCitaDao --|> JpaRepository
 ```
 
 ---

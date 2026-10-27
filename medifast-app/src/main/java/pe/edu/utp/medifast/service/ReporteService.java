@@ -21,11 +21,11 @@ public interface ReporteService {
     ReporteCitasDto citas(Long idMedico, FiltroReporteDto filtro);
 
     /**
-     * Genera el resumen de pagos validados de un médico dentro del rango indicado.
+     * Pagos validados de un médico cuya fecha de validación cae dentro del rango indicado.
      *
      * @param idMedico identificador del médico autenticado
-     * @param filtro rango de fechas del reporte
-     * @return resumen agrupado por día, totales y ticket promedio
+     * @param filtro rango de fechas del reporte (por fecha de validación del pago)
+     * @return un pago por fila con la cantidad, el total y el ticket promedio
      */
     ResumenPagosDto pagos(Long idMedico, FiltroReporteDto filtro);
 }

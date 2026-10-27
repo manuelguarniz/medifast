@@ -28,7 +28,6 @@ import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.VistaCita;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
-import pe.edu.utp.medifast.model.enums.EstadoPagoEnum;
 import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.ConfirmacionPdfService;
 import pe.edu.utp.medifast.service.ConstanciaService;
@@ -126,35 +125,14 @@ public class MisCitasController {
 				minutos,
 				formatearMonto(dto.monto()),
 				dto.vencida() ? EtiquetasEstado.VENCIDA : EtiquetasEstado.cita(cita.getEstado()),
-				dto.vencida() ? "vencida" : claseCita(cita.getEstado()),
+				dto.vencida() ? "vencida" : EtiquetasEstado.claseCita(cita.getEstado()),
 				cita.getEstadoPago() == null ? null : EtiquetasEstado.pago(cita.getEstadoPago()),
-				clasePago(cita.getEstadoPago()),
+				EtiquetasEstado.clasePago(cita.getEstadoPago()),
 				cita.getEstado() == EstadoCitaEnum.CANCELADA ? cita.getObservacion() : null,
 				dto.pagoPendiente(),
 				dto.segundosRestantes(),
 				dto.permiteDetalle(),
 				dto.tieneConstancia());
-	}
-
-	private static String claseCita(EstadoCitaEnum estado) {
-		return switch (estado) {
-			case PENDIENTE_PAGO -> "pendiente";
-			case PROGRAMADA -> "confirmada";
-			case ATENDIDA -> "atendida";
-			case NO_ASISTIO -> "no-asistio";
-			case CANCELADA -> "cancelada";
-		};
-	}
-
-	private static String clasePago(EstadoPagoEnum estado) {
-		if (estado == null) {
-			return null;
-		}
-		return switch (estado) {
-			case POR_VALIDAR -> "pendiente";
-			case VALIDADO -> "atendida";
-			case RECHAZADO -> "cancelada";
-		};
 	}
 
 	/** "10:30–11:30 a. m."; el periodo se repite solo si cambia, como en P2. */

@@ -154,6 +154,9 @@
                 </a>
                 <p class="reporte-contador" th:text="${contador}">10 citas</p>
             </div>
+
+            <nav th:replace="~{fragments/paginacion :: barra(${paginacion},
+                    @{/medico/reportes/citas(desde=${fechas.desde},hasta=${fechas.hasta},estado=${estado})})}"></nav>
         </th:block>
 
         <div th:if="${filas.isEmpty()}" class="citas-vacio">

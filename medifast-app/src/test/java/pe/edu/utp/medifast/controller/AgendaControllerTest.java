@@ -202,6 +202,31 @@ class AgendaControllerTest {
 	}
 
 	@Test
+	void vistaSemanaPaginaLasCitasYConservaElTotalDeCadaDia() throws Exception {
+		List<VistaCita> citas = new ArrayList<>();
+		for (int i = 0; i < 12; i++) {
+			LocalDate dia = i < 8 ? LocalDate.of(2026, 11, 9) : MIERCOLES;
+			citas.add(cita(20L + i, dia, LocalTime.of(8, 0).plusMinutes(30L * (i % 8)), "Paciente " + (char) ('A' + i),
+					"7000" + (1000 + i), TipoCitaEnum.CONTROL, EstadoCitaEnum.PROGRAMADA, EstadoPagoEnum.POR_VALIDAR));
+		}
+		AgendaDto agenda = new AgendaDto(citas, 12, 0, 12, 0, horarioLunesASabado());
+		when(gestionCitaService.agenda(eq(ID_MEDICO), any())).thenReturn(agenda);
+
+		mockMvc.perform(get("/medico/agenda").param("vista", "semana").param("fecha", "2026-11-11")
+				.param("pagina", "2").with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isOk())
+				.andExpect(model().attribute("rango", "Mostrando 11–12 de 12 citas"))
+				.andExpect(content().string(allOf(
+						containsString("Paciente K"),
+						containsString("Paciente L"),
+						not(containsString("Paciente J")),
+						not(containsString("Lunes 9 de noviembre")),
+						containsString("Miércoles 11 de noviembre"),
+						containsString("4 citas"),
+						containsString("/medico/agenda?vista=semana&amp;fecha=2026-11-11&amp;estado=&amp;pagina=1"))));
+	}
+
+	@Test
 	void diaSinCitasMuestraElEstadoVacio() throws Exception {
 		AgendaDto agenda = new AgendaDto(List.of(), 0, 0, 0, 0, horarioLunesASabado());
 		when(gestionCitaService.agenda(eq(ID_MEDICO), any())).thenReturn(agenda);

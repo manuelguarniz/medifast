@@ -26,7 +26,7 @@
         <a th:href="@{/paciente/citas(tab='historial')}" th:classappend="${pestana == 'historial'} ? 'active'"
            th:attr="aria-current=${pestana == 'historial' ? 'page' : null}">
             Historial <span class="citas-contador" th:unless="${historial.isEmpty()}"
-                            th:text="${historial.size()}">3</span>
+                            th:text="${paginacion.totalFilas()}">3</span>
         </a>
     </nav>
 
@@ -188,6 +188,9 @@
                     </div>
                 </li>
             </ul>
+
+            <p th:if="${paginacion.varias()}" class="reporte-contador paginacion-rango" th:text="${rango}">Mostrando 1–10 de 14 citas</p>
+            <nav th:replace="~{fragments/paginacion :: barra(${paginacion}, @{/paciente/citas(tab='historial')})}"></nav>
         </th:block>
 
         <div th:if="${historial.isEmpty()}" class="citas-vacio">

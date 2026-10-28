@@ -4276,6 +4276,110 @@ form[aria-disabled="true"] .reserva-summary {
     }
 }
 
+/* Paginación de los listados (P5, P7, P9 y P10): la página actual en el verde de la marca */
+.paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.paginacion-paginas {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.paginacion-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.paginacion-item:hover {
+    border-color: #0d5c4d;
+    color: #0d5c4d;
+}
+
+a.paginacion-item:focus-visible {
+    outline: 2px solid #0d5c4d;
+    outline-offset: 2px;
+}
+
+.paginacion-item.active {
+    border-color: #0d5c4d;
+    background: #0d5c4d;
+    color: #fff;
+}
+
+.paginacion-deshabilitada {
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.paginacion-item svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.paginacion-gap {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 24px;
+    color: #94a3b8;
+}
+
+.paginacion-rango {
+    margin: 16px 0 0;
+}
+
+.paginacion-rango + .paginacion {
+    margin-top: 8px;
+}
+
+@media (max-width: 767.98px) {
+    .paginacion {
+        gap: 8px;
+    }
+
+    .paginacion-nav {
+        padding: 0;
+    }
+
+    /* En móvil, Anterior / Siguiente quedan como flechas; el texto sigue para lectores de pantalla */
+    .paginacion-nav > span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    .paginacion-rango {
+        text-align: center;
+    }
+}
+
 /* P8 — Detalle de cita (diseño aprobado v2/v3) */
 .detalle-volver {
     display: inline-flex;

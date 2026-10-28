@@ -119,6 +119,11 @@
                     <strong th:text="${totalSoles}">S/ 690.00</strong>
                 </p>
             </div>
+
+            <!-- Paginación: la fila de total suma todo el período, no solo la página -->
+            <p th:if="${paginacion.varias()}" class="reporte-contador paginacion-rango" th:text="${rango}">Mostrando 1–10 de 23 pagos</p>
+            <nav th:replace="~{fragments/paginacion :: barra(${paginacion},
+                    @{/medico/reportes/pagos(desde=${fechas.desde},hasta=${fechas.hasta})})}"></nav>
         </th:block>
 
         <div th:if="${filas.isEmpty()}" class="citas-vacio">

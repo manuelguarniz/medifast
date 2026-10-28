@@ -41,6 +41,7 @@ import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.ReporteService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
 import pe.edu.utp.medifast.util.ExportadorReporte;
+import pe.edu.utp.medifast.util.Paginacion;
 import pe.edu.utp.medifast.util.Reporte;
 
 /**
@@ -76,12 +77,13 @@ public class ReporteController {
 
     /**
      * P9. Por defecto, "Esta semana" (lunes a sábado) y todos los estados. Si las fechas no son válidas no se
-     * consulta y el error se muestra bajo el campo.
+     * consulta y el error se muestra bajo el campo. La tabla se pagina con {@code pagina} (desde 1); una página
+     * inválida o fuera de rango se ajusta a la más cercana.
      */
     @GetMapping("/citas")
     public String reporteCitas(@RequestParam(required = false) String desde,
             @RequestParam(required = false) String hasta, @RequestParam(required = false) String estado,
-            Authentication authentication, Model model) {
+            @RequestParam(required = false) String pagina, Authentication authentication, Model model) {
         Medico medico = usuarioActual.medico(authentication);
         List<Atajo> atajos = atajos(LocalDate.now(clock), DayOfWeek.SATURDAY);
         Fechas fechas = Fechas.leer(desde, hasta, atajos.get(1));
@@ -96,7 +98,11 @@ public class ReporteController {
         ReporteCitasDto reporte = reporteService.citas(medico.getId(),
                 new FiltroReporteDto(fechas.desde(), fechas.hasta(), filtroEstado));
         long total = reporte.filas().size();
-        model.addAttribute("filas", reporte.filas().stream().map(ReporteController::filaCita).toList());
+        // Los indicadores y el Excel usan el resultado completo; solo la tabla se pagina.
+        Paginacion paginacion = Paginacion.de(pagina, reporte.filas().size());
+        model.addAttribute("filas", paginacion.recortar(reporte.filas()).stream()
+                .map(ReporteController::filaCita).toList());
+        model.addAttribute("paginacion", paginacion);
         model.addAttribute("total", total);
         model.addAttribute("atendidas", reporte.total(EstadoCitaEnum.ATENDIDA));
         model.addAttribute("canceladas", reporte.total(EstadoCitaEnum.CANCELADA));
@@ -107,7 +113,7 @@ public class ReporteController {
         model.addAttribute("porEstado", Arrays.stream(EstadoCitaEnum.values())
                 .map(e -> new TotalEstado(EtiquetasEstado.cita(e), EtiquetasEstado.claseCita(e), reporte.total(e)))
                 .toList());
-        model.addAttribute("contador", total == 1 ? "1 cita" : total + " citas");
+        model.addAttribute("contador", paginacion.contador("cita", "citas"));
         return VISTA_CITAS;
     }
 
@@ -129,11 +135,13 @@ public class ReporteController {
 
     /**
      * P10. Por defecto, "Esta semana"; el período filtra por la fecha de validación del pago, que puede caer
-     * cualquier día, por eso la semana va de lunes a domingo.
+     * cualquier día, por eso la semana va de lunes a domingo. La tabla se pagina con {@code pagina}; la fila de
+     * total y los indicadores suman todo el período.
      */
     @GetMapping("/pagos")
     public String reportePagos(@RequestParam(required = false) String desde,
-            @RequestParam(required = false) String hasta, Authentication authentication, Model model) {
+            @RequestParam(required = false) String hasta, @RequestParam(required = false) String pagina,
+            Authentication authentication, Model model) {
         Medico medico = usuarioActual.medico(authentication);
         List<Atajo> atajos = atajos(LocalDate.now(clock), DayOfWeek.SUNDAY);
         Fechas fechas = Fechas.leer(desde, hasta, atajos.get(1));
@@ -144,7 +152,11 @@ public class ReporteController {
 
         ResumenPagosDto resumen = reporteService.pagos(medico.getId(),
                 new FiltroReporteDto(fechas.desde(), fechas.hasta()));
-        model.addAttribute("filas", resumen.pagos().stream().map(ReporteController::filaPago).toList());
+        Paginacion paginacion = Paginacion.de(pagina, resumen.pagos().size());
+        model.addAttribute("filas", paginacion.recortar(resumen.pagos()).stream()
+                .map(ReporteController::filaPago).toList());
+        model.addAttribute("paginacion", paginacion);
+        model.addAttribute("rango", paginacion.contador("pago", "pagos"));
         model.addAttribute("cantidad", resumen.cantidad());
         model.addAttribute("totalSoles", FormatoVista.soles(resumen.total()));
         model.addAttribute("ticketPromedio", FormatoVista.soles(resumen.ticketPromedio()));

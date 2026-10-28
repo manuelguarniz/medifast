@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -279,6 +280,67 @@ class ReporteControllerTest {
     }
 
     @Test
+    void reporteCitasPaginaLaTablaYConservaLosFiltros() throws Exception {
+        ReporteCitasDto reporte = citasAtendidas(23);
+        when(reporteService.citas(ID_MEDICO, new FiltroReporteDto(LUNES, SABADO, EstadoCitaEnum.ATENDIDA)))
+                .thenReturn(reporte);
+
+        mockMvc.perform(get("/medico/reportes/citas").param("desde", "2026-11-09").param("hasta", "2026-11-14")
+                        .param("estado", "ATENDIDA").param("pagina", "2").with(medico()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("total", 23L))
+                .andExpect(model().attribute("contador", "Mostrando 11–20 de 23 citas"))
+                .andExpect(content().string(allOf(
+                        containsString("#000210"),
+                        not(containsString("#000209")),
+                        not(containsString("#000220")),
+                        containsString("aria-current=\"page\""),
+                        containsString("/medico/reportes/citas?desde=2026-11-09&amp;hasta=2026-11-14"
+                                + "&amp;estado=ATENDIDA&amp;pagina=3"))));
+    }
+
+    @Test
+    void reporteCitasAjustaLaPaginaFueraDeRango() throws Exception {
+        ReporteCitasDto reporte = citasAtendidas(23);
+        when(reporteService.citas(any(), any())).thenReturn(reporte);
+
+        mockMvc.perform(get("/medico/reportes/citas").param("pagina", "99").with(medico()))
+                .andExpect(model().attribute("contador", "Mostrando 21–23 de 23 citas"));
+        mockMvc.perform(get("/medico/reportes/citas").param("pagina", "abc").with(medico()))
+                .andExpect(model().attribute("contador", "Mostrando 1–10 de 23 citas"));
+    }
+
+    @Test
+    void reporteCitasSinPaginasExtraNoMuestraLaPaginacion() throws Exception {
+        ReporteCitasDto reporte = citasDeLaSemana();
+        when(reporteService.citas(any(), any())).thenReturn(reporte);
+
+        mockMvc.perform(get("/medico/reportes/citas").with(medico()))
+                .andExpect(content().string(not(containsString("reporte-paginacion"))));
+    }
+
+    @Test
+    void reportePagosPaginaLaTablaPeroElTotalSumaTodoElPeriodo() throws Exception {
+        List<PagoValidadoDto> pagos = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            pagos.add(new PagoValidadoDto(LocalDateTime.of(2026, 11, 9, 8, i), 300L + i, "Paciente " + i,
+                    TipoDocumentoEnum.DNI, "7000" + (1000 + i), TipoCitaEnum.CONTROL, null, new BigDecimal("80.00")));
+        }
+        when(reporteService.pagos(any(), any())).thenReturn(new ResumenPagosDto(pagos));
+
+        mockMvc.perform(get("/medico/reportes/pagos").param("desde", "2026-11-09").param("hasta", "2026-11-15")
+                        .param("pagina", "2").with(medico()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("rango", "Mostrando 11–12 de 12 pagos"))
+                .andExpect(content().string(allOf(
+                        containsString("#000310"),
+                        not(containsString("#000309")),
+                        containsString("Total · 12 pagos"),
+                        containsString("S/ 960.00"),
+                        containsString("/medico/reportes/pagos?desde=2026-11-09&amp;hasta=2026-11-15&amp;pagina=1"))));
+    }
+
+    @Test
     void pacienteNoPuedeAccederALosReportes() throws Exception {
         mockMvc.perform(get("/medico/reportes/citas").with(user("70000001").roles("PACIENTE")))
                 .andExpect(status().isForbidden());
@@ -313,6 +375,16 @@ class ReporteControllerTest {
                         TipoCitaEnum.CONTROL, EstadoCitaEnum.CANCELADA, EstadoPagoEnum.RECHAZADO),
                 cita(131L, LocalDate.of(2026, 11, 13), LocalTime.of(12, 0), "María Rojas Vega", "70008193",
                         TipoCitaEnum.CONTROL, EstadoCitaEnum.PENDIENTE_PAGO, null)));
+    }
+
+    /** Citas atendidas consecutivas desde la #000200, para probar la paginación. */
+    private static ReporteCitasDto citasAtendidas(int cantidad) {
+        List<VistaCita> citas = new ArrayList<>();
+        for (int i = 0; i < cantidad; i++) {
+            citas.add(cita(200L + i, LUNES, LocalTime.of(8, 0).plusMinutes(30L * i), "Paciente " + i, "7000" + (1000 + i),
+                    TipoCitaEnum.CONTROL, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO));
+        }
+        return new ReporteCitasDto(citas);
     }
 
     private static ResumenPagosDto pagosDeLaSemana() {

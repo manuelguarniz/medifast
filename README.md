@@ -130,7 +130,7 @@ El rol sale de la cuenta: la pantalla de login no pide elegirlo.
 
 - **RF01** — Si el paciente ya tiene una cita activa (`PENDIENTE_PAGO` o `PROGRAMADA`), no puede reservar y se le muestra cuál es. Si no la tiene, al elegir un horario libre se crea, en una sola transacción, la cita `PENDIENTE_PAGO` con `expira_en = ahora + 15 min` y se apartan sus bloques (1 o 2). Si otro paciente tomó el horario antes, se muestra "Horario no disponible, elija otro".
 - **RF02** — DNI de 8 dígitos; CE alfanumérico de 9 a 12 caracteres; n.º de documento único; fecha de nacimiento en el pasado; celular de 9 dígitos que empieza en 9; correo válido y único; contraseña de al menos 8 caracteres, igual a su confirmación.
-- **RF03** — Muestra un QR o número de Yape de ejemplo, el monto de la tarifa (S/ 150 o S/ 80), un contador del tiempo restante y la constancia como campo obligatorio (JPG, PNG o PDF de hasta 5 MB); el n.º de operación es opcional. Leyenda visible: "Simulación — no se realizó ningún cobro". Al adjuntar la constancia, la cita pasa a `PROGRAMADA` y el pago queda `POR_VALIDAR`. Si el paciente sale de la pantalla, puede volver desde "Mis citas" mientras no venza el plazo; si vence, ve la cita como cancelada.
+- **RF03** — Muestra un QR o número de Yape de ejemplo, el monto de la tarifa (S/ 150 o S/ 80), un contador del tiempo restante y la constancia como campo obligatorio (JPG, PNG o PDF de hasta 5 MB); el n.º de operación es opcional y, si se ingresa, solo admite dígitos. Leyenda visible: "Simulación — no se realizó ningún cobro". Al adjuntar la constancia, la cita pasa a `PROGRAMADA` y el pago queda `POR_VALIDAR`. Si el paciente sale de la pantalla, puede volver desde "Mis citas" mientras no venza el plazo; si vence, ve la cita como cancelada.
 - **RF04** — Lista ordenada por fecha y hora con paciente, tipo, estado de la cita y estado del pago; filtros por día, semana y estado.
 - **RF05** — Solo bloques desde mañana hasta dentro de 30 días, no bloqueados y sin cita activa. Para un paciente nuevo, solo se ofrecen inicios con 2 bloques consecutivos libres dentro del horario.
 - **RF06** — Los bloques se generan desde `horario_semanal` para toda la ventana de reserva, sin duplicados, al iniciar la aplicación y una vez al día.
@@ -306,12 +306,12 @@ Actualmente, el inventario funcional contempla **11 pantallas (P0–P10)**, pero
 | P0      | Login                    | `login.html`                 | 🟡 Existe, pero aún requiere completar todo el flujo funcional                                                        |
 | P1      | Registro                 | `registro.html`              | 🟡 Implementada: registro transaccional, validaciones y formulario responsive; falta completar la verificación manual |
 | P2      | Reservar cita / horarios | `paciente/reservar.html`     | ✅ Implementada: tipo y tarifa detectados (RN-02/RN-03), semana con ventana de 1 a 30 días, bloques de la BD, aviso de cita activa con "Continuar pago", "Horario no disponible, elija otro" y navbar superior del diseño aprobado |
-| P3      | Pago Yape simulado       | `paciente/pago.html`         | ❌ No implementada                                                                                                     |
-| P4      | Confirmación            | `paciente/confirmacion.html` | ❌ No implementada                                                                                                     |
+| P3      | Pago Yape simulado       | `paciente/pago.html`         | ✅ Implementada: monto de la tarifa, QR y número de Yape de ejemplo, contador de 15 min con modal bloqueante "Tiempo de reserva vencido", subida con arrastrar y soltar y "Quitar", tipo real JPG/PNG/PDF y ≤ 5 MB validados en cliente y servidor, n.º de operación opcional solo con dígitos, "Volver" sin liberar el horario, leyenda de simulación, bloqueo de la cita frente a RF16 y navbar superior del diseño aprobado |
+| P4      | Confirmación            | `paciente/confirmacion.html` | ✅ Implementada: card dividida del diseño aprobado; desde P3, "Cita reservada" con la alerta de éxito; desde P5, "Detalle de la cita" con el estado real (incluidos "Vencida" y el motivo de las canceladas) y la constancia con "Ver constancia"; n.º de cita, paciente, médico, tipo, fecha y hora, monto y estados de §5.2; "Descargar PDF" solo para citas confirmadas o atendidas; una reserva que aún espera el pago vuelve a P3; cita ajena → 403 |
 | P5      | Mis citas                | `paciente/citas.html`        | ✅ Implementada: pestañas Próximas / Historial, "Continuar pago" con contador, PDF de la confirmación (OpenPDF), constancia solo para el dueño y estado "Vencida" |
 | P6      | Mi perfil                | `paciente/perfil.html`       | ✅ Implementada: datos personales y contraseña en formularios independientes, documento en solo lectura, validación en servidor y auditoría |
-| P7      | Agenda                   | `medico/agenda.html`         | ✅ Implementada: vista Día / Semana (agrupada por día), navegación de fecha y "Hoy", filtro por los 5 estados, indicadores del período (total, por validar, confirmadas, atendidas) con el horario de la BD, DNI parcial, estado vacío y navbar superior del diseño aprobado. "Ver detalle" apunta a P8 (`/medico/citas/{id}`), aún pendiente |
-| P8      | Detalle de cita          | `medico/detalle-cita.html`   | ❌ No implementada                                                                                                     |
+| P7      | Agenda                   | `medico/agenda.html`         | ✅ Implementada: vista Día / Semana (agrupada por día), navegación de fecha y "Hoy", filtro por los 5 estados, indicadores del período (total, por validar, confirmadas, atendidas) con el horario de la BD, DNI parcial, estado vacío y navbar superior del diseño aprobado. "Ver detalle" abre P8 (`/medico/citas/{id}`) conservando los filtros |
+| P8      | Detalle de cita          | `medico/detalle-cita.html`   | ✅ Implementada: datos del paciente y de la cita, constancia con vista previa y "Ver constancia" (solo el médico de la cita), acciones según el estado (validar / rechazar pago, marcar atendida / no asistió con ayuda cuando están deshabilitadas, cancelar), modal del motivo obligatorio (≤ 500) validado en cliente y servidor, aviso del motivo en las canceladas, estados finales, alerta tras cada acción, "Volver a la agenda" con los filtros, auditoría y navbar superior del diseño aprobado |
 | P9      | Reporte de citas         | `medico/reporte-citas.html`  | ✅ Implementada: rango Desde / Hasta con atajos "Hoy", "Esta semana" (por defecto, lunes a sábado) y "Este mes", filtro por estado, validación de fechas en cliente y servidor, indicadores (total, atendidas, canceladas y no asistieron con %) y total por cada uno de los 5 estados, tabla con DNI parcial y etiquetas de §5.2, estado vacío y "Exportar Excel" con los mismos filtros y el resumen |
 | P10     | Reporte de pagos         | `medico/reporte-pagos.html`  | ✅ Implementada: período por fecha de validación con atajos, solo pagos `VALIDADO` (un pago por fila: validado el, n.º de cita, paciente, tipo, n.º de operación y monto), fila de total, indicadores (cantidad, total en S/ y ticket promedio), estado vacío y "Exportar Excel" con filas, total e indicadores |
 
@@ -524,7 +524,8 @@ sequenceDiagram
     actor Pac as Paciente
     participant C as ReservaController
     participant S as ReservaService
-    participant A as AlmacenamientoService
+    participant PC as PagoController
+    participant P as PagoService
     participant D as CitaDao / HorarioDao / TarifaDao
     participant DB as MySQL
 
@@ -551,14 +552,20 @@ sequenceDiagram
         C-->>Pac: P3 Pago Yape con contador
     end
 
-    Pac->>C: POST /paciente/citas/{id}/constancia (archivo, n.º de operación)
-    C->>S: adjuntarConstancia(idCita, archivo, nroOperacion)
-    S->>S: verificar dueño, estado PENDIENTE_PAGO y plazo vigente
-    S->>A: guardar(archivo)
-    A->>A: validar tipo real y ≤ 5 MB, nombre UUID (Commons IO)
-    A-->>S: ruta del archivo
-    S->>DB: INSERT pago POR_VALIDAR + UPDATE cita PROGRAMADA
-    C-->>Pac: P4 Confirmación
+    Pac->>PC: POST /paciente/pago (citaId, constancia, n.º de operación)
+    PC->>P: registrarPago(idCita, idPaciente, nroOperacion, archivo)
+    P->>DB: SELECT cita … FOR UPDATE: dueño, PENDIENTE_PAGO y plazo vigente
+    alt plazo vencido (RN-04)
+        P-->>PC: ReservaVencidaException
+        PC-->>Pac: P3 con el modal "Tiempo de reserva vencido"
+    else constancia o n.º de operación no válidos
+        P-->>PC: PagoInvalidoException (mensaje por campo)
+        PC-->>Pac: P3 con el error bajo cada campo
+    else válido
+        P->>P: tipo real JPG/PNG/PDF por sus primeros bytes, ≤ 5 MB, nombre UUID (Commons IO)
+        P->>DB: INSERT pago POR_VALIDAR + UPDATE cita PROGRAMADA
+        PC-->>Pac: P4 Confirmación
+    end
 ```
 
 ### SD-04 — Vencimiento automático de reservas (RF16, RN-04)
@@ -586,26 +593,31 @@ sequenceDiagram
     actor Med as Médico
     participant C as AgendaController
     participant G as GestionCitaService
-    participant A as AlmacenamientoService
+    participant K as ConstanciaService
     participant DB as MySQL
 
-    Med->>C: GET /medico/citas/{id}
-    C->>G: detalle(idCita)
-    C-->>Med: P8 Detalle de cita
+    Med->>C: GET /medico/citas/{id}?vista&fecha&estado
+    C->>G: detalle(idCita, idMedico)
+    G->>G: la cita es del médico (RF12), si no AccesoDenegadoException (403)
+    C-->>Med: P8 Detalle de cita (acciones según el estado)
     Med->>C: GET /medico/citas/{id}/constancia
-    C->>A: cargar(ruta)
-    A-->>Med: archivo de la constancia
+    C->>K: paraMedico(idCita, idMedico)
+    K-->>Med: archivo de la constancia (pestaña nueva)
 
     alt constancia válida
         Med->>C: POST /medico/citas/{id}/validar
-        C->>G: validarPago(idCita)
+        C->>G: validarPago(idCita, idMedico)
         G->>DB: UPDATE pago VALIDADO, validado_en = ahora
-        C-->>Med: P8 con pago verificado
+        C-->>Med: P8 con "Pago validado."
     else constancia no válida
-        Med->>C: POST /medico/citas/{id}/rechazar (observación)
-        C->>G: rechazarPago(idCita, observacion)
-        G->>DB: pago RECHAZADO + cita CANCELADA + cita_horario.activo = FALSE (transacción)
-        C-->>Med: P7 Agenda actualizada
+        Med->>C: POST /medico/citas/{id}/rechazar (motivo obligatorio, ≤ 500)
+        alt motivo vacío o muy largo
+            C-->>Med: P8 con el modal abierto y el error bajo el motivo
+        else motivo válido
+            C->>G: rechazarPago(idCita, idMedico, observacion)
+            G->>DB: pago RECHAZADO + cita CANCELADA (MEDICO) + cita_horario.activo = FALSE (transacción)
+            C-->>Med: P8 con "Pago rechazado. La cita se canceló y el horario quedó libre."
+        end
     end
 ```
 
@@ -621,22 +633,27 @@ sequenceDiagram
 
     alt marcar atendida o no asistió
         Med->>C: POST /medico/citas/{id}/atendida | /no-asistio
-        C->>G: marcarAtendida(idCita) | marcarNoAsistio(idCita)
+        C->>G: marcarAtendida(idCita, idMedico) | marcarNoAsistio(idCita, idMedico)
         G->>G: estado PROGRAMADA y hora de inicio ya llegó (RN-14)
-        alt atendida sin pago VALIDADO (RN-07)
+        alt la hora de inicio no llegó
+            G-->>C: AccionNoPermitidaException
+            C-->>Med: P8 "La cita aún no empieza."
+        else atendida sin pago VALIDADO (RN-07)
             G-->>C: PagoNoValidadoException
-            C-->>Med: P8 "Primero valide el pago"
+            C-->>Med: P8 "Primero valida el pago."
         else válido
             G->>DB: UPDATE cita ATENDIDA | NO_ASISTIO
-            C-->>Med: P7 Agenda actualizada
+            C-->>Med: P8 con "Cita marcada como atendida." | "Cita marcada como no asistió."
         end
     else cancelar
-        Med->>C: POST /medico/citas/{id}/cancelar (observación obligatoria)
-        C->>G: cancelar(idCita, observacion)
-        G->>DB: UPDATE cita CANCELADA + cita_horario.activo = FALSE
-        C-->>Med: P7 Agenda actualizada
+        Med->>C: POST /medico/citas/{id}/cancelar (motivo obligatorio, ≤ 500)
+        C->>G: cancelar(idCita, idMedico, observacion)
+        G->>DB: UPDATE cita CANCELADA (MEDICO) + cita_horario.activo = FALSE
+        C-->>Med: P8 con "Cita cancelada. El horario quedó libre."
     end
 ```
+
+Después de cada acción se vuelve a P8 con la alerta del resultado (decisión de flujo del diseño de P8); "‹ Volver a la agenda" regresa a P7 con los filtros que tenía.
 
 ### SD-07 — Generar y exportar reportes (RF09)
 
@@ -917,6 +934,7 @@ Los nombres de cada plantilla están en la tabla de §7. Fuera de Git: `uploads/
 | [`02_datos_prueba.sql`](docs/sql/02_datos_prueba.sql)               | Datos de prueba: consultorio Medifast, 1 médico, tarifas, horario lunes a sábado 09:00–13:00, bloques ±30 días, 30 pacientes y citas en todos los estados |
 | [`03_consultas.sql`](docs/sql/03_consultas.sql)                     | Vista `v_cita`, JOIN de verificación, reporte de citas, reporte de pagos, disponibilidad y pruebas de constraints (INSERT que **deben fallar**)       |
 | [`04_migracion_auditoria.sql`](docs/sql/04_migracion_auditoria.sql) | Solo para BD creadas antes de RNF13 completo: agrega `creado_en` / `actualizado_en` a las tablas que no las tenían. Re-ejecutable; requiere `root`      |
+| [`05_evento_vencimiento.sql`](docs/sql/05_evento_vencimiento.sql) | Evento `ev_vencer_reservas` (RF16, SD-04): cada minuto cancela las reservas `PENDIENTE_PAGO` vencidas con "Tiempo de reserva vencido" y libera sus bloques. Re-ejecutable; requiere `root` y `event_scheduler = ON` |
 
 ### 13.2 Diagramas — [`docs/diagramas/`](docs/diagramas/)
 
@@ -959,6 +977,7 @@ Sin Docker, ejecuta los scripts en un MySQL 8.4 local:
 ```bash
 mysql -u root -p < docs/sql/01_schema.sql
 mysql -u root -p < docs/sql/02_datos_prueba.sql
+mysql -u root -p < docs/sql/05_evento_vencimiento.sql          # RF16: vencimiento de reservas
 mysql --force -u root -p medifast < docs/sql/03_consultas.sql   # la sección 6 contiene errores esperados
 ```
 
@@ -966,6 +985,7 @@ mysql --force -u root -p medifast < docs/sql/03_consultas.sql   # la sección 6 
 
 ```bash
 docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/04_migracion_auditoria.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/05_evento_vencimiento.sql   # si tu BD no tiene el evento de RF16
 ```
 
 **Cuentas de prueba** (contraseña `Medifast2026`):

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -14,13 +15,17 @@ import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.enums.TipoDocumentoEnum;
 import pe.edu.utp.medifast.util.Enmascarador;
 
-/** Formatos de texto comunes a las pantallas del médico (P7, P9 y P10), en español de Perú. */
+/** Formatos de texto comunes a las pantallas del médico (P7–P10) y al paciente (P3, P4), en español de Perú. */
 final class FormatoVista {
 
 	static final Locale LOCALE = Locale.forLanguageTag("es-PE");
 	static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm", LOCALE);
 	static final DateTimeFormatter FECHA_INPUT = DateTimeFormatter.ofPattern("dd/MM/yyyy", LOCALE);
 	private static final DateTimeFormatter FECHA_CORTA = DateTimeFormatter.ofPattern("EEE d MMM yyyy", LOCALE);
+	private static final DateTimeFormatter DIA_CORTO = DateTimeFormatter.ofPattern("EEE d MMM", LOCALE);
+	private static final DateTimeFormatter DIA_CORTO_COMA = DateTimeFormatter.ofPattern("EEE, d MMM", LOCALE);
+	private static final DateTimeFormatter FECHA_LARGA = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy",
+			LOCALE);
 
 	private FormatoVista() {
 	}
@@ -30,9 +35,50 @@ final class FormatoVista {
 		return capitalizar(sinPuntos(FECHA_CORTA.format(fecha)));
 	}
 
+	/** "Mié 11 nov", sin el año (P3). */
+	static String diaCorto(LocalDate fecha) {
+		return capitalizar(sinPuntos(DIA_CORTO.format(fecha)));
+	}
+
+	/** "Mié, 11 nov", sin el año (P4). */
+	static String diaCortoConComa(LocalDate fecha) {
+		return capitalizar(sinPuntos(DIA_CORTO_COMA.format(fecha)));
+	}
+
 	/** "Lun 9 nov 2026, 08:40". */
 	static String fechaHoraCorta(LocalDateTime fechaHora) {
 		return fechaCorta(fechaHora.toLocalDate()) + ", " + HORA.format(fechaHora);
+	}
+
+	/** "Miércoles, 11 de noviembre de 2026". */
+	static String fechaLarga(LocalDate fecha) {
+		return capitalizar(FECHA_LARGA.format(fecha));
+	}
+
+	/** "10:30 a. m." (P8). */
+	static String hora12(LocalTime hora) {
+		return reloj12(hora) + " " + periodo(hora);
+	}
+
+	/** "10:30–11:30 a. m."; el periodo se repite solo si cambia, como en P2 y P5. */
+	static String rangoHoras12(LocalTime inicio, LocalTime fin) {
+		return periodo(inicio).equals(periodo(fin))
+				? reloj12(inicio) + "–" + reloj12(fin) + " " + periodo(fin)
+				: hora12(inicio) + "–" + hora12(fin);
+	}
+
+	/** "Lun 9 nov 2026, 10:12 a. m." (P8). */
+	static String fechaHora12(LocalDateTime fechaHora) {
+		return fechaCorta(fechaHora.toLocalDate()) + ", " + hora12(fechaHora.toLocalTime());
+	}
+
+	private static String reloj12(LocalTime hora) {
+		int hora12 = hora.getHour() % 12 == 0 ? 12 : hora.getHour() % 12;
+		return "%d:%02d".formatted(hora12, hora.getMinute());
+	}
+
+	private static String periodo(LocalTime hora) {
+		return hora.getHour() < 12 ? "a. m." : "p. m.";
 	}
 
 	/** "Del 9 al 14 nov 2026" o, si es un solo día, "15 nov 2026"; repite el mes o el año solo si cambian. */

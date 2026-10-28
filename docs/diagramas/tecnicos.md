@@ -88,18 +88,24 @@ classDiagram
         +disponibilidad(Long idPaciente, Long idMedico) DisponibilidadDto
         +detectarTipo(Long idPaciente, Long idMedico) TipoCita
         +reservar(Long idPaciente, Long idHorario) Cita
-        +adjuntarConstancia(Long idCita, MultipartFile archivo, String nroOperacion) Pago
         +historial(Long idPaciente) MisCitasDto
         +vencerReservas(LocalDateTime ahora) int
+    }
+    class PagoController
+    class PagoService {
+        <<interface>>
+        +paraPagar(Long idCita, Long idPaciente) PagoPendienteDto
+        +registrarPago(Long idCita, Long idPaciente, String nroOperacion, MultipartFile comprobante) Pago
     }
     class GestionCitaService {
         <<interface>>
         +agenda(Long idMedico, FiltroAgendaDto filtro) AgendaDto
-        +validarPago(Long idCita)
-        +rechazarPago(Long idCita, String observacion)
-        +marcarAtendida(Long idCita)
-        +marcarNoAsistio(Long idCita)
-        +cancelar(Long idCita, String observacion)
+        +detalle(Long idCita, Long idMedico) DetalleCitaDto
+        +validarPago(Long idCita, Long idMedico)
+        +rechazarPago(Long idCita, Long idMedico, String observacion)
+        +marcarAtendida(Long idCita, Long idMedico)
+        +marcarNoAsistio(Long idCita, Long idMedico)
+        +cancelar(Long idCita, Long idMedico, String observacion)
     }
     class ReporteService {
         <<interface>>
@@ -132,6 +138,7 @@ classDiagram
     class ConstanciaService {
         <<interface>>
         +paraPaciente(Long idCita, Long idPaciente) ConstanciaDto
+        +paraMedico(Long idCita, Long idMedico) ConstanciaDto
     }
     class AlmacenamientoService {
         <<interface>>
@@ -236,7 +243,9 @@ classDiagram
     AgendaController --> UsuarioActual
     AgendaController ..> FiltroAgendaDto
     GestionCitaService ..> AgendaDto
-    AgendaController --> AlmacenamientoService
+    GestionCitaService ..> DetalleCitaDto
+    AgendaController ..> MotivoDto
+    AgendaController --> ConstanciaService
     ReporteController --> ReporteService
     ReporteController --> UsuarioActual
     ReporteController --> ExportadorReporte
@@ -257,7 +266,12 @@ classDiagram
     ReservaService ..> CitaDao
     ReservaService ..> TarifaDao
     ReservaService ..> PagoDao
-    ReservaService ..> AlmacenamientoService
+    PagoController --> PagoService
+    PagoController --> UsuarioActual
+    PagoService ..> CitaDao
+    PagoService ..> PagoDao
+    PagoService ..> TarifaDao
+    PagoService ..> VistaCitaDao
     GestionCitaService ..> CitaDao
     GestionCitaService ..> PagoDao
     GestionCitaService ..> VistaCitaDao
@@ -436,7 +450,8 @@ sequenceDiagram
     actor Pac as Paciente
     participant C as ReservaController
     participant S as ReservaService
-    participant A as AlmacenamientoService
+    participant PC as PagoController
+    participant P as PagoService
     participant D as CitaDao / HorarioDao / PagoDao
     participant DB as MySQL
     participant J as VencimientoReservasJob
@@ -465,13 +480,12 @@ sequenceDiagram
         C-->>Pac: P3 Pago Yape con contador
     end
 
-    Pac->>C: POST /paciente/citas/{id}/constancia (archivo, n.º de operación)
-    C->>S: adjuntarConstancia(idCita, archivo, nroOperacion)
-    S->>A: guardar(archivo) valida tipo y 5 MB, nombre UUID
-    A-->>S: ruta del archivo
-    S->>DB: INSERT pago POR_VALIDAR y UPDATE cita PROGRAMADA
-    S-->>C: confirmación
-    C-->>Pac: P4 Confirmación + Descargar PDF
+    Pac->>PC: POST /paciente/pago (citaId, constancia, n.º de operación)
+    PC->>P: registrarPago(idCita, idPaciente, nroOperacion, archivo)
+    P->>DB: SELECT cita … FOR UPDATE (dueño, PENDIENTE_PAGO y plazo vigente)
+    P->>P: tipo real JPG/PNG/PDF, ≤ 5 MB, n.º de operación solo dígitos
+    P->>DB: guarda el archivo con nombre UUID, INSERT pago POR_VALIDAR y UPDATE cita PROGRAMADA
+    PC-->>Pac: P4 Confirmación + Descargar PDF
 
     loop cada minuto
         J->>S: vencerReservas(ahora)
@@ -492,36 +506,39 @@ sequenceDiagram
     actor Med as Médico
     participant C as AgendaController
     participant G as GestionCitaService
-    participant A as AlmacenamientoService
-    participant D as CitaDao / PagoDao
+    participant K as ConstanciaService
+    participant D as CitaDao / PagoDao / VistaCitaDao
     participant DB as MySQL
 
     Med->>C: GET /medico/citas/{id}
-    C->>G: detalle(idCita)
-    G->>D: cita, paciente, bloques y pago
+    C->>G: detalle(idCita, idMedico)
+    G->>D: cita del médico (RF12), paciente, pago y tarifa
     C-->>Med: P8 Detalle de cita
     Med->>C: GET /medico/citas/{id}/constancia
-    C->>A: cargar(ruta)
-    A-->>Med: archivo de la constancia
+    C->>K: paraMedico(idCita, idMedico)
+    K-->>Med: archivo de la constancia
 
     alt constancia válida
         Med->>C: POST validar
-        C->>G: validarPago(idCita)
+        C->>G: validarPago(idCita, idMedico)
         G->>DB: UPDATE pago VALIDADO, validado_en = ahora
     else constancia no válida
-        Med->>C: POST rechazar (observación)
-        C->>G: rechazarPago(idCita, observacion)
+        Med->>C: POST rechazar (motivo obligatorio, ≤ 500)
+        C->>G: rechazarPago(idCita, idMedico, observacion)
         G->>DB: pago RECHAZADO, cita CANCELADA (MEDICO), cita_horario.activo = FALSE
     end
 
     Med->>C: POST atendida o no asistió
-    C->>G: marcarAtendida(idCita) o marcarNoAsistio(idCita)
+    C->>G: marcarAtendida(idCita, idMedico) o marcarNoAsistio(idCita, idMedico)
     G->>G: verificar hora de inicio ya llegó (RN-14)
-    alt atendida sin pago VALIDADO
+    alt la hora de inicio no llegó
+        G-->>C: AccionNoPermitidaException
+        C-->>Med: P8 "La cita aún no empieza."
+    else atendida sin pago VALIDADO
         G-->>C: PagoNoValidadoException (RN-07)
-        C-->>Med: Primero valide el pago
+        C-->>Med: P8 "Primero valida el pago."
     else válido
         G->>DB: UPDATE cita ATENDIDA o NO_ASISTIO
-        C-->>Med: P7 Agenda actualizada
+        C-->>Med: P8 con la alerta de éxito
     end
 ```

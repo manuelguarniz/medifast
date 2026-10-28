@@ -32,6 +32,7 @@ import pe.edu.utp.medifast.dto.BloqueHorarioDto;
 import pe.edu.utp.medifast.dto.CitaPacienteDto;
 import pe.edu.utp.medifast.dto.InicioDisponibleDto;
 import pe.edu.utp.medifast.dto.MisCitasDto;
+import pe.edu.utp.medifast.exception.AccesoDenegadoException;
 import pe.edu.utp.medifast.exception.CitaActivaException;
 import pe.edu.utp.medifast.exception.FueraDeRangoException;
 import pe.edu.utp.medifast.exception.HorarioNoDisponibleException;
@@ -192,18 +193,9 @@ public class ReservaServiceImpl implements ReservaService {
 		CitaPacienteDto proxima = null;
 		List<CitaPacienteDto> historial = new ArrayList<>();
 		for (VistaCita cita : vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(idPaciente)) {
-			boolean pendiente = cita.getEstado() == EstadoCitaEnum.PENDIENTE_PAGO;
-			boolean vencida = pendiente && (cita.getExpiraEn() == null || !cita.getExpiraEn().isAfter(ahora));
-			long segundosRestantes = pendiente && !vencida
-					? Duration.between(ahora, cita.getExpiraEn()).toSeconds()
-					: 0;
-			BigDecimal monto = cita.getMonto() != null
-					? cita.getMonto()
-					: preciosPorTarifa.computeIfAbsent(cita.getIdMedico() + ":" + cita.getTipoCita(),
-							clave -> requireTarifa(cita.getIdMedico(), cita.getTipoCita()).getPrecio());
-			CitaPacienteDto dto = new CitaPacienteDto(cita, monto, vencida, segundosRestantes);
+			CitaPacienteDto dto = paraPaciente(cita, ahora, preciosPorTarifa);
 			// RN-09 garantiza una sola activa; si la BD tuviera más, las demás quedan en el historial.
-			boolean activa = cita.getEstado() == EstadoCitaEnum.PROGRAMADA || (pendiente && !vencida);
+			boolean activa = cita.getEstado() == EstadoCitaEnum.PROGRAMADA || dto.pagoPendiente();
 			if (activa && proxima == null) {
 				proxima = dto;
 			} else {
@@ -211,6 +203,29 @@ public class ReservaServiceImpl implements ReservaService {
 			}
 		}
 		return new MisCitasDto(Optional.ofNullable(proxima), List.copyOf(historial));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public CitaPacienteDto cita(Long idCita, Long idPaciente) {
+		VistaCita cita = vistaCitaDao.findById(idCita)
+				.filter(encontrada -> encontrada.getIdPaciente().equals(idPaciente))
+				.orElseThrow(() -> new AccesoDenegadoException("La cita no pertenece al paciente autenticado."));
+		return paraPaciente(cita, LocalDateTime.now(clock), new HashMap<>());
+	}
+
+	/** Monto (del pago o de la tarifa, RN-03), vencimiento y tiempo restante de una cita del paciente. */
+	private CitaPacienteDto paraPaciente(VistaCita cita, LocalDateTime ahora, Map<String, BigDecimal> preciosPorTarifa) {
+		boolean pendiente = cita.getEstado() == EstadoCitaEnum.PENDIENTE_PAGO;
+		boolean vencida = pendiente && (cita.getExpiraEn() == null || !cita.getExpiraEn().isAfter(ahora));
+		long segundosRestantes = pendiente && !vencida
+				? Duration.between(ahora, cita.getExpiraEn()).toSeconds()
+				: 0;
+		BigDecimal monto = cita.getMonto() != null
+				? cita.getMonto()
+				: preciosPorTarifa.computeIfAbsent(cita.getIdMedico() + ":" + cita.getTipoCita(),
+						clave -> requireTarifa(cita.getIdMedico(), cita.getTipoCita()).getPrecio());
+		return new CitaPacienteDto(cita, monto, vencida, segundosRestantes);
 	}
 
 	private Paciente requirePaciente(Long idPaciente) {

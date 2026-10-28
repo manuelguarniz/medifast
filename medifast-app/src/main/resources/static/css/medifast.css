@@ -3007,6 +3007,18 @@ form[aria-disabled="true"] .reserva-summary {
     background: #0284c7;
 }
 
+.reserva-status.citas-badge-atendida::before {
+    background: #10b981;
+}
+
+.reserva-status.citas-badge-cancelada::before {
+    background: #ef4444;
+}
+
+.reserva-status.citas-badge-no-asistio::before {
+    background: #64748b;
+}
+
 .citas-vacio {
     display: grid;
     justify-items: center;
@@ -4261,5 +4273,1302 @@ form[aria-disabled="true"] .reserva-summary {
     .reporte-lista > .reporte-contador {
         margin: 4px 0 0;
         text-align: center;
+    }
+}
+
+/* P8 — Detalle de cita (diseño aprobado v2/v3) */
+.detalle-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 24px;
+    color: #0d5c4d;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.detalle-volver:hover {
+    color: #084b40;
+    text-decoration: underline;
+}
+
+.detalle-volver svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.detalle-alerta {
+    margin-bottom: 24px;
+}
+
+.detalle-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.detalle-heading h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.detalle-fecha {
+    margin: 0;
+    color: #64748b;
+    font-size: 16px;
+}
+
+.detalle-badge {
+    flex: 0 0 auto;
+    margin-top: 30px;
+    padding: 6px 14px;
+    font-size: 14px;
+}
+
+.detalle-motivo {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: -8px 0 32px;
+    padding: 12px 14px;
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 14px;
+}
+
+.detalle-motivo p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.detalle-motivo svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    stroke: #ef4444;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+/* Escritorio: paciente y constancia a la izquierda (~65%), acciones a la derecha (~35%) */
+.detalle-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "paciente acciones"
+        "constancia acciones";
+    align-items: start;
+    gap: 32px;
+}
+
+.detalle-paciente {
+    grid-area: paciente;
+}
+
+.detalle-acciones {
+    grid-area: acciones;
+}
+
+.detalle-constancia {
+    grid-area: constancia;
+}
+
+.detalle-avatar {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+}
+
+.detalle-paciente .perfil-card-header strong {
+    overflow-wrap: anywhere;
+}
+
+.detalle-datos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0;
+}
+
+.detalle-datos dt {
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.detalle-datos dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.detalle-card-titulo {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.detalle-constancia-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.detalle-vista-previa {
+    display: grid;
+    height: 240px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f1f5f9;
+}
+
+.detalle-vista-previa img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.detalle-vista-pdf {
+    display: grid;
+    gap: 4px;
+    justify-items: center;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.detalle-vista-pdf svg {
+    width: 48px;
+    height: 48px;
+    stroke: #64748b;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.4;
+}
+
+.detalle-archivo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.detalle-archivo > svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    stroke: #475569;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.detalle-archivo-nombre {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.detalle-archivo-nombre small {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.detalle-archivo a {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #0d5c4d;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.detalle-archivo a:hover {
+    text-decoration: underline;
+}
+
+.detalle-archivo a svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.detalle-sin-archivo {
+    margin: 0;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.detalle-datos-pago {
+    margin-top: 20px;
+}
+
+.detalle-acciones .perfil-eyebrow {
+    margin-bottom: 4px;
+}
+
+.detalle-seccion {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.detalle-acciones .detalle-card-titulo + .detalle-seccion {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.detalle-seccion h3 {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.detalle-seccion form {
+    display: grid;
+    gap: 8px;
+}
+
+.detalle-boton {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+.detalle-boton svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.2;
+}
+
+.detalle-boton:disabled {
+    border-color: #e2e8f0;
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.detalle-boton-secundario {
+    border-color: #cbd5e1;
+    background: #fff;
+    color: #0f172a;
+}
+
+.detalle-boton-secundario:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+.detalle-boton-peligro {
+    border-color: #ef4444;
+    background: #fff;
+    color: #ef4444;
+}
+
+.detalle-boton-peligro:hover {
+    background: #fef2f2;
+}
+
+.detalle-boton-peligro-relleno {
+    width: auto;
+    background: #ef4444;
+    color: #fff;
+}
+
+.detalle-boton-peligro-relleno:hover {
+    background: #dc2626;
+}
+
+.detalle-ayuda {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0 0 4px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.detalle-ayuda svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    margin-top: 2px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+}
+
+.detalle-seccion-cancelar {
+    justify-items: center;
+}
+
+.detalle-cancelar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 0;
+    background: none;
+    color: #ef4444;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.detalle-cancelar:hover {
+    color: #dc2626;
+    text-decoration: underline;
+}
+
+.detalle-cancelar svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.6;
+}
+
+/* Estado final de la card de acciones y "Sin constancia" */
+.detalle-final {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    text-align: center;
+}
+
+.detalle-final h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.detalle-final p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.detalle-sin-constancia {
+    margin-top: 0;
+    padding: 24px 0 8px;
+}
+
+.detalle-final-icono {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border-radius: 50%;
+}
+
+.detalle-final-icono svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.detalle-final-exito {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.detalle-final-peligro {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.detalle-final-neutro {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.detalle-final-ambar {
+    background: #fffbeb;
+    color: #f59e0b;
+}
+
+/* Modal del motivo: 520 px, overlay #0f172a al 50% */
+.detalle-modal .modal-dialog {
+    max-width: 520px;
+}
+
+.modal-backdrop.show {
+    background: #0f172a;
+    opacity: .5;
+}
+
+.detalle-modal-form {
+    padding: 24px;
+    border: 0;
+    border-radius: 16px;
+    color: #0f172a;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+.detalle-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.detalle-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.detalle-modal-texto {
+    margin: 8px 0 20px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.detalle-motivo-campo label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.detalle-obligatorio {
+    color: #ef4444;
+}
+
+.detalle-motivo-campo textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 15px;
+    resize: vertical;
+}
+
+.detalle-motivo-campo textarea::placeholder {
+    color: #94a3b8;
+}
+
+.detalle-motivo-campo textarea:focus {
+    border-color: #0d5c4d;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(13, 92, 77, .15);
+}
+
+.detalle-motivo-campo textarea.is-invalid {
+    border-color: #ef4444;
+}
+
+.detalle-motivo-pie {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.detalle-motivo-pie .perfil-field-error {
+    margin: 0;
+}
+
+.detalle-motivo-pie .perfil-field-error[hidden] {
+    display: none;
+}
+
+.detalle-contador {
+    margin-left: auto;
+    color: #64748b;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.detalle-modal-pie {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.detalle-modal-pie .detalle-boton {
+    width: auto;
+    min-width: 120px;
+}
+
+@media (max-width: 767.98px) {
+    .detalle-heading {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .detalle-heading h1 {
+        font-size: 28px;
+    }
+
+    .detalle-badge {
+        margin-top: 0;
+        padding: 2px 10px;
+        font-size: 12px;
+    }
+
+    /* Móvil: paciente, acciones y constancia en una columna */
+    .detalle-layout {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+        grid-template-areas:
+            "paciente"
+            "acciones"
+            "constancia";
+        gap: 20px;
+    }
+
+    .detalle-layout .perfil-card {
+        padding: 24px 20px;
+    }
+
+    .detalle-datos {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .detalle-modal .modal-dialog {
+        margin: 16px;
+    }
+
+    .detalle-modal-pie {
+        flex-direction: column-reverse;
+    }
+
+    .detalle-modal-pie .detalle-boton {
+        width: 100%;
+    }
+}
+
+/* P3 — Pago Yape simulado (diseño aprobado v3.x) */
+.pago-main {
+    flex: 1;
+    padding-bottom: 32px;
+}
+
+.pago-aviso {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding: 12px 12px 12px 16px;
+    border: 1px solid #a7f3d0;
+    border-radius: 12px;
+    background: #ecfdf5;
+    color: #065f46;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.pago-aviso > svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.pago-aviso-corto {
+    display: none;
+}
+
+.pago-contador {
+    margin-left: auto;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: #0d5c4d;
+    color: #fff;
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.pago-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 24px;
+}
+
+.pago-card {
+    display: flex;
+    flex-direction: column;
+    padding: 32px;
+    border-radius: 16px;
+}
+
+.pago-yape {
+    align-items: center;
+    text-align: center;
+}
+
+.pago-yape .reserva-step {
+    align-self: stretch;
+    text-align: left;
+}
+
+.pago-monto-etiqueta {
+    margin: 16px 0 4px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .08em;
+}
+
+.pago-monto {
+    margin: 0 0 20px;
+    color: #0d5c4d;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.pago-qr {
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.pago-qr img {
+    display: block;
+    width: 200px;
+    max-width: 100%;
+    height: auto;
+}
+
+.pago-qr-etiqueta {
+    margin-top: 10px;
+    padding: 2px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pago-destino {
+    display: grid;
+    gap: 2px;
+    align-self: stretch;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.pago-destino small {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.pago-destino strong {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pago-destino span {
+    color: #0d5c4d;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.pago-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 8px;
+}
+
+.pago-campo {
+    display: grid;
+    gap: 6px;
+}
+
+.pago-etiqueta {
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.pago-subida {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    padding: 28px 16px;
+    border: 2px dashed #0d5c4d;
+    border-radius: 8px;
+    background: #f8fafc;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color .15s ease;
+}
+
+.pago-subida:hover,
+.pago-subida-activa {
+    background: #ecfdf5;
+}
+
+.pago-campo:focus-within .pago-subida {
+    box-shadow: 0 0 0 3px rgba(13, 92, 77, .2);
+}
+
+.pago-subida svg {
+    width: 32px;
+    height: 32px;
+    stroke: #0d5c4d;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.pago-subida strong {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pago-subida small {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.pago-subida-corto {
+    display: none;
+}
+
+.pago-subida.pago-subida-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.pago-archivo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.pago-archivo > svg {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    stroke: #0d5c4d;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.pago-archivo-nombre {
+    display: flex;
+    flex: 1;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.pago-archivo-nombre strong {
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pago-archivo-nombre small {
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.pago-quitar {
+    flex: 0 0 auto;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: #475569;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pago-quitar:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.pago-campo .perfil-field-error {
+    margin: 0;
+}
+
+.pago-ayuda {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.pago-acciones {
+    display: grid;
+    grid-template-columns: minmax(0, .55fr) minmax(0, 1fr);
+    gap: 16px;
+    margin-top: auto;
+}
+
+.pago-volver,
+.pago-enviar,
+.pago-modal-boton {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pago-volver {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #0f172a;
+}
+
+.pago-volver:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.pago-enviar,
+.pago-modal-boton {
+    color: #fff;
+}
+
+.pago-modal-boton:hover {
+    color: #fff;
+}
+
+.pago-volver svg,
+.pago-enviar svg,
+.pago-modal-boton svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.pago-nota {
+    margin: -4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+}
+
+.pago-nota a {
+    color: #0d5c4d;
+    font-weight: 700;
+}
+
+.pago-simulacion {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 10px;
+    margin: 32px auto 0;
+    padding: 12px 20px;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    background: #fffbeb;
+    color: #92400e;
+    font-size: 15px;
+}
+
+.pago-simulacion svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    stroke: #d97706;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.pago-footer {
+    border-top: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Modal bloqueante "Tiempo de reserva vencido" (480 px) */
+.pago-modal .modal-dialog {
+    max-width: 480px;
+}
+
+.pago-modal-contenido {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    padding: 32px 28px 28px;
+    border: 0;
+    border-radius: 16px;
+    color: #0f172a;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    text-align: center;
+}
+
+.pago-modal-contenido h2 {
+    margin: 4px 0 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.pago-modal-contenido p {
+    margin: 0 0 8px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+.pago-modal-boton {
+    width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    /* El aviso con el contador va primero y queda fijo bajo la navbar */
+    .pago-main {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pago-aviso {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        order: -1;
+        margin: -22px -16px 20px;
+        border-width: 0 0 1px;
+        border-radius: 0;
+        font-size: 14px;
+    }
+
+    .pago-aviso-largo {
+        display: none;
+    }
+
+    .pago-aviso-corto {
+        display: inline;
+    }
+
+    .pago-contador {
+        padding: 4px 12px;
+        font-size: 17px;
+    }
+
+    .pago-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    .pago-card {
+        padding: 24px 20px;
+    }
+
+    .pago-monto {
+        font-size: 36px;
+    }
+
+    .pago-subida-largo {
+        display: none;
+    }
+
+    .pago-subida-corto {
+        display: inline;
+    }
+
+    .pago-acciones {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pago-acciones .pago-enviar {
+        order: -1;
+    }
+
+    .pago-simulacion {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .pago-modal .modal-dialog {
+        margin: 16px;
+    }
+}
+
+/* P4 — Confirmación y detalle de la cita (diseño aprobado v2, card dividida de P1) */
+.confirmacion-main {
+    flex: 1;
+    padding-top: 48px;
+}
+
+.confirmacion-card {
+    min-height: 0;
+    grid-template-columns: minmax(300px, 40%) minmax(0, 60%);
+}
+
+.confirmacion-intro {
+    justify-content: flex-start;
+}
+
+.confirmacion-pill {
+    gap: 6px;
+    border: 1px solid rgba(159, 224, 196, .35);
+    background: rgba(255, 255, 255, .08);
+    color: #d1fae5;
+    font-weight: 600;
+}
+
+.confirmacion-pill svg {
+    width: 14px;
+    height: 14px;
+    stroke: #9fe0c4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.confirmacion-lead-movil {
+    display: none;
+}
+
+.confirmacion-recomendacion {
+    margin-top: auto;
+}
+
+.confirmacion-alerta {
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.confirmacion-alerta p {
+    margin: 0;
+    color: #0f172a;
+}
+
+.confirmacion-filas {
+    margin: 0;
+}
+
+.confirmacion-filas > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.confirmacion-filas > div:last-child {
+    border-bottom: 0;
+}
+
+.confirmacion-filas dt {
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.confirmacion-filas dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.confirmacion-fila-motivo dd {
+    color: #b91c1c;
+    font-weight: 500;
+}
+
+.confirmacion-constancia {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px 12px;
+}
+
+.confirmacion-constancia a {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #0d5c4d;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.confirmacion-constancia a:hover {
+    text-decoration: underline;
+}
+
+.confirmacion-constancia svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.confirmacion-acciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.confirmacion-boton {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.registro-submit.confirmacion-boton,
+a.registro-submit.confirmacion-boton:hover {
+    color: #fff;
+}
+
+.confirmacion-boton svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.confirmacion-secundario {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #0d5c4d;
+}
+
+.confirmacion-secundario:hover {
+    background: #f8fafc;
+    color: #0d5c4d;
+}
+
+@media (max-width: 767.98px) {
+    .confirmacion-main {
+        padding-top: 0;
+    }
+
+    /* Móvil: la cabecera verde lleva el título; la card empieza con la alerta */
+    .confirmacion-lead {
+        display: none;
+    }
+
+    .confirmacion-lead-movil {
+        display: block;
+    }
+
+    .confirmacion-panel > h2,
+    .confirmacion-panel > .registro-subtitle {
+        display: none;
+    }
+
+    .confirmacion-filas > div {
+        padding: 14px 0;
+    }
+
+    .confirmacion-filas dt {
+        font-size: 12px;
+    }
+
+    .confirmacion-filas dd {
+        font-size: 15px;
+    }
+
+    .confirmacion-acciones {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        margin-top: 24px;
     }
 }

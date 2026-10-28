@@ -33,6 +33,7 @@ import pe.edu.utp.medifast.service.ConfirmacionPdfService;
 import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
+import pe.edu.utp.medifast.util.Paginacion;
 
 /** P5 — Mis citas: cita activa, historial, PDF de la confirmación y constancia del paciente (RF10, RF12, RF15). */
 @Controller
@@ -60,13 +61,17 @@ public class MisCitasController {
 
 	/**
 	 * Abre "Próximas" si hay una cita activa; si no, "Historial" cuando tiene citas (decisión de diseño de P5).
+	 * El historial se pagina con {@code pagina}.
 	 */
 	@GetMapping
-	public String mostrar(@RequestParam(required = false) String tab, Authentication authentication, Model model) {
+	public String mostrar(@RequestParam(required = false) String tab, @RequestParam(required = false) String pagina,
+			Authentication authentication, Model model) {
 		Long idPaciente = usuarioActual.idPaciente(authentication);
 		MisCitasDto citas = reservaService.historial(idPaciente);
 		CitaView proxima = citas.proxima().map(MisCitasController::vista).orElse(null);
-		List<CitaView> historial = citas.historial().stream().map(MisCitasController::vista).toList();
+		Paginacion paginacion = Paginacion.de(pagina, citas.historial().size());
+		List<CitaView> historial = paginacion.recortar(citas.historial()).stream().map(MisCitasController::vista)
+				.toList();
 		String pestana = switch (tab == null ? "" : tab) {
 			case "proximas", "historial" -> tab;
 			default -> proxima == null && !historial.isEmpty() ? "historial" : "proximas";
@@ -79,6 +84,8 @@ public class MisCitasController {
 
 		model.addAttribute("proxima", proxima);
 		model.addAttribute("historial", historial);
+		model.addAttribute("paginacion", paginacion);
+		model.addAttribute("rango", paginacion.contador("cita", "citas"));
 		model.addAttribute("pestana", pestana);
 		model.addAttribute("nombreMedico", medico == null ? "el médico"
 				: "Dr. " + medico.getNombres() + " " + medico.getApellidos());

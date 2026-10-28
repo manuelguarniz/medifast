@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+    Barra de paginación de los listados (P5, P7, P9 y P10). {@code url} es el enlace del listado con sus filtros
+    ya aplicados; cada página le agrega el parámetro "pagina". Con una sola página no se muestra.
+-->
+<nav th:fragment="barra(paginacion, url)" th:if="${paginacion.varias()}" class="paginacion"
+     aria-label="Paginación"
+     th:with="separador=${#strings.contains(url, '?') ? '&' : '?'}">
+    <a th:if="${paginacion.tieneAnterior()}" class="paginacion-item paginacion-nav" rel="prev"
+       th:href="${url + separador + 'pagina=' + (paginacion.actual() - 1)}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+        <span>Anterior</span>
+    </a>
+    <span th:unless="${paginacion.tieneAnterior()}" class="paginacion-item paginacion-nav paginacion-deshabilitada"
+          aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+        <span>Anterior</span>
+    </span>
+    <ol class="paginacion-paginas">
+        <li th:each="n : ${paginacion.paginas()}">
+            <span th:if="${n == null}" class="paginacion-gap" aria-hidden="true">…</span>
+            <a th:if="${n != null and n != paginacion.actual()}" class="paginacion-item"
+               th:href="${url + separador + 'pagina=' + n}"
+               th:text="${n}" th:attr="aria-label=|Página ${n}|">2</a>
+            <span th:if="${n != null and n == paginacion.actual()}" class="paginacion-item active"
+                  aria-current="page" th:text="${n}" th:attr="aria-label=|Página ${n}|">1</span>
+        </li>
+    </ol>
+    <a th:if="${paginacion.tieneSiguiente()}" class="paginacion-item paginacion-nav" rel="next"
+       th:href="${url + separador + 'pagina=' + (paginacion.actual() + 1)}">
+        <span>Siguiente</span>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+    <span th:unless="${paginacion.tieneSiguiente()}" class="paginacion-item paginacion-nav paginacion-deshabilitada"
+          aria-disabled="true">
+        <span>Siguiente</span>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </span>
+</nav>
+
+</body>
+</html>

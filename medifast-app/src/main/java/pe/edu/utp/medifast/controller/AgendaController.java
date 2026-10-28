@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
@@ -59,6 +60,7 @@ import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.GestionCitaService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
+import pe.edu.utp.medifast.util.Paginacion;
 
 /**
  * P7 — Agenda del médico: citas del día o de la semana con filtro por estado (RF04, CU07). P8 — Detalle de cita:
@@ -97,11 +99,13 @@ public class AgendaController {
 
 	/**
 	 * Por defecto abre el día de hoy con todos los estados (decisión de diseño de P7). Los parámetros inválidos
-	 * no producen error: se vuelve al valor por defecto.
+	 * no producen error: se vuelve al valor por defecto. Las citas se paginan con {@code pagina}; los indicadores y
+	 * el contador de cada día cuentan todo el período.
 	 */
 	@GetMapping("/agenda")
 	public String mostrar(@RequestParam(required = false) String vista, @RequestParam(required = false) String fecha,
-			@RequestParam(required = false) String estado, Authentication authentication, Model model) {
+			@RequestParam(required = false) String estado, @RequestParam(required = false) String pagina,
+			Authentication authentication, Model model) {
 		LocalDate hoy = LocalDate.now(clock);
 		FiltroAgendaDto filtro = new FiltroAgendaDto(
 				"semana".equalsIgnoreCase(vista) ? Vista.SEMANA : Vista.DIA,
@@ -133,7 +137,10 @@ public class AgendaController {
 				? diasDeAtencion(agenda.horario())
 				: rangoDeAtencion(agenda.horario(), filtro.fecha().getDayOfWeek()));
 		model.addAttribute("agenda", agenda);
-		model.addAttribute("dias", agruparPorDia(agenda.citas()));
+		Paginacion paginacion = Paginacion.de(pagina, agenda.citas().size());
+		model.addAttribute("dias", agruparPorDia(paginacion.recortar(agenda.citas()), agenda.citas()));
+		model.addAttribute("paginacion", paginacion);
+		model.addAttribute("rango", paginacion.contador("cita", "citas"));
 		model.addAttribute("cantidad", agenda.citas().size());
 		model.addAttribute("estados", ESTADOS);
 		return "medico/agenda";
@@ -323,13 +330,17 @@ public class AgendaController {
 		}
 	}
 
-	private static List<DiaAgenda> agruparPorDia(List<VistaCita> citas) {
+	/** Agrupa por día las citas de la página; {@code todas} da el total de cada día aunque esté en varias páginas. */
+	private static List<DiaAgenda> agruparPorDia(List<VistaCita> pagina, List<VistaCita> todas) {
+		Map<LocalDate, Long> totales = todas.stream()
+				.collect(Collectors.groupingBy(VistaCita::getFecha, Collectors.counting()));
 		Map<LocalDate, List<FilaAgenda>> porDia = new LinkedHashMap<>();
-		for (VistaCita cita : citas) {
+		for (VistaCita cita : pagina) {
 			porDia.computeIfAbsent(cita.getFecha(), dia -> new ArrayList<>()).add(fila(cita));
 		}
 		return porDia.entrySet().stream()
-				.map(dia -> new DiaAgenda(capitalizar(TITULO_DIA.format(dia.getKey())), dia.getValue()))
+				.map(dia -> new DiaAgenda(capitalizar(TITULO_DIA.format(dia.getKey())), dia.getValue(),
+						totales.get(dia.getKey())))
 				.toList();
 	}
 
@@ -442,11 +453,14 @@ public class AgendaController {
 		return FormatoVista.capitalizar(texto);
 	}
 
-	/** Citas de un día; en la vista semana, cada día lleva su cabecera con el contador. */
-	public record DiaAgenda(String titulo, List<FilaAgenda> citas) {
+	/**
+	 * Citas de un día en la página actual; en la vista semana, cada día lleva su cabecera con el contador.
+	 * {@code total} cuenta todas las citas del día, aunque la paginación las reparta en varias páginas.
+	 */
+	public record DiaAgenda(String titulo, List<FilaAgenda> citas, long total) {
 
 		public String contador() {
-			return citas.size() == 1 ? "1 cita" : citas.size() + " citas";
+			return total == 1 ? "1 cita" : total + " citas";
 		}
 	}
 

@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -172,6 +173,25 @@ class MisCitasControllerTest {
 						not(containsString("/paciente/citas/109/constancia")),
 						not(containsString("/paciente/citas/117/pdf")),
 						not(containsString("/paciente/pago?citaId=130")))));
+	}
+
+	@Test
+	void historialSePaginaYElContadorDeLaPestanaCuentaTodas() throws Exception {
+		List<CitaPacienteDto> historial = new ArrayList<>();
+		for (int i = 0; i < 13; i++) {
+			historial.add(dto(400L + i, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO, false, 0, null));
+		}
+		when(reservaService.historial(ID_PACIENTE)).thenReturn(new MisCitasDto(Optional.empty(), historial));
+
+		mockMvc.perform(get("/paciente/citas").param("tab", "historial").param("pagina", "2")
+						.with(user("70000001").roles("PACIENTE")))
+				.andExpect(status().isOk())
+				.andExpect(model().attribute("rango", "Mostrando 11–13 de 13 citas"))
+				.andExpect(content().string(allOf(
+						containsString("#000410"),
+						not(containsString("#000409")),
+						containsString("<span class=\"citas-contador\">13</span>"),
+						containsString("/paciente/citas?tab=historial&amp;pagina=1"))));
 	}
 
 	@Test

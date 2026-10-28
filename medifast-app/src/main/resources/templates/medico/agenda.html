@@ -195,6 +195,10 @@
                 </article>
             </section>
         </div>
+
+        <p th:if="${paginacion.varias()}" class="reporte-contador paginacion-rango" th:text="${rango}">Mostrando 1–10 de 14 citas</p>
+        <nav th:replace="~{fragments/paginacion :: barra(${paginacion},
+                @{/medico/agenda(vista=${vista},fecha=${fecha},estado=${estado})})}"></nav>
     </th:block>
 
     <!-- Estado vacío: por filtro de estado, por día o por semana -->

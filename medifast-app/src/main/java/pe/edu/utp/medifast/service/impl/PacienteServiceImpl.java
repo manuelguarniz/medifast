@@ -21,6 +21,7 @@ import pe.edu.utp.medifast.model.enums.RolEnum;
 import pe.edu.utp.medifast.service.PacienteService;
 import pe.edu.utp.medifast.util.Auditoria;
 import pe.edu.utp.medifast.util.Auditoria.Evento;
+import pe.edu.utp.medifast.util.RestriccionesBd;
 
 /** Implementación transaccional del registro (RF02) y de la actualización de datos de pacientes (RF11). */
 @Service
@@ -64,10 +65,10 @@ public class PacienteServiceImpl implements PacienteService {
 			auditoria.registrar(Evento.REGISTRO, numeroDocumento, "registro_paciente");
 			return pacienteGuardado;
 		} catch (DataIntegrityViolationException ex) {
-			if (contieneRestriccion(ex, "uq_usuario_documento")) {
+			if (RestriccionesBd.viola(ex, "uq_usuario_documento")) {
 				throw new DocumentoDuplicadoException();
 			}
-			if (contieneRestriccion(ex, "uq_paciente_correo")) {
+			if (RestriccionesBd.viola(ex, "uq_paciente_correo")) {
 				throw new CorreoDuplicadoException();
 			}
 			throw ex;
@@ -91,7 +92,7 @@ public class PacienteServiceImpl implements PacienteService {
 			auditoria.registrar(Evento.PERFIL, "id_paciente=" + idPaciente);
 			return pacienteGuardado;
 		} catch (DataIntegrityViolationException ex) {
-			if (contieneRestriccion(ex, "uq_paciente_correo")) {
+			if (RestriccionesBd.viola(ex, "uq_paciente_correo")) {
 				throw new CorreoDuplicadoException();
 			}
 			throw ex;
@@ -111,11 +112,5 @@ public class PacienteServiceImpl implements PacienteService {
 		usuario.setContrasenaHash(passwordEncoder.encode(nueva));
 		usuarioDao.save(usuario);
 		auditoria.registrar(Evento.CONTRASENA, "id_usuario=" + idUsuario);
-	}
-
-	private static boolean contieneRestriccion(DataIntegrityViolationException ex, String nombre) {
-		Throwable causa = ex.getMostSpecificCause();
-		String mensaje = causa.getMessage();
-		return mensaje != null && mensaje.toLowerCase(Locale.ROOT).contains(nombre);
 	}
 }

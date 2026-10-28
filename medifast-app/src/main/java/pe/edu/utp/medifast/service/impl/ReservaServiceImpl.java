@@ -5,16 +5,13 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -48,6 +45,7 @@ import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.Auditoria;
 import pe.edu.utp.medifast.util.Auditoria.Evento;
+import pe.edu.utp.medifast.util.RestriccionesBd;
 
 /** Implementación transaccional de disponibilidad y reserva (RN-01 a RN-09). */
 @Service
@@ -66,15 +64,7 @@ public class ReservaServiceImpl implements ReservaService {
 	private final Auditoria auditoria;
 	private final Clock clock;
 
-	@Autowired
-	public ReservaServiceImpl(PacienteDao pacienteDao, MedicoDao medicoDao, CitaDao citaDao,
-			CitaHorarioDao citaHorarioDao, HorarioDao horarioDao, TarifaDao tarifaDao, VistaCitaDao vistaCitaDao,
-			Auditoria auditoria) {
-		this(pacienteDao, medicoDao, citaDao, citaHorarioDao, horarioDao, tarifaDao, vistaCitaDao, auditoria,
-				Clock.system(ZoneId.of("America/Lima")));
-	}
-
-	ReservaServiceImpl(PacienteDao pacienteDao, MedicoDao medicoDao, CitaDao citaDao, CitaHorarioDao citaHorarioDao,
+	public ReservaServiceImpl(PacienteDao pacienteDao, MedicoDao medicoDao, CitaDao citaDao, CitaHorarioDao citaHorarioDao,
 			HorarioDao horarioDao, TarifaDao tarifaDao, VistaCitaDao vistaCitaDao, Auditoria auditoria, Clock clock) {
 		this.pacienteDao = pacienteDao;
 		this.medicoDao = medicoDao;
@@ -172,12 +162,12 @@ public class ReservaServiceImpl implements ReservaService {
 			auditoria.registrar(Evento.RESERVA, "id_cita=" + guardada.getId());
 			return guardada;
 		} catch (DataIntegrityViolationException ex) {
-			if (contieneRestriccion(ex, "uq_cita_paciente_activo")) {
+			if (RestriccionesBd.viola(ex, "uq_cita_paciente_activo")) {
 				Cita activa = citaDao.findFirstByPacienteIdAndEstadoIn(idPaciente, ESTADOS_ACTIVOS)
 						.orElseThrow(() -> ex);
 				throw new CitaActivaException(activa);
 			}
-			if (contieneRestriccion(ex, "uq_cita_horario_activo")) {
+			if (RestriccionesBd.viola(ex, "uq_cita_horario_activo")) {
 				throw new HorarioNoDisponibleException();
 			}
 			throw ex;
@@ -301,15 +291,5 @@ public class ReservaServiceImpl implements ReservaService {
 			}
 		}
 		return -1;
-	}
-
-	private static boolean contieneRestriccion(DataIntegrityViolationException ex, String nombre) {
-		for (Throwable causa = ex; causa != null; causa = causa.getCause()) {
-			String mensaje = causa.getMessage();
-			if (mensaje != null && mensaje.toLowerCase(Locale.ROOT).contains(nombre)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

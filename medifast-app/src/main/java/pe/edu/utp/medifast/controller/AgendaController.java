@@ -3,28 +3,23 @@ package pe.edu.utp.medifast.controller;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -37,9 +32,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.google.common.base.Enums;
-import com.google.common.collect.ImmutableMap;
 
 import jakarta.validation.Valid;
 
@@ -60,6 +52,7 @@ import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.GestionCitaService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
+import pe.edu.utp.medifast.util.FormatoVista;
 import pe.edu.utp.medifast.util.Paginacion;
 
 /**
@@ -79,10 +72,6 @@ public class AgendaController {
 	private static final String MODAL_RECHAZAR = "rechazar";
 	private static final String MODAL_CANCELAR = "cancelar";
 	private static final DateTimeFormatter TITULO_DIA = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", LOCALE);
-
-	/** Opciones del filtro "Estado": los 5 estados de la cita con sus etiquetas de README §5.2. */
-	private static final Map<String, String> ESTADOS = Arrays.stream(EstadoCitaEnum.values())
-			.collect(ImmutableMap.toImmutableMap(EstadoCitaEnum::name, EtiquetasEstado::cita));
 
 	private final GestionCitaService gestionCitaService;
 	private final ConstanciaService constanciaService;
@@ -109,8 +98,8 @@ public class AgendaController {
 		LocalDate hoy = LocalDate.now(clock);
 		FiltroAgendaDto filtro = new FiltroAgendaDto(
 				"semana".equalsIgnoreCase(vista) ? Vista.SEMANA : Vista.DIA,
-				leerFecha(fecha, hoy),
-				Enums.getIfPresent(EstadoCitaEnum.class, StringUtils.defaultString(estado)).orNull());
+				Objects.requireNonNullElse(Parametros.fecha(fecha), hoy),
+				Parametros.estadoCita(estado));
 		Medico medico = usuarioActual.medico(authentication);
 		AgendaDto agenda = gestionCitaService.agenda(medico.getId(), filtro);
 		boolean semana = filtro.vista() == Vista.SEMANA;
@@ -142,7 +131,7 @@ public class AgendaController {
 		model.addAttribute("paginacion", paginacion);
 		model.addAttribute("rango", paginacion.contador("cita", "citas"));
 		model.addAttribute("cantidad", agenda.citas().size());
-		model.addAttribute("estados", ESTADOS);
+		model.addAttribute("estados", EtiquetasEstado.OPCIONES_CITA);
 		return "medico/agenda";
 	}
 
@@ -158,12 +147,7 @@ public class AgendaController {
 	/** RF12: abre la constancia en una pestaña nueva; solo la ve el médico de la cita. */
 	@GetMapping("/citas/{id}/constancia")
 	public ResponseEntity<Resource> verConstancia(@PathVariable Long id, Authentication authentication) {
-		ConstanciaDto constancia = constanciaService.paraMedico(id, usuarioActual.idMedico(authentication));
-		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(constancia.tipo()))
-				.header(HttpHeaders.CONTENT_DISPOSITION,
-						ContentDisposition.inline().filename(constancia.nombre()).build().toString())
-				.body(constancia.archivo());
+		return Respuestas.constancia(constanciaService.paraMedico(id, usuarioActual.idMedico(authentication)));
 	}
 
 	/** RF13: valida el pago sin modal, porque no pide datos. */
@@ -276,12 +260,11 @@ public class AgendaController {
 						+ FormatoVista.rangoHoras12(cita.getHoraInicio(), cita.getHoraFin()),
 				EtiquetasEstado.cita(cita.getEstado()),
 				EtiquetasEstado.claseCita(cita.getEstado()),
-				iniciales(cita.getPaciente()),
+				FormatoVista.iniciales(cita.getPaciente()),
 				cita.getPaciente(),
 				cita.getTipoDocumento() + " " + cita.getNumeroDocumento(),
-				EtiquetasEstado.tipo(cita.getTipoCita()) + " · "
-						+ Duration.between(cita.getHoraInicio(), cita.getHoraFin()).toMinutes() + " min",
-				detalle.monto() == null ? "—" : FormatoVista.soles(detalle.monto()),
+				FormatoVista.tipoYDuracion(cita),
+				FormatoVista.solesOGuion(detalle.monto()),
 				detalle.celular(),
 				detalle.correo(),
 				pago == null ? null : EtiquetasEstado.pago(pago.getEstado()),
@@ -319,17 +302,6 @@ public class AgendaController {
 		}
 	}
 
-	private static LocalDate leerFecha(String fecha, LocalDate hoy) {
-		if (StringUtils.isBlank(fecha)) {
-			return hoy;
-		}
-		try {
-			return LocalDate.parse(fecha.strip());
-		} catch (DateTimeParseException e) {
-			return hoy;
-		}
-	}
-
 	/** Agrupa por día las citas de la página; {@code todas} da el total de cada día aunque esté en varias páginas. */
 	private static List<DiaAgenda> agruparPorDia(List<VistaCita> pagina, List<VistaCita> todas) {
 		Map<LocalDate, Long> totales = todas.stream()
@@ -339,7 +311,7 @@ public class AgendaController {
 			porDia.computeIfAbsent(cita.getFecha(), dia -> new ArrayList<>()).add(fila(cita));
 		}
 		return porDia.entrySet().stream()
-				.map(dia -> new DiaAgenda(capitalizar(TITULO_DIA.format(dia.getKey())), dia.getValue(),
+				.map(dia -> new DiaAgenda(FormatoVista.capitalizar(TITULO_DIA.format(dia.getKey())), dia.getValue(),
 						totales.get(dia.getKey())))
 				.toList();
 	}
@@ -348,31 +320,15 @@ public class AgendaController {
 		return new FilaAgenda(
 				cita.getIdCita(),
 				HORA.format(cita.getHoraInicio()),
-				Duration.between(cita.getHoraInicio(), cita.getHoraFin()).toMinutes(),
-				iniciales(cita.getPaciente()),
+				FormatoVista.minutos(cita),
+				FormatoVista.iniciales(cita.getPaciente()),
 				cita.getPaciente(),
 				FormatoVista.documento(cita.getTipoDocumento(), cita.getNumeroDocumento()),
 				EtiquetasEstado.tipo(cita.getTipoCita()),
 				EtiquetasEstado.cita(cita.getEstado()),
 				EtiquetasEstado.claseCita(cita.getEstado()),
-				cita.getEstadoPago() == null ? null : EtiquetasEstado.pago(cita.getEstadoPago()),
+				EtiquetasEstado.pagoSiExiste(cita.getEstadoPago()),
 				EtiquetasEstado.clasePago(cita.getEstadoPago()));
-	}
-
-	/**
-	 * Inicial del primer nombre y del apellido paterno. {@code v_cita} trae "nombres apellidos" en un solo campo;
-	 * con 3 palabras o más se toma la penúltima como apellido paterno ("Andrea Sofía Salazar Pérez" → "AS").
-	 */
-	static String iniciales(String nombreCompleto) {
-		String[] palabras = StringUtils.split(StringUtils.defaultString(nombreCompleto));
-		if (palabras.length == 0) {
-			return "?";
-		}
-		if (palabras.length == 1) {
-			return palabras[0].substring(0, 1).toUpperCase(LOCALE);
-		}
-		String apellido = palabras.length >= 3 ? palabras[palabras.length - 2] : palabras[1];
-		return (palabras[0].substring(0, 1) + apellido.substring(0, 1)).toUpperCase(LOCALE);
 	}
 
 	/**
@@ -416,10 +372,10 @@ public class AgendaController {
 		}
 		boolean consecutivos = dias.get(dias.size() - 1).getValue() - dias.get(0).getValue() == dias.size() - 1;
 		if (consecutivos) {
-			return capitalizar(nombreDia(dias.get(0))) + " a " + nombreDia(dias.get(dias.size() - 1));
+			return FormatoVista.capitalizar(nombreDia(dias.get(0))) + " a " + nombreDia(dias.get(dias.size() - 1));
 		}
 		List<String> nombres = dias.stream().map(AgendaController::nombreDia).toList();
-		return capitalizar(String.join(", ", nombres.subList(0, nombres.size() - 1)) + " y "
+		return FormatoVista.capitalizar(String.join(", ", nombres.subList(0, nombres.size() - 1)) + " y "
 				+ nombres.get(nombres.size() - 1));
 	}
 
@@ -429,28 +385,20 @@ public class AgendaController {
 
 	/** "Semana del 9 al 14 de noviembre de 2026"; repite el mes o el año solo si cambian. */
 	private static String subtituloSemana(LocalDate desde, LocalDate hasta) {
-		String fin = hasta.getDayOfMonth() + " de " + mes(hasta, TextStyle.FULL) + " de " + hasta.getYear();
+		String fin = hasta.getDayOfMonth() + " de " + FormatoVista.mes(hasta, TextStyle.FULL) + " de " + hasta.getYear();
 		String inicio = desde.getDayOfMonth()
-				+ (desde.getMonth() == hasta.getMonth() ? "" : " de " + mes(desde, TextStyle.FULL))
+				+ (desde.getMonth() == hasta.getMonth() ? "" : " de " + FormatoVista.mes(desde, TextStyle.FULL))
 				+ (desde.getYear() == hasta.getYear() ? "" : " de " + desde.getYear());
 		return "Semana del " + inicio + " al " + fin;
 	}
 
 	/** "9 – 14 nov 2026"; repite el mes o el año solo si cambian. */
 	private static String etiquetaSemana(LocalDate desde, LocalDate hasta) {
-		String fin = hasta.getDayOfMonth() + " " + mes(hasta, TextStyle.SHORT) + " " + hasta.getYear();
+		String fin = hasta.getDayOfMonth() + " " + FormatoVista.mes(hasta, TextStyle.SHORT) + " " + hasta.getYear();
 		String inicio = desde.getDayOfMonth()
-				+ (desde.getMonth() == hasta.getMonth() ? "" : " " + mes(desde, TextStyle.SHORT))
+				+ (desde.getMonth() == hasta.getMonth() ? "" : " " + FormatoVista.mes(desde, TextStyle.SHORT))
 				+ (desde.getYear() == hasta.getYear() ? "" : " " + desde.getYear());
 		return inicio + " – " + fin;
-	}
-
-	private static String mes(LocalDate fecha, TextStyle estilo) {
-		return FormatoVista.mes(fecha, estilo);
-	}
-
-	private static String capitalizar(String texto) {
-		return FormatoVista.capitalizar(texto);
 	}
 
 	/**
@@ -460,7 +408,7 @@ public class AgendaController {
 	public record DiaAgenda(String titulo, List<FilaAgenda> citas, long total) {
 
 		public String contador() {
-			return total == 1 ? "1 cita" : total + " citas";
+			return FormatoVista.cantidad(total, "cita", "citas");
 		}
 	}
 
@@ -481,9 +429,8 @@ public class AgendaController {
 		static Regreso de(String vista, String fecha, String estado) {
 			return new Regreso(
 					"semana".equalsIgnoreCase(vista) ? "semana" : "dia",
-					leerFecha(fecha, null),
-					Enums.getIfPresent(EstadoCitaEnum.class, StringUtils.defaultString(estado)).transform(Enum::name)
-							.orNull());
+					Parametros.fecha(fecha),
+					Optional.ofNullable(Parametros.estadoCita(estado)).map(Enum::name).orElse(null));
 		}
 
 		Regreso conFecha(LocalDate otra) {

@@ -1,16 +1,9 @@
 package pe.edu.utp.medifast.controller;
 
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.dto.CitaPacienteDto;
-import pe.edu.utp.medifast.dto.ConstanciaDto;
 import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.VistaCita;
@@ -33,16 +25,13 @@ import pe.edu.utp.medifast.service.ConfirmacionPdfService;
 import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
+import pe.edu.utp.medifast.util.FormatoVista;
 import pe.edu.utp.medifast.util.Paginacion;
 
 /** P5 — Mis citas: cita activa, historial, PDF de la confirmación y constancia del paciente (RF10, RF12, RF15). */
 @Controller
 @RequestMapping("/paciente/citas")
 public class MisCitasController {
-
-	private static final Locale LOCALE = Locale.forLanguageTag("es-PE");
-	private static final DateTimeFormatter HORA_FORMATTER = DateTimeFormatter.ofPattern("HH:mm", LOCALE);
-	private static final DateTimeFormatter FECHA_TABLA_FORMATTER = DateTimeFormatter.ofPattern("EEE d MMM yyyy", LOCALE);
 
 	private final ReservaService reservaService;
 	private final ConfirmacionPdfService confirmacionPdfService;
@@ -87,8 +76,7 @@ public class MisCitasController {
 		model.addAttribute("paginacion", paginacion);
 		model.addAttribute("rango", paginacion.contador("cita", "citas"));
 		model.addAttribute("pestana", pestana);
-		model.addAttribute("nombreMedico", medico == null ? "el médico"
-				: "Dr. " + medico.getNombres() + " " + medico.getApellidos());
+		model.addAttribute("nombreMedico", medico == null ? "el médico" : FormatoVista.nombreCompletoMedico(medico));
 		model.addAttribute("especialidad", medico == null ? null : medico.getEspecialidad());
 		return "paciente/citas";
 	}
@@ -97,73 +85,39 @@ public class MisCitasController {
 	@GetMapping("/{id}/pdf")
 	public ResponseEntity<byte[]> descargarPdf(@PathVariable Long id, Authentication authentication) {
 		byte[] pdf = confirmacionPdfService.generar(id, usuarioActual.idPaciente(authentication));
-		return ResponseEntity.ok()
-				.contentType(MediaType.APPLICATION_PDF)
-				.header(HttpHeaders.CONTENT_DISPOSITION,
-						ContentDisposition.attachment().filename("cita-%06d.pdf".formatted(id)).build().toString())
-				.body(pdf);
+		return Respuestas.descarga(pdf, MediaType.APPLICATION_PDF, "cita-%06d.pdf".formatted(id));
 	}
 
 	/** RF12: abre la constancia en una pestaña nueva; solo la ve su dueño. */
 	@GetMapping("/{id}/constancia")
 	public ResponseEntity<Resource> verConstancia(@PathVariable Long id, Authentication authentication) {
-		ConstanciaDto constancia = constanciaService.paraPaciente(id, usuarioActual.idPaciente(authentication));
-		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(constancia.tipo()))
-				.header(HttpHeaders.CONTENT_DISPOSITION,
-						ContentDisposition.inline().filename(constancia.nombre()).build().toString())
-				.body(constancia.archivo());
+		return Respuestas.constancia(constanciaService.paraPaciente(id, usuarioActual.idPaciente(authentication)));
 	}
 
 	private static CitaView vista(CitaPacienteDto dto) {
 		VistaCita cita = dto.cita();
-		long minutos = Duration.between(cita.getHoraInicio(), cita.getHoraFin()).toMinutes();
-		String diaSemana = cita.getFecha().getDayOfWeek().getDisplayName(TextStyle.FULL, LOCALE);
+		String diaSemana = cita.getFecha().getDayOfWeek().getDisplayName(TextStyle.FULL, FormatoVista.LOCALE);
 		return new CitaView(
 				cita.getIdCita(),
-				"#%06d".formatted(cita.getIdCita()),
-				cita.getFecha().getMonth().getDisplayName(TextStyle.SHORT, LOCALE).replace(".", "").toUpperCase(LOCALE),
+				FormatoVista.numeroCita(cita.getIdCita()),
+				FormatoVista.mes(cita.getFecha(), TextStyle.SHORT).toUpperCase(FormatoVista.LOCALE),
 				cita.getFecha().getDayOfMonth(),
-				capitalizar(diaSemana),
-				capitalizar(cita.getFecha().format(FECHA_TABLA_FORMATTER).replace(".", "")),
-				formatearRango(cita.getHoraInicio(), cita.getHoraFin()),
-				HORA_FORMATTER.format(cita.getHoraInicio()) + "–" + HORA_FORMATTER.format(cita.getHoraFin()),
+				FormatoVista.capitalizar(diaSemana),
+				FormatoVista.fechaCorta(cita.getFecha()),
+				FormatoVista.rangoHoras12(cita.getHoraInicio(), cita.getHoraFin()),
+				FormatoVista.rangoHoras24(cita.getHoraInicio(), cita.getHoraFin()),
 				EtiquetasEstado.tipo(cita.getTipoCita()),
-				minutos,
-				formatearMonto(dto.monto()),
-				dto.vencida() ? EtiquetasEstado.VENCIDA : EtiquetasEstado.cita(cita.getEstado()),
-				dto.vencida() ? "vencida" : EtiquetasEstado.claseCita(cita.getEstado()),
-				cita.getEstadoPago() == null ? null : EtiquetasEstado.pago(cita.getEstadoPago()),
+				FormatoVista.minutos(cita),
+				FormatoVista.solesOGuion(dto.monto()),
+				EtiquetasEstado.cita(cita.getEstado(), dto.vencida()),
+				EtiquetasEstado.claseCita(cita.getEstado(), dto.vencida()),
+				EtiquetasEstado.pagoSiExiste(cita.getEstadoPago()),
 				EtiquetasEstado.clasePago(cita.getEstadoPago()),
 				cita.getEstado() == EstadoCitaEnum.CANCELADA ? cita.getObservacion() : null,
 				dto.pagoPendiente(),
 				dto.segundosRestantes(),
 				dto.permiteDetalle(),
 				dto.tieneConstancia());
-	}
-
-	/** "10:30–11:30 a. m."; el periodo se repite solo si cambia, como en P2. */
-	private static String formatearRango(LocalTime inicio, LocalTime fin) {
-		return periodo(inicio).equals(periodo(fin))
-				? hora12(inicio) + "–" + hora12(fin) + " " + periodo(fin)
-				: hora12(inicio) + " " + periodo(inicio) + "–" + hora12(fin) + " " + periodo(fin);
-	}
-
-	private static String hora12(LocalTime hora) {
-		int hora12 = hora.getHour() % 12 == 0 ? 12 : hora.getHour() % 12;
-		return "%d:%02d".formatted(hora12, hora.getMinute());
-	}
-
-	private static String periodo(LocalTime hora) {
-		return hora.getHour() < 12 ? "a. m." : "p. m.";
-	}
-
-	private static String formatearMonto(BigDecimal monto) {
-		return monto == null ? "—" : "S/ " + String.format(Locale.ROOT, "%.2f", monto);
-	}
-
-	private static String capitalizar(String texto) {
-		return texto.isEmpty() ? texto : texto.substring(0, 1).toUpperCase(LOCALE) + texto.substring(1);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package pe.edu.utp.medifast.controller;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.PagoService;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
+import pe.edu.utp.medifast.util.FormatoVista;
 
 /** P3 — Pago Yape simulado (RF03, RN-04, RN-11) y P4 — Confirmación y detalle de la cita (RF15). */
 @Controller
@@ -106,7 +106,7 @@ public class PagoController {
 
 	private void prepararPago(PagoPendienteDto pago, Model model) {
 		VistaCita cita = pago.cita();
-		String medico = "Dr. " + cita.getMedico();
+		String medico = FormatoVista.doctor(cita.getMedico());
 		model.addAttribute("citaId", cita.getIdCita());
 		model.addAttribute("resumen", String.join(" · ",
 				FormatoVista.diaCorto(cita.getFecha()),
@@ -144,24 +144,20 @@ public class PagoController {
 		model.addAttribute("citaId", cita.getIdCita());
 		model.addAttribute("numero", FormatoVista.numeroCita(cita.getIdCita()));
 		model.addAttribute("paciente", cita.getPaciente());
-		model.addAttribute("nombreMedico", "Dr. " + cita.getMedico());
-		model.addAttribute("tipo", EtiquetasEstado.tipo(cita.getTipoCita()) + " · "
-				+ Duration.between(cita.getHoraInicio(), cita.getHoraFin()).toMinutes() + " min");
+		model.addAttribute("nombreMedico", FormatoVista.doctor(cita.getMedico()));
+		model.addAttribute("tipo", FormatoVista.tipoYDuracion(cita));
 		model.addAttribute("fechaHora", FormatoVista.diaCortoConComa(cita.getFecha()) + " · "
 				+ FormatoVista.rangoHoras12(cita.getHoraInicio(), cita.getHoraFin()));
 		model.addAttribute("monto", FormatoVista.soles(detalle.monto()));
-		model.addAttribute("etiquetaCita",
-				detalle.vencida() ? EtiquetasEstado.VENCIDA : EtiquetasEstado.cita(cita.getEstado()));
-		model.addAttribute("claseCita", detalle.vencida() ? "vencida" : EtiquetasEstado.claseCita(cita.getEstado()));
-		model.addAttribute("etiquetaPago",
-				cita.getEstadoPago() == null ? null : EtiquetasEstado.pago(cita.getEstadoPago()));
+		model.addAttribute("etiquetaCita", EtiquetasEstado.cita(cita.getEstado(), detalle.vencida()));
+		model.addAttribute("claseCita", EtiquetasEstado.claseCita(cita.getEstado(), detalle.vencida()));
+		model.addAttribute("etiquetaPago", EtiquetasEstado.pagoSiExiste(cita.getEstadoPago()));
 		model.addAttribute("clasePago", EtiquetasEstado.clasePago(cita.getEstadoPago()));
 		model.addAttribute("motivo", cita.getEstado() == EstadoCitaEnum.CANCELADA ? cita.getObservacion() : null);
 		model.addAttribute("permitePdf", detalle.permiteDetalle());
-		model.addAttribute("constancia", !reservada && detalle.tieneConstancia()
-				? nombreConstancia(citaId, idPaciente)
-				: null);
-		model.addAttribute("tieneConstancia", !reservada && detalle.tieneConstancia());
+		boolean muestraConstancia = !reservada && detalle.tieneConstancia();
+		model.addAttribute("constancia", muestraConstancia ? nombreConstancia(citaId, idPaciente) : null);
+		model.addAttribute("tieneConstancia", muestraConstancia);
 		return "paciente/confirmacion";
 	}
 

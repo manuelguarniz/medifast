@@ -5,19 +5,14 @@ import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -26,9 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.google.common.base.Enums;
-import com.google.common.collect.ImmutableMap;
 
 import pe.edu.utp.medifast.dto.FiltroReporteDto;
 import pe.edu.utp.medifast.dto.PagoValidadoDto;
@@ -41,6 +33,7 @@ import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.ReporteService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
 import pe.edu.utp.medifast.util.ExportadorReporte;
+import pe.edu.utp.medifast.util.FormatoVista;
 import pe.edu.utp.medifast.util.Paginacion;
 import pe.edu.utp.medifast.util.Reporte;
 
@@ -52,15 +45,9 @@ import pe.edu.utp.medifast.util.Reporte;
 @RequestMapping("/medico/reportes")
 public class ReporteController {
 
-    private static final MediaType XLSX = MediaType.parseMediaType(
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     private static final String VISTA_CITAS = "medico/reporte-citas";
     private static final String VISTA_PAGOS = "medico/reporte-pagos";
     private static final String TODOS_LOS_ESTADOS = "Todos los estados";
-
-    /** Opciones del filtro "Estado": los 5 estados de la cita con sus etiquetas de README §5.2. */
-    private static final Map<String, String> ESTADOS = Arrays.stream(EstadoCitaEnum.values())
-            .collect(ImmutableMap.toImmutableMap(EstadoCitaEnum::name, EtiquetasEstado::cita));
 
     private final ReporteService reporteService;
     private final ExportadorReporte exportadorReporte;
@@ -87,10 +74,10 @@ public class ReporteController {
         Medico medico = usuarioActual.medico(authentication);
         List<Atajo> atajos = atajos(LocalDate.now(clock), DayOfWeek.SATURDAY);
         Fechas fechas = Fechas.leer(desde, hasta, atajos.get(1));
-        EstadoCitaEnum filtroEstado = leerEstado(estado);
+        EstadoCitaEnum filtroEstado = Parametros.estadoCita(estado);
         cargarComunes(model, medico, "citas", fechas, atajos);
         model.addAttribute("estado", filtroEstado == null ? null : filtroEstado.name());
-        model.addAttribute("estados", ESTADOS);
+        model.addAttribute("estados", EtiquetasEstado.OPCIONES_CITA);
         if (!fechas.valido()) {
             return VISTA_CITAS;
         }
@@ -126,10 +113,10 @@ public class ReporteController {
         if (!fechas.valido()) {
             return volverA("/medico/reportes/citas", desde, hasta, estado);
         }
-        EstadoCitaEnum filtroEstado = leerEstado(estado);
-        FiltroReporteDto filtro = new FiltroReporteDto(fechas.desde(), fechas.hasta(), filtroEstado);
+        FiltroReporteDto filtro = new FiltroReporteDto(fechas.desde(), fechas.hasta(),
+                Parametros.estadoCita(estado));
         ReporteCitasDto reporte = reporteService.citas(usuarioActual.idMedico(authentication), filtro);
-        return respuestaExcel(exportadorReporte.exportar(reporteCitas(reporte, filtro)),
+        return Respuestas.descarga(exportadorReporte.exportar(reporteCitas(reporte, filtro)), Respuestas.XLSX,
                 "reporte-citas-" + fechas.desde() + "-" + fechas.hasta() + ".xlsx");
     }
 
@@ -160,7 +147,7 @@ public class ReporteController {
         model.addAttribute("cantidad", resumen.cantidad());
         model.addAttribute("totalSoles", FormatoVista.soles(resumen.total()));
         model.addAttribute("ticketPromedio", FormatoVista.soles(resumen.ticketPromedio()));
-        model.addAttribute("contador", resumen.cantidad() == 1 ? "1 pago" : resumen.cantidad() + " pagos");
+        model.addAttribute("contador", FormatoVista.cantidad(resumen.cantidad(), "pago", "pagos"));
         return VISTA_PAGOS;
     }
 
@@ -174,7 +161,7 @@ public class ReporteController {
         }
         ResumenPagosDto resumen = reporteService.pagos(usuarioActual.idMedico(authentication),
                 new FiltroReporteDto(fechas.desde(), fechas.hasta()));
-        return respuestaExcel(exportadorReporte.exportar(reportePagos(resumen, fechas)),
+        return Respuestas.descarga(exportadorReporte.exportar(reportePagos(resumen, fechas)), Respuestas.XLSX,
                 "reporte-pagos-" + fechas.desde() + "-" + fechas.hasta() + ".xlsx");
     }
 
@@ -201,10 +188,6 @@ public class ReporteController {
                 new Atajo("Este mes", mes.atDay(1), mes.atEndOfMonth()));
     }
 
-    private static EstadoCitaEnum leerEstado(String estado) {
-        return Enums.getIfPresent(EstadoCitaEnum.class, StringUtils.defaultString(estado)).orNull();
-    }
-
     /** "40 % del total"; sin citas, 0 %. */
     private static String porcentaje(long parte, long total) {
         return (total == 0 ? 0 : Math.round(parte * 100.0 / total)) + " % del total";
@@ -221,7 +204,7 @@ public class ReporteController {
                 EtiquetasEstado.tipo(cita.getTipoCita()),
                 EtiquetasEstado.cita(cita.getEstado()),
                 EtiquetasEstado.claseCita(cita.getEstado()),
-                cita.getEstadoPago() == null ? null : EtiquetasEstado.pago(cita.getEstadoPago()),
+                EtiquetasEstado.pagoSiExiste(cita.getEstadoPago()),
                 EtiquetasEstado.clasePago(cita.getEstadoPago()));
     }
 
@@ -266,7 +249,7 @@ public class ReporteController {
                 filtrosEnTexto(filtro.desde(), filtro.hasta()) + " | Estado: " + estado,
                 List.of("N.º", "Fecha", "Hora", "Paciente", "Documento", "Tipo", "Cita", "Pago"),
                 filas,
-                List.of(total == 1 ? "1 cita" : total + " citas"),
+                List.of(FormatoVista.cantidad(total, "cita", "citas")),
                 resumen);
     }
 
@@ -282,7 +265,7 @@ public class ReporteController {
                         pago.monto()))
                 .toList();
         List<Object> totales = new ArrayList<>(List.of(
-                "Total · " + (resumen.cantidad() == 1 ? "1 pago" : resumen.cantidad() + " pagos"),
+                "Total · " + FormatoVista.cantidad(resumen.cantidad(), "pago", "pagos"),
                 "", "", "", "", ""));
         totales.add(resumen.total());
 
@@ -313,14 +296,6 @@ public class ReporteController {
         return ResponseEntity.status(HttpStatus.FOUND).location(destino).build();
     }
 
-    private static ResponseEntity<byte[]> respuestaExcel(byte[] archivo, String nombreArchivo) {
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        ContentDisposition.attachment().filename(nombreArchivo).build().toString())
-                .contentType(XLSX)
-                .body(archivo);
-    }
-
     /** Atajo de período: rellena Desde y Hasta sin consultar. */
     public record Atajo(String nombre, LocalDate desde, LocalDate hasta) {
     }
@@ -341,8 +316,8 @@ public class ReporteController {
                 return new Fechas(porDefecto.desde().toString(), porDefecto.hasta().toString(), porDefecto.desde(),
                         porDefecto.hasta(), null, null);
             }
-            LocalDate inicio = parsear(desde);
-            LocalDate fin = parsear(hasta);
+            LocalDate inicio = Parametros.fecha(desde);
+            LocalDate fin = Parametros.fecha(hasta);
             String errorDesde = inicio == null ? FiltroReporteDto.FECHA_OBLIGATORIA : null;
             String errorHasta = null;
             if (fin == null) {
@@ -352,17 +327,6 @@ public class ReporteController {
             }
             return new Fechas(StringUtils.defaultString(desde), StringUtils.defaultString(hasta), inicio, fin,
                     errorDesde, errorHasta);
-        }
-
-        private static LocalDate parsear(String fecha) {
-            if (StringUtils.isBlank(fecha)) {
-                return null;
-            }
-            try {
-                return LocalDate.parse(fecha.strip());
-            } catch (DateTimeParseException e) {
-                return null;
-            }
         }
 
         public boolean valido() {

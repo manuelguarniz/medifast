@@ -1,5 +1,6 @@
 package pe.edu.utp.medifast.util;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -26,6 +27,10 @@ public final class EtiquetasEstado {
 			EstadoPagoEnum.VALIDADO, "Verificado",
 			EstadoPagoEnum.RECHAZADO, "Rechazado");
 
+	/** Opciones del filtro "Estado" (P7, P9): los 5 estados de la cita con sus etiquetas, en el orden del enum. */
+	public static final Map<String, String> OPCIONES_CITA = Arrays.stream(EstadoCitaEnum.values())
+			.collect(ImmutableMap.toImmutableMap(EstadoCitaEnum::name, EtiquetasEstado::cita));
+
 	private EtiquetasEstado() {
 	}
 
@@ -33,8 +38,19 @@ public final class EtiquetasEstado {
 		return CITA.get(estado);
 	}
 
+	/** Como {@link #cita(EstadoCitaEnum)}, pero "Vencida" si el plazo del pago pasó (RF10). */
+	public static String cita(EstadoCitaEnum estado, boolean vencida) {
+		return vencida ? VENCIDA : cita(estado);
+	}
+
+	/** "—" si la cita aún no tiene pago (Excel y PDF). */
 	public static String pago(EstadoPagoEnum estado) {
 		return estado == null ? "—" : PAGO.get(estado);
+	}
+
+	/** {@code null} si la cita aún no tiene pago: la plantilla decide qué mostrar en su lugar. */
+	public static String pagoSiExiste(EstadoPagoEnum estado) {
+		return estado == null ? null : PAGO.get(estado);
 	}
 
 	public static String tipo(TipoCitaEnum tipo) {
@@ -50,6 +66,11 @@ public final class EtiquetasEstado {
 			case NO_ASISTIO -> "no-asistio";
 			case CANCELADA -> "cancelada";
 		};
+	}
+
+	/** Como {@link #claseCita(EstadoCitaEnum)}, con el color de "Vencida" si el plazo del pago pasó. */
+	public static String claseCita(EstadoCitaEnum estado, boolean vencida) {
+		return vencida ? "vencida" : claseCita(estado);
 	}
 
 	/** Sufijo de la clase {@code citas-badge-*} del pago; {@code null} si la cita aún no tiene pago. */

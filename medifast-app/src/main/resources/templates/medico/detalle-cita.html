@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle de cita')}"></head>
+<body class="perfil-page">
+<nav th:replace="~{fragments/layout :: navbarMedico('agenda', ${nombreMedico})}"></nav>
+
+<main class="perfil-main detalle-main">
+    <a class="detalle-volver"
+       th:href="@{/medico/agenda(vista=${regreso.vista},fecha=${regreso.fecha},estado=${regreso.estado})}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+        Volver a la agenda
+    </a>
+
+    <!-- Resultado de la última acción (decisión de flujo de P8) -->
+    <div class="perfil-alert detalle-alerta" role="status" th:if="${exito}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
+        <strong th:text="${exito}">Pago validado.</strong>
+    </div>
+    <div class="reserva-alert reserva-alert-error detalle-alerta" role="alert" th:if="${error}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <strong th:text="${error}">Primero valida el pago.</strong>
+    </div>
+
+    <header class="detalle-heading">
+        <div>
+            <p class="perfil-eyebrow">DETALLE DE CITA</p>
+            <h1 th:text="|Cita ${cita.numero}|">Cita #000124</h1>
+            <p class="detalle-fecha" th:text="${cita.fechaHora}">Miércoles, 11 de noviembre de 2026 · 10:30–11:30 a. m.</p>
+        </div>
+        <span class="reserva-status detalle-badge" th:classappend="'citas-badge-' + ${cita.claseCita}"
+              th:text="${cita.etiquetaCita}">Confirmada</span>
+    </header>
+
+    <!-- RN-13: el motivo de la cancelación (el mismo que ve el paciente en P5) -->
+    <div class="detalle-motivo" role="note" th:if="${cita.motivo != null}">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 10v4M12 17.5h.01"/></svg>
+        <p><strong>Motivo de la cancelación:</strong> <span th:text="${cita.motivo}">La constancia no corresponde al monto de la cita.</span></p>
+    </div>
+
+    <div class="detalle-layout">
+        <!-- Paciente y cita -->
+        <section class="perfil-card detalle-paciente" aria-labelledby="detalle-paciente-nombre">
+            <header class="perfil-card-header perfil-identidad">
+                <span class="perfil-avatar detalle-avatar" aria-hidden="true" th:text="${cita.iniciales}">AS</span>
+                <span>
+                    <strong id="detalle-paciente-nombre" th:text="${cita.paciente}">Andrea Sofía Salazar Pérez</strong>
+                    <small th:text="${cita.documento}">DNI 41235678</small>
+                </span>
+            </header>
+            <dl class="detalle-datos">
+                <div><dt>Tipo de cita</dt><dd th:text="${cita.tipo}">Nuevo · 60 min</dd></div>
+                <div><dt>Monto</dt><dd th:text="${cita.monto}">S/ 150.00</dd></div>
+                <div><dt>Celular</dt><dd th:text="${cita.celular}">933731536</dd></div>
+                <div><dt>Correo</dt><dd th:text="${cita.correo}">andrea.salazar@gmail.com</dd></div>
+            </dl>
+        </section>
+
+        <!-- Acciones según el estado (tabla de acciones del diseño de P8) -->
+        <aside class="perfil-card detalle-acciones" aria-labelledby="detalle-acciones-titulo">
+            <p class="perfil-eyebrow">ACCIONES</p>
+            <h2 id="detalle-acciones-titulo" class="detalle-card-titulo"
+                th:text="${detalle.finalizada()} ? 'Estado de la cita' : 'Actualizar estado'">Actualizar estado</h2>
+
+            <section class="detalle-seccion" th:if="${detalle.pagoPorValidar()}" aria-label="Pago">
+                <h3>Pago</h3>
+                <form th:action="@{/medico/citas/{id}/validar(id=${detalle.cita.idCita})}" method="post">
+                    <input type="hidden" name="vista" th:value="${filtros.vista}">
+                    <input type="hidden" name="fecha" th:value="${filtros.fecha}">
+                    <input type="hidden" name="estado" th:value="${filtros.estado}">
+                    <button class="registro-submit detalle-boton" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                        Validar pago
+                    </button>
+                </form>
+                <button class="detalle-boton detalle-boton-peligro" type="button" data-bs-toggle="modal"
+                        data-bs-target="#modalRechazar">Rechazar pago</button>
+            </section>
+
+            <section class="detalle-seccion" th:if="${detalle.admiteAsistencia()}" aria-label="Asistencia">
+                <h3>Asistencia</h3>
+                <form th:action="@{/medico/citas/{id}/atendida(id=${detalle.cita.idCita})}" method="post">
+                    <input type="hidden" name="vista" th:value="${filtros.vista}">
+                    <input type="hidden" name="fecha" th:value="${filtros.fecha}">
+                    <input type="hidden" name="estado" th:value="${filtros.estado}">
+                    <button th:if="${detalle.puedeMarcarAtendida()}" class="registro-submit detalle-boton" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                        Marcar atendida
+                    </button>
+                    <th:block th:unless="${detalle.puedeMarcarAtendida()}">
+                        <button class="detalle-boton" type="submit" disabled aria-describedby="ayuda-atendida">
+                            Marcar atendida
+                        </button>
+                        <p class="detalle-ayuda" id="ayuda-atendida">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                            <span th:text="${!detalle.pagoValidado()} ? 'Disponible cuando el pago esté verificado.' : |Disponible desde las ${cita.horaInicio}|">
+                                Disponible cuando el pago esté verificado.</span>
+                        </p>
+                    </th:block>
+                </form>
+                <form th:action="@{/medico/citas/{id}/no-asistio(id=${detalle.cita.idCita})}" method="post">
+                    <input type="hidden" name="vista" th:value="${filtros.vista}">
+                    <input type="hidden" name="fecha" th:value="${filtros.fecha}">
+                    <input type="hidden" name="estado" th:value="${filtros.estado}">
+                    <button class="detalle-boton detalle-boton-secundario" type="submit"
+                            th:disabled="${!detalle.puedeMarcarNoAsistio()}"
+                            th:attr="aria-describedby=${detalle.puedeMarcarNoAsistio() ? null : 'ayuda-no-asistio'}">
+                        No asistió
+                    </button>
+                    <p class="detalle-ayuda" id="ayuda-no-asistio" th:unless="${detalle.puedeMarcarNoAsistio()}">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                        <span th:text="|Disponible desde las ${cita.horaInicio}|">Disponible desde las 10:30 a. m.</span>
+                    </p>
+                </form>
+            </section>
+
+            <div class="detalle-seccion detalle-seccion-cancelar" th:if="${detalle.puedeCancelar()}">
+                <button class="detalle-cancelar" type="button" data-bs-toggle="modal" data-bs-target="#modalCancelar">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg>
+                    Cancelar cita
+                </button>
+            </div>
+
+            <!-- Estados finales: la card solo informa -->
+            <div class="detalle-final" th:if="${detalle.finalizada()}"
+                 th:with="atendida=${detalle.cita.estado.name() == 'ATENDIDA'}, cancelada=${detalle.cita.estado.name() == 'CANCELADA'}">
+                <span class="detalle-final-icono"
+                      th:classappend="${atendida} ? 'detalle-final-exito' : (${cancelada} ? 'detalle-final-peligro' : 'detalle-final-neutro')"
+                      aria-hidden="true">
+                    <svg th:if="${atendida}" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                    <svg th:if="${cancelada}" viewBox="0 0 24 24" fill="none"><path d="m7 7 10 10M17 7 7 17"/></svg>
+                    <svg th:if="${!atendida and !cancelada}" viewBox="0 0 24 24" fill="none"><circle cx="10" cy="8" r="4"/><path d="M3 20c0-3.3 3.1-6 7-6M16 15l5 5M21 15l-5 5"/></svg>
+                </span>
+                <h3 th:text="${atendida} ? 'Cita atendida' : (${cancelada} ? 'Cita cancelada' : 'Paciente no asistió')">Cita atendida</h3>
+                <p th:if="${cancelada}">El horario quedó libre. Esta cita ya no tiene acciones disponibles.</p>
+                <p th:unless="${cancelada}"
+                   th:text="${cita.marcadaEl != null} ? |Marcada el ${cita.marcadaEl}. Esta cita ya no tiene acciones disponibles.| : 'Esta cita ya no tiene acciones disponibles.'">
+                    Marcada el Mié 11 nov 2026, 11:58 a. m. Esta cita ya no tiene acciones disponibles.</p>
+            </div>
+        </aside>
+
+        <!-- Constancia de pago (RF12) -->
+        <section class="perfil-card detalle-constancia" aria-labelledby="detalle-constancia-titulo">
+            <header class="detalle-constancia-header">
+                <div>
+                    <p class="perfil-eyebrow">CONSTANCIA DE PAGO</p>
+                    <h2 id="detalle-constancia-titulo" class="detalle-card-titulo">Pago con Yape (simulado)</h2>
+                </div>
+                <span th:if="${cita.etiquetaPago != null}" class="reserva-status"
+                      th:classappend="'citas-badge-' + ${cita.clasePago}" th:text="${cita.etiquetaPago}">Por validar</span>
+            </header>
+
+            <th:block th:if="${detalle.pago != null}">
+                <th:block th:if="${constancia != null}">
+                    <a class="detalle-vista-previa" target="_blank" rel="noopener"
+                       th:href="@{/medico/citas/{id}/constancia(id=${detalle.cita.idCita})}"
+                       th:attr="aria-label=|Ver ${constancia.nombre} en una pestaña nueva|">
+                        <img th:if="${constancia.imagen}" th:src="@{/medico/citas/{id}/constancia(id=${detalle.cita.idCita})}"
+                             alt="Vista previa de la constancia de pago" loading="lazy">
+                        <span th:unless="${constancia.imagen}" class="detalle-vista-pdf" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+                            PDF
+                        </span>
+                    </a>
+                    <p class="detalle-archivo">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+                        <span class="detalle-archivo-nombre">
+                            <strong th:text="${constancia.nombre}">constancia-000124.jpg</strong>
+                            <small th:if="${constancia.tamano != null}" th:text="${constancia.tamano}">1.2 MB</small>
+                        </span>
+                        <a target="_blank" rel="noopener"
+                           th:href="@{/medico/citas/{id}/constancia(id=${detalle.cita.idCita})}">Ver constancia
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+                        </a>
+                    </p>
+                </th:block>
+                <p class="detalle-sin-archivo" th:if="${constancia == null}">No se encontró el archivo de la constancia.</p>
+
+                <dl class="detalle-datos detalle-datos-pago">
+                    <div><dt>N.º de operación</dt><dd th:text="${cita.nroOperacion}">25789222</dd></div>
+                    <div><dt>Enviada el</dt><dd th:text="${cita.enviadaEl}">Lun 9 nov 2026, 10:12 a. m.</dd></div>
+                    <div th:if="${cita.validadoEl != null}"><dt>Validado el</dt><dd th:text="${cita.validadoEl}">Mié 11 nov 2026, 11:50 a. m.</dd></div>
+                </dl>
+            </th:block>
+
+            <div class="detalle-final detalle-sin-constancia" th:if="${detalle.pago == null}">
+                <span class="detalle-final-icono detalle-final-ambar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </span>
+                <h3>Sin constancia</h3>
+                <p th:if="${detalle.puedeCancelar() and !cita.vencida}"
+                   th:text="|El paciente aún no adjunta la constancia. Si no lo hace, la reserva se cancelará automáticamente a las ${cita.expiraA}.|">
+                    El paciente aún no adjunta la constancia. Si no lo hace, la reserva se cancelará automáticamente a las 11:58 a. m.</p>
+                <p th:if="${detalle.puedeCancelar() and cita.vencida}">
+                    El plazo para adjuntar la constancia venció; la reserva se cancelará automáticamente en unos instantes.</p>
+                <p th:unless="${detalle.puedeCancelar()}">La cita se canceló sin que el paciente adjuntara la constancia.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Modales del motivo (RN-13): obligatorio, hasta 500 caracteres -->
+<div th:each="modal : ${ {'rechazar', 'cancelar'} }" class="modal fade detalle-modal" tabindex="-1"
+     th:with="rechazar=${modal == 'rechazar'}, abierto=${modalAbierto == modal}"
+     th:if="${modal == 'rechazar' ? detalle.pagoPorValidar() : detalle.puedeCancelar()}"
+     th:id="${rechazar ? 'modalRechazar' : 'modalCancelar'}"
+     th:attr="aria-labelledby=|titulo-${modal}|,data-abierto=${abierto}">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content detalle-modal-form" method="post" novalidate
+              th:action="${rechazar} ? @{/medico/citas/{id}/rechazar(id=${detalle.cita.idCita})} : @{/medico/citas/{id}/cancelar(id=${detalle.cita.idCita})}">
+            <input type="hidden" name="vista" th:value="${filtros.vista}">
+            <input type="hidden" name="fecha" th:value="${filtros.fecha}">
+            <input type="hidden" name="estado" th:value="${filtros.estado}">
+            <div class="detalle-modal-header">
+                <h2 th:id="|titulo-${modal}|" th:text="${rechazar} ? 'Rechazar pago' : 'Cancelar cita'">Rechazar pago</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <p class="detalle-modal-texto"
+               th:text="${rechazar} ? 'La cita se cancelará y el horario quedará libre. El paciente verá este motivo en «Mis citas».' : 'El horario quedará libre. El paciente verá este motivo en «Mis citas».'">
+                La cita se cancelará y el horario quedará libre.</p>
+            <div class="detalle-motivo-campo">
+                <label th:for="|motivo-${modal}|">
+                    <span th:text="${rechazar} ? 'Motivo del rechazo' : 'Motivo de la cancelación'">Motivo del rechazo</span>
+                    <span class="detalle-obligatorio" aria-hidden="true">*</span>
+                </label>
+                <textarea th:id="|motivo-${modal}|" name="observacion" rows="4" required
+                          th:attr="maxlength=${maximoMotivo},aria-invalid=${abierto and errorMotivo != null},aria-describedby=|error-${modal} contador-${modal}|"
+                          th:classappend="${abierto and errorMotivo != null} ? 'is-invalid'"
+                          placeholder="Ej. La constancia no corresponde al monto de la cita."
+                          th:text="${abierto} ? ${motivo.observacion} : ''"></textarea>
+                <div class="detalle-motivo-pie">
+                    <p class="perfil-field-error" th:id="|error-${modal}|" th:hidden="${!abierto or errorMotivo == null}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 7v6M12 16.5v.5"/></svg>
+                        <span th:text="${abierto} ? ${errorMotivo} : ''">Ingresa el motivo.</span>
+                    </p>
+                    <small class="detalle-contador" th:id="|contador-${modal}|" aria-live="polite"
+                           th:text="|0/${maximoMotivo}|">0/500</small>
+                </div>
+            </div>
+            <div class="detalle-modal-pie">
+                <button type="button" class="detalle-boton detalle-boton-secundario" data-bs-dismiss="modal">Volver</button>
+                <button type="submit" class="detalle-boton detalle-boton-peligro-relleno"
+                        th:text="${rechazar} ? 'Rechazar pago' : 'Cancelar cita'">Rechazar pago</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer class="perfil-footer agenda-footer">Consultorio Medifast · Dr. Moisés Barrantes Cabrera · Trujillo, Perú</footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    // Modales del motivo: contador, validación en cliente con los mismos mensajes del servidor y reapertura
+    // automática cuando el servidor devolvió un error.
+    document.querySelectorAll(".detalle-modal").forEach((modal) => {
+        const campo = modal.querySelector("textarea");
+        const contador = modal.querySelector(".detalle-contador");
+        const error = modal.querySelector(".perfil-field-error");
+        const maximo = Number(campo.getAttribute("maxlength"));
+        const actualizar = () => { contador.textContent = campo.value.length + "/" + maximo; };
+        const mostrarError = (mensaje) => {
+            error.querySelector("span").textContent = mensaje;
+            error.hidden = !mensaje;
+            campo.classList.toggle("is-invalid", Boolean(mensaje));
+            campo.setAttribute("aria-invalid", String(Boolean(mensaje)));
+        };
+        campo.addEventListener("input", () => {
+            actualizar();
+            if (campo.value.trim()) {
+                mostrarError("");
+            }
+        });
+        modal.querySelector("form").addEventListener("submit", (evento) => {
+            if (!campo.value.trim()) {
+                evento.preventDefault();
+                mostrarError("Ingresa el motivo.");
+                campo.focus();
+            }
+        });
+        modal.addEventListener("shown.bs.modal", () => campo.focus());
+        actualizar();
+        if (modal.dataset.abierto === "true") {
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+        }
+    });
+</script>
+</body>
+</html>

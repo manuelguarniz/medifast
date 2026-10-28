@@ -6,20 +6,30 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -33,16 +43,23 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import pe.edu.utp.medifast.config.SecurityConfig;
 import pe.edu.utp.medifast.dao.UsuarioDao;
 import pe.edu.utp.medifast.dto.AgendaDto;
+import pe.edu.utp.medifast.dto.ConstanciaDto;
+import pe.edu.utp.medifast.dto.DetalleCitaDto;
 import pe.edu.utp.medifast.dto.FiltroAgendaDto;
 import pe.edu.utp.medifast.dto.FiltroAgendaDto.Vista;
 import pe.edu.utp.medifast.model.HorarioSemanal;
+import pe.edu.utp.medifast.exception.AccesoDenegadoException;
+import pe.edu.utp.medifast.exception.PagoNoValidadoException;
+import pe.edu.utp.medifast.exception.RecursoNoEncontradoException;
 import pe.edu.utp.medifast.model.Medico;
+import pe.edu.utp.medifast.model.Pago;
 import pe.edu.utp.medifast.model.VistaCita;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.EstadoPagoEnum;
@@ -53,6 +70,7 @@ import pe.edu.utp.medifast.security.IntentosLoginService;
 import pe.edu.utp.medifast.security.RedireccionPorRol;
 import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.security.UsuarioDetailsService;
+import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.GestionCitaService;
 import pe.edu.utp.medifast.util.Auditoria;
 
@@ -79,6 +97,8 @@ class AgendaControllerTest {
 	@MockitoBean
 	private GestionCitaService gestionCitaService;
 	@MockitoBean
+	private ConstanciaService constanciaService;
+	@MockitoBean
 	private UsuarioActual usuarioActual;
 	@MockitoBean
 	private UsuarioDao usuarioDao;
@@ -92,6 +112,9 @@ class AgendaControllerTest {
 		when(medico.getNombres()).thenReturn("Moisés");
 		when(medico.getApellidos()).thenReturn("Barrantes Cabrera");
 		when(usuarioActual.medico(any())).thenReturn(medico);
+		when(usuarioActual.idMedico(any())).thenReturn(ID_MEDICO);
+		when(constanciaService.paraMedico(any(), any()))
+				.thenThrow(new RecursoNoEncontradoException("No se encontró el archivo de la constancia."));
 	}
 
 	@Test
@@ -221,6 +244,142 @@ class AgendaControllerTest {
 	}
 
 	@Test
+	void detalleMuestraLaCitaConElPagoPorValidar() throws Exception {
+		DetalleCitaDto detalle = detalleDeAndrea(EstadoPagoEnum.POR_VALIDAR);
+		when(gestionCitaService.detalle(124L, ID_MEDICO)).thenReturn(detalle);
+		doReturn(new ConstanciaDto(new ByteArrayResource(new byte[1_258_291]), "image/jpeg", "constancia-000124.jpg"))
+				.when(constanciaService).paraMedico(124L, ID_MEDICO);
+
+		mockMvc.perform(get("/medico/citas/124").param("vista", "dia").param("fecha", "2026-11-11")
+				.with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isOk())
+				.andExpect(view().name("medico/detalle-cita"))
+				.andExpect(content().string(allOf(
+						containsString("Cita #000124"),
+						containsString("Miércoles, 11 de noviembre de 2026 · 10:30–11:30 a. m."),
+						containsString("Andrea Sofía Salazar Pérez"),
+						containsString("DNI 41235678"),
+						containsString(">AS<"),
+						containsString("Nuevo · 60 min"),
+						containsString("S/ 150.00"),
+						containsString("933731536"),
+						containsString("Confirmada"),
+						containsString("Por validar"),
+						containsString("Validar pago"),
+						containsString("Rechazar pago"),
+						containsString("Disponible cuando el pago esté verificado."),
+						containsString("No asistió"),
+						containsString("Cancelar cita"),
+						containsString("constancia-000124.jpg"),
+						containsString("1.2 MB"),
+						containsString("25789222"),
+						containsString("Lun 9 nov 2026, 10:12 a. m."),
+						containsString("/medico/agenda?vista=dia&amp;fecha=2026-11-11"),
+						not(containsString("Estado de la cita")))));
+	}
+
+	@Test
+	void detalleSinFiltrosVuelveAlDiaDeLaCita() throws Exception {
+		DetalleCitaDto detalle = detalleDeAndrea(EstadoPagoEnum.VALIDADO);
+		when(gestionCitaService.detalle(124L, ID_MEDICO)).thenReturn(detalle);
+
+		mockMvc.perform(get("/medico/citas/124").with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isOk())
+				.andExpect(content().string(allOf(
+						containsString("/medico/agenda?vista=dia&amp;fecha=2026-11-11"),
+						containsString("Verificado"),
+						containsString("Marcar atendida"),
+						not(containsString("Validar pago")),
+						not(containsString("Disponible cuando el pago esté verificado.")),
+						containsString("No se encontró el archivo de la constancia."))));
+	}
+
+	@Test
+	void validarPagoVuelveAlDetalleConLaAlertaYLosFiltros() throws Exception {
+		mockMvc.perform(post("/medico/citas/124/validar").param("vista", "semana").param("fecha", "2026-11-11")
+				.param("estado", "PROGRAMADA").with(csrf()).with(user("10000001").roles("MEDICO")))
+				.andExpect(redirectedUrl("/medico/citas/124?vista=semana&fecha=2026-11-11&estado=PROGRAMADA"))
+				.andExpect(flash().attribute("exito", "Pago validado."));
+
+		verify(gestionCitaService).validarPago(124L, ID_MEDICO);
+	}
+
+	@Test
+	void marcarAtendidaSinPagoValidadoMuestraLaRegla() throws Exception {
+		doThrow(new PagoNoValidadoException()).when(gestionCitaService).marcarAtendida(124L, ID_MEDICO);
+
+		mockMvc.perform(post("/medico/citas/124/atendida").with(csrf()).with(user("10000001").roles("MEDICO")))
+				.andExpect(redirectedUrl("/medico/citas/124?vista=dia"))
+				.andExpect(flash().attribute("error", "Primero valida el pago."));
+	}
+
+	@Test
+	void rechazarSinMotivoReabreElModalConElError() throws Exception {
+		DetalleCitaDto detalle = detalleDeAndrea(EstadoPagoEnum.POR_VALIDAR);
+		when(gestionCitaService.detalle(124L, ID_MEDICO)).thenReturn(detalle);
+
+		mockMvc.perform(post("/medico/citas/124/rechazar").param("observacion", "   ").with(csrf())
+				.with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isOk())
+				.andExpect(view().name("medico/detalle-cita"))
+				.andExpect(model().attribute("modalAbierto", "rechazar"))
+				.andExpect(model().attribute("errorMotivo", "Ingresa el motivo."))
+				.andExpect(content().string(containsString("data-abierto=\"true\"")));
+
+		verify(gestionCitaService, never()).rechazarPago(any(), any(), any());
+	}
+
+	@Test
+	void cancelarConMotivoMuyLargoNoLlamaAlServicio() throws Exception {
+		DetalleCitaDto detalle = detalleDeAndrea(EstadoPagoEnum.POR_VALIDAR);
+		when(gestionCitaService.detalle(124L, ID_MEDICO)).thenReturn(detalle);
+
+		mockMvc.perform(post("/medico/citas/124/cancelar").param("observacion", "x".repeat(501)).with(csrf())
+				.with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isOk())
+				.andExpect(model().attribute("modalAbierto", "cancelar"))
+				.andExpect(model().attribute("errorMotivo", "El motivo no puede superar los 500 caracteres."));
+
+		verify(gestionCitaService, never()).cancelar(any(), any(), any());
+	}
+
+	@Test
+	void cancelarConMotivoLiberaElHorario() throws Exception {
+		mockMvc.perform(post("/medico/citas/124/cancelar").param("observacion", "El paciente viajó.")
+				.param("fecha", "2026-11-11").with(csrf()).with(user("10000001").roles("MEDICO")))
+				.andExpect(redirectedUrl("/medico/citas/124?vista=dia&fecha=2026-11-11"))
+				.andExpect(flash().attribute("exito", "Cita cancelada. El horario quedó libre."));
+
+		verify(gestionCitaService).cancelar(124L, ID_MEDICO, "El paciente viajó.");
+	}
+
+	@Test
+	void constanciaSeAbreEnLineaConSuTipo() throws Exception {
+		doReturn(new ConstanciaDto(new ByteArrayResource(new byte[] { 1, 2, 3 }), "image/png", "constancia-000124.png"))
+				.when(constanciaService).paraMedico(124L, ID_MEDICO);
+
+		mockMvc.perform(get("/medico/citas/124/constancia").with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isOk())
+				.andExpect(header().string("Content-Type", "image/png"))
+				.andExpect(header().string("Content-Disposition", containsString("inline")));
+	}
+
+	@Test
+	void citaDeOtroMedicoResponde403() throws Exception {
+		when(gestionCitaService.detalle(200L, ID_MEDICO))
+				.thenThrow(new AccesoDenegadoException("La cita no pertenece al médico autenticado."));
+
+		mockMvc.perform(get("/medico/citas/200").with(user("10000001").roles("MEDICO")))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
+	void pacienteNoAccedeAlDetalle() throws Exception {
+		mockMvc.perform(get("/medico/citas/124").with(user("70000001").roles("PACIENTE")))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
 	void inicialesDelNombreYDelApellidoPaterno() {
 		assertThat(AgendaController.iniciales("Andrea Sofía Salazar Pérez")).isEqualTo("AS");
 		assertThat(AgendaController.iniciales("Carlos Mendoza Ríos")).isEqualTo("CM");
@@ -251,6 +410,18 @@ class AgendaControllerTest {
 				cita(6L, MIERCOLES, LocalTime.of(12, 30), "Pedro Huamán Díaz", "70003018", TipoCitaEnum.CONTROL,
 						EstadoCitaEnum.CANCELADA, EstadoPagoEnum.RECHAZADO));
 		return new AgendaDto(citas, 6, 1, 2, 1, horarioLunesASabado());
+	}
+
+	/** Cita #000124 de Andrea del diseño aprobado de P8. */
+	private static DetalleCitaDto detalleDeAndrea(EstadoPagoEnum estadoPago) {
+		VistaCita cita = cita(124L, MIERCOLES, LocalTime.of(10, 30), "Andrea Sofía Salazar Pérez", "41235678",
+				TipoCitaEnum.NUEVO, EstadoCitaEnum.PROGRAMADA, estadoPago);
+		Pago pago = mock(Pago.class);
+		when(pago.getEstado()).thenReturn(estadoPago);
+		when(pago.getNroOperacion()).thenReturn("25789222");
+		when(pago.getFechaPago()).thenReturn(LocalDateTime.of(2026, 11, 9, 10, 12));
+		return new DetalleCitaDto(cita, "933731536", "andrea.salazar@gmail.com", new BigDecimal("150.00"), pago, true,
+				null);
 	}
 
 	private static List<HorarioSemanal> horarioLunesASabado() {

@@ -17,9 +17,10 @@ spring:
           time_zone: America/Lima
   servlet:
     multipart:
-      # RN-11: constancias de hasta 5 MB
-      max-file-size: 5MB
-      max-request-size: 6MB
+      # RN-11 limita la constancia a 5 MB; PagoService lo valida con su mensaje. Este tope, más alto, solo corta
+      # envíos muy grandes antes de leerlos.
+      max-file-size: 10MB
+      max-request-size: 11MB
 
 server:
   servlet:
@@ -34,3 +35,5 @@ server:
 medifast:
   # Constancias fuera de static/ (RNF06)
   uploads-dir: ${MEDIFAST_UPLOADS_DIR:uploads/comprobantes}
+  # Número de Yape de ejemplo que muestra P3: el pago es simulado (RF03)
+  yape-numero: ${MEDIFAST_YAPE_NUMERO:999 888 777}

@@ -24,6 +24,7 @@ import pe.edu.utp.medifast.dto.ConstanciaDto;
 import pe.edu.utp.medifast.exception.AccesoDenegadoException;
 import pe.edu.utp.medifast.exception.RecursoNoEncontradoException;
 import pe.edu.utp.medifast.model.Cita;
+import pe.edu.utp.medifast.model.Medico;
 import pe.edu.utp.medifast.model.Paciente;
 import pe.edu.utp.medifast.model.Pago;
 
@@ -33,6 +34,7 @@ class ConstanciaServiceImplTest {
 
 	private static final long ID_CITA = 124L;
 	private static final long ID_PACIENTE = 20L;
+	private static final long ID_MEDICO = 1L;
 
 	@TempDir
 	private Path carpeta;
@@ -54,6 +56,9 @@ class ConstanciaServiceImplTest {
 		when(paciente.getId()).thenReturn(ID_PACIENTE);
 		when(cita.getId()).thenReturn(ID_CITA);
 		when(cita.getPaciente()).thenReturn(paciente);
+		Medico medico = mock(Medico.class);
+		when(medico.getId()).thenReturn(ID_MEDICO);
+		when(cita.getMedico()).thenReturn(medico);
 		when(citaDao.findById(ID_CITA)).thenReturn(Optional.of(cita));
 		when(pago.getComprobanteTipo()).thenReturn("image/png");
 	}
@@ -74,6 +79,23 @@ class ConstanciaServiceImplTest {
 	@Test
 	void niegaLaConstanciaAOtroPaciente() {
 		assertThatThrownBy(() -> servicio.paraPaciente(ID_CITA, 99L)).isInstanceOf(AccesoDenegadoException.class);
+	}
+
+	@Test
+	void devuelveLaConstanciaAlMedicoDeLaCita() throws Exception {
+		Path archivo = Files.writeString(carpeta.resolve("0b7c2e1a-uuid.png"), "png");
+		when(pago.getComprobanteRuta()).thenReturn(archivo.toString());
+		when(pagoDao.findByCitaId(ID_CITA)).thenReturn(Optional.of(pago));
+
+		ConstanciaDto constancia = servicio.paraMedico(ID_CITA, ID_MEDICO);
+
+		assertThat(constancia.nombre()).isEqualTo("constancia-000124.png");
+		assertThat(constancia.archivo().getContentAsByteArray()).isEqualTo("png".getBytes());
+	}
+
+	@Test
+	void niegaLaConstanciaAOtroMedico() {
+		assertThatThrownBy(() -> servicio.paraMedico(ID_CITA, 2L)).isInstanceOf(AccesoDenegadoException.class);
 	}
 
 	@Test

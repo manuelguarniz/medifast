@@ -34,6 +34,8 @@ import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.dao.PacienteDao;
 import pe.edu.utp.medifast.dao.TarifaDao;
 import pe.edu.utp.medifast.dao.VistaCitaDao;
+import pe.edu.utp.medifast.exception.AccesoDenegadoException;
+import pe.edu.utp.medifast.dto.CitaPacienteDto;
 import pe.edu.utp.medifast.dto.DisponibilidadDto;
 import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.exception.CitaActivaException;
@@ -315,6 +317,45 @@ class ReservaServiceImplTest {
 
 		assertThatThrownBy(() -> servicio.historial(99L))
 				.isInstanceOf(jakarta.persistence.EntityNotFoundException.class);
+	}
+
+	@Test
+	void citaDevuelveLaCitaDelPacienteConSuMonto() {
+		VistaCita confirmada = vista(124L, EstadoCitaEnum.PROGRAMADA, null, EstadoPagoEnum.POR_VALIDAR, "150.00");
+		when(confirmada.getIdPaciente()).thenReturn(ID_PACIENTE);
+		when(vistaCitaDao.findById(124L)).thenReturn(Optional.of(confirmada));
+
+		CitaPacienteDto dto = servicio.cita(124L, ID_PACIENTE);
+
+		assertThat(dto.cita()).isSameAs(confirmada);
+		assertThat(dto.monto()).isEqualByComparingTo("150.00");
+		assertThat(dto.permiteDetalle()).isTrue();
+		assertThat(dto.vencida()).isFalse();
+	}
+
+	@Test
+	void citaUsaLaTarifaYElPlazoSiAunNoHayPago() {
+		VistaCita pendiente = vista(125L, EstadoCitaEnum.PENDIENTE_PAGO,
+				LocalDateTime.now(RELOJ_FIJO).plusMinutes(5), null, null);
+		when(pendiente.getIdPaciente()).thenReturn(ID_PACIENTE);
+		when(vistaCitaDao.findById(125L)).thenReturn(Optional.of(pendiente));
+
+		CitaPacienteDto dto = servicio.cita(125L, ID_PACIENTE);
+
+		assertThat(dto.monto()).isEqualByComparingTo("150.00");
+		assertThat(dto.pagoPendiente()).isTrue();
+		assertThat(dto.segundosRestantes()).isEqualTo(300);
+	}
+
+	@Test
+	void citaNoMuestraCitasAjenasNiInexistentes() {
+		VistaCita ajena = vista(126L, EstadoCitaEnum.PROGRAMADA, null, EstadoPagoEnum.VALIDADO, "80.00");
+		when(ajena.getIdPaciente()).thenReturn(99L);
+		when(vistaCitaDao.findById(126L)).thenReturn(Optional.of(ajena));
+		when(vistaCitaDao.findById(500L)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> servicio.cita(126L, ID_PACIENTE)).isInstanceOf(AccesoDenegadoException.class);
+		assertThatThrownBy(() -> servicio.cita(500L, ID_PACIENTE)).isInstanceOf(AccesoDenegadoException.class);
 	}
 
 	private static VistaCita vista(long id, EstadoCitaEnum estado, LocalDateTime expiraEn, EstadoPagoEnum estadoPago,

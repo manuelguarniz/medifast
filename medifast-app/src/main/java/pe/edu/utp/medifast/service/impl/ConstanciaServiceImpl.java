@@ -40,6 +40,19 @@ public class ConstanciaServiceImpl implements ConstanciaService {
 		Cita cita = citaDao.findById(idCita)
 				.filter(encontrada -> encontrada.getPaciente().getId().equals(idPaciente))
 				.orElseThrow(() -> new AccesoDenegadoException("La cita no pertenece al paciente autenticado."));
+		return cargar(cita);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ConstanciaDto paraMedico(Long idCita, Long idMedico) {
+		Cita cita = citaDao.findById(idCita)
+				.filter(encontrada -> encontrada.getMedico().getId().equals(idMedico))
+				.orElseThrow(() -> new AccesoDenegadoException("La cita no pertenece al médico autenticado."));
+		return cargar(cita);
+	}
+
+	private ConstanciaDto cargar(Cita cita) {
 		Pago pago = pagoDao.findByCitaId(cita.getId())
 				.orElseThrow(() -> new RecursoNoEncontradoException("La cita no tiene una constancia adjunta."));
 

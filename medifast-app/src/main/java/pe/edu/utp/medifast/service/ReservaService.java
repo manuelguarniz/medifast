@@ -2,6 +2,7 @@ package pe.edu.utp.medifast.service;
 
 import java.time.LocalDate;
 
+import pe.edu.utp.medifast.dto.CitaPacienteDto;
 import pe.edu.utp.medifast.dto.DisponibilidadDto;
 import pe.edu.utp.medifast.dto.MisCitasDto;
 import pe.edu.utp.medifast.model.Cita;
@@ -53,4 +54,15 @@ public interface ReservaService {
 	 * @throws jakarta.persistence.EntityNotFoundException si no existe el paciente o la tarifa de una cita sin pago
 	 */
 	MisCitasDto historial(Long idPaciente);
+
+	/**
+	 * Una cita del paciente para la confirmación o el detalle (P4, RF15), con el monto y el plazo calculados igual
+	 * que en {@link #historial(Long)}.
+	 *
+	 * @param idCita cita solicitada
+	 * @param idPaciente paciente autenticado
+	 * @return cita con su monto, si venció y los segundos que le quedan para pagar
+	 * @throws pe.edu.utp.medifast.exception.AccesoDenegadoException si la cita no existe o es de otro paciente
+	 */
+	CitaPacienteDto cita(Long idCita, Long idPaciente);
 }

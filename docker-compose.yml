@@ -1,5 +1,5 @@
 # MySQL 8.4 para desarrollo local. Al crearse por primera vez el volumen,
-# ejecuta 01_schema.sql y 02_datos_prueba.sql.
+# ejecuta 01_schema.sql, 02_datos_prueba.sql y 05_evento_vencimiento.sql (RF16).
 # Reiniciar la BD desde cero:  docker compose down -v && docker compose up -d
 services:
   mysql:
@@ -8,13 +8,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       TZ: America/Lima
-    command: --default-time-zone=-05:00
+    command: --default-time-zone=-05:00 --event-scheduler=ON
     ports:
       - "3306:3306"
     volumes:
       - medifast-data:/var/lib/mysql
       - ./docs/sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
       - ./docs/sql/02_datos_prueba.sql:/docker-entrypoint-initdb.d/02_datos_prueba.sql:ro
+      - ./docs/sql/05_evento_vencimiento.sql:/docker-entrypoint-initdb.d/03_evento_vencimiento.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
       interval: 5s

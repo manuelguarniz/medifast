@@ -31,6 +31,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import pe.edu.utp.medifast.config.SecurityConfig;
+import pe.edu.utp.medifast.config.TiempoConfig;
 import pe.edu.utp.medifast.dao.HorarioDao;
 import pe.edu.utp.medifast.dao.MedicoDao;
 import pe.edu.utp.medifast.dao.UsuarioDao;
@@ -56,7 +57,7 @@ import pe.edu.utp.medifast.util.Auditoria;
 
 @WebMvcTest(ReservaController.class)
 @Import({ SecurityConfig.class, RedireccionPorRol.class, UsuarioDetailsService.class,
-		IntentosLoginService.class, EventosAutenticacion.class })
+		IntentosLoginService.class, EventosAutenticacion.class, TiempoConfig.class })
 class ReservaControllerTest {
 
 	private static final LocalDate FECHA =

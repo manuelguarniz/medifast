@@ -65,8 +65,8 @@ import pe.edu.utp.medifast.util.ExportadorReporte;
 import pe.edu.utp.medifast.util.Reporte;
 
 @WebMvcTest(ReporteController.class)
-@Import({ SecurityConfig.class, RedireccionPorRol.class, UsuarioDetailsService.class,
-        IntentosLoginService.class, EventosAutenticacion.class, ReporteControllerTest.Reloj.class })
+@Import({SecurityConfig.class, RedireccionPorRol.class, UsuarioDetailsService.class,
+    IntentosLoginService.class, EventosAutenticacion.class, ReporteControllerTest.Reloj.class})
 class ReporteControllerTest {
 
     private static final String XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -74,9 +74,12 @@ class ReporteControllerTest {
     private static final LocalDate LUNES = LocalDate.of(2026, 11, 9);
     private static final LocalDate SABADO = LocalDate.of(2026, 11, 14);
 
-    /** Hoy es el miércoles 11 de noviembre de 2026, como en el diseño aprobado. */
+    /**
+     * Hoy es el miércoles 11 de noviembre de 2026, como en el diseño aprobado.
+     */
     @TestConfiguration
     static class Reloj {
+
         @Bean
         Clock clock() {
             return Clock.fixed(Instant.parse("2026-11-11T16:45:00Z"), ZoneId.of("America/Lima"));
@@ -148,7 +151,7 @@ class ReporteControllerTest {
         when(reporteService.citas(any(), any())).thenReturn(new ReporteCitasDto(List.of()));
 
         mockMvc.perform(get("/medico/reportes/citas").param("desde", "2026-11-01").param("hasta", "2026-11-30")
-                        .param("estado", "CANCELADA").with(medico()))
+                .param("estado", "CANCELADA").with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("atajoActivo", "Este mes"))
                 .andExpect(content().string(allOf(
@@ -163,7 +166,7 @@ class ReporteControllerTest {
     @Test
     void hastaAnteriorADesdeNoConsultaYMuestraElErrorBajoHasta() throws Exception {
         mockMvc.perform(get("/medico/reportes/citas").param("desde", "2026-11-14").param("hasta", "2026-11-09")
-                        .with(medico()))
+                .with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(allOf(
                         containsString("La fecha final debe ser igual o posterior a la inicial."),
@@ -175,7 +178,7 @@ class ReporteControllerTest {
     @Test
     void fechaVaciaPideIngresarla() throws Exception {
         mockMvc.perform(get("/medico/reportes/citas").param("desde", "").param("hasta", "2026-11-09")
-                        .with(medico()))
+                .with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Ingresa la fecha.")));
 
@@ -186,15 +189,15 @@ class ReporteControllerTest {
     void exportarCitasUsaEtiquetasDocumentoParcialYResumen() throws Exception {
         ReporteCitasDto citas = citasDeLaSemana();
         when(reporteService.citas(ID_MEDICO, new FiltroReporteDto(LUNES, SABADO, null))).thenReturn(citas);
-        when(exportadorReporte.exportar(any())).thenReturn(new byte[] { 1, 2, 3 });
+        when(exportadorReporte.exportar(any())).thenReturn(new byte[]{1, 2, 3});
 
         mockMvc.perform(get("/medico/reportes/citas.xlsx").param("desde", "2026-11-09").param("hasta", "2026-11-14")
-                        .with(medico()))
+                .with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(XLSX))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"reporte-citas-2026-11-09-2026-11-14.xlsx\""))
-                .andExpect(content().bytes(new byte[] { 1, 2, 3 }));
+                .andExpect(content().bytes(new byte[]{1, 2, 3}));
 
         Reporte reporte = reporteExportado();
         assertThat(reporte.encabezados())
@@ -216,7 +219,7 @@ class ReporteControllerTest {
     @Test
     void exportarConRangoInvalidoVuelveALaPantalla() throws Exception {
         mockMvc.perform(get("/medico/reportes/citas.xlsx").param("desde", "2026-11-14").param("hasta", "2026-11-09")
-                        .with(medico()))
+                .with(medico()))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/medico/reportes/citas?desde=2026-11-14&hasta=2026-11-09"));
 
@@ -226,23 +229,20 @@ class ReporteControllerTest {
     @Test
     void reportePagosMuestraUnaFilaPorPagoConTotalEIndicadores() throws Exception {
         LocalDate domingo = LocalDate.of(2026, 11, 15);
+
         when(reporteService.pagos(ID_MEDICO, new FiltroReporteDto(LUNES, domingo))).thenReturn(pagosDeLaSemana());
 
-        mockMvc.perform(get("/medico/reportes/pagos").with(medico()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("medico/reporte-pagos"))
-                .andExpect(model().attribute("atajoActivo", "Esta semana"))
-                .andExpect(content().string(allOf(
-                        containsString("Filtra por la fecha de validación del pago."),
-                        containsString("Pagos verificados"),
-                        containsString("S/ 230.00"),
-                        containsString("S/ 115.00"),
-                        containsString("Lun 9 nov 2026, 08:40"),
-                        containsString("#000118"),
-                        containsString("25790114"),
-                        containsString("Total · 2 pagos"),
-                        containsString("Op. —"),
-                        not(containsString("name=\"estado\"")))));
+        mockMvc.perform(get("/medico/reportes/pagos").with(medico())).andExpect(status().isOk()).andExpect(view().name("medico/reporte-pagos")).andExpect(model().attribute("atajoActivo", "Esta semana")).andExpect(model().attribute("cantidad", 2L)).andExpect(model().attribute("totalSoles", "S/ 230.00")).andExpect(model().attribute("ticketPromedio", "S/ 115.00")).andExpect(model().attribute("contador", "2 pagos")).andExpect(content().string(allOf(
+                containsString("Filtra por la fecha de validación del pago."),
+                containsString("Pagos verificados"),
+                containsString("S/ 230.00"),
+                containsString("S/ 115.00"),
+                containsString("Lun 9 nov 2026, 08:40"),
+                containsString("#000118"),
+                containsString("25790114"),
+                containsString("Total · 2 pagos"),
+                containsString("Op. —"),
+                not(containsString("name=\"estado\"")))));
     }
 
     @Test
@@ -250,7 +250,7 @@ class ReporteControllerTest {
         when(reporteService.pagos(any(), any())).thenReturn(new ResumenPagosDto(List.of()));
 
         mockMvc.perform(get("/medico/reportes/pagos").param("desde", "2026-11-15").param("hasta", "2026-11-15")
-                        .with(medico()))
+                .with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(allOf(
                         containsString("No hay pagos verificados en este período"),
@@ -262,10 +262,10 @@ class ReporteControllerTest {
     @Test
     void exportarPagosIncluyeFilaDeTotalEIndicadores() throws Exception {
         when(reporteService.pagos(ID_MEDICO, new FiltroReporteDto(LUNES, SABADO))).thenReturn(pagosDeLaSemana());
-        when(exportadorReporte.exportar(any())).thenReturn(new byte[] { 9 });
+        when(exportadorReporte.exportar(any())).thenReturn(new byte[]{9});
 
         mockMvc.perform(get("/medico/reportes/pagos.xlsx").param("desde", "2026-11-09").param("hasta", "2026-11-14")
-                        .with(medico()))
+                .with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"reporte-pagos-2026-11-09-2026-11-14.xlsx\""));
@@ -286,7 +286,7 @@ class ReporteControllerTest {
                 .thenReturn(reporte);
 
         mockMvc.perform(get("/medico/reportes/citas").param("desde", "2026-11-09").param("hasta", "2026-11-14")
-                        .param("estado", "ATENDIDA").param("pagina", "2").with(medico()))
+                .param("estado", "ATENDIDA").param("pagina", "2").with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("total", 23L))
                 .andExpect(model().attribute("contador", "Mostrando 11–20 de 23 citas"))
@@ -329,7 +329,7 @@ class ReporteControllerTest {
         when(reporteService.pagos(any(), any())).thenReturn(new ResumenPagosDto(pagos));
 
         mockMvc.perform(get("/medico/reportes/pagos").param("desde", "2026-11-09").param("hasta", "2026-11-15")
-                        .param("pagina", "2").with(medico()))
+                .param("pagina", "2").with(medico()))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("rango", "Mostrando 11–12 de 12 pagos"))
                 .andExpect(content().string(allOf(
@@ -355,6 +355,16 @@ class ReporteControllerTest {
                 .andExpect(redirectedUrl("/login"));
     }
 
+    @Test
+    void pacienteNoPuedeAccederAlReporteDePagos() throws Exception {
+        mockMvc.perform(get("/medico/reportes/pagos").with(user("70000001").roles("PACIENTE"))).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void usuarioNoAutenticadoEsRedirigidoAlLoginEnReporteDePagos() throws Exception {
+        mockMvc.perform(get("/medico/reportes/pagos")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
+    }
+
     private static RequestPostProcessor medico() {
         return user("10000001").roles("MEDICO");
     }
@@ -367,17 +377,15 @@ class ReporteControllerTest {
 
     private static ReporteCitasDto citasDeLaSemana() {
         return new ReporteCitasDto(List.of(
-                cita(118L, LUNES, LocalTime.of(9, 30), "Roberto Castro Silva", "70003214", TipoCitaEnum.CONTROL,
-                        EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO),
-                cita(119L, LUNES, LocalTime.of(11, 0), "Valeria Gómez Morales", "70008765", TipoCitaEnum.NUEVO,
-                        EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO),
-                cita(129L, LocalDate.of(2026, 11, 11), LocalTime.of(12, 30), "Pedro Huamán Díaz", "70003018",
-                        TipoCitaEnum.CONTROL, EstadoCitaEnum.CANCELADA, EstadoPagoEnum.RECHAZADO),
-                cita(131L, LocalDate.of(2026, 11, 13), LocalTime.of(12, 0), "María Rojas Vega", "70008193",
-                        TipoCitaEnum.CONTROL, EstadoCitaEnum.PENDIENTE_PAGO, null)));
+                cita(118L, LUNES, LocalTime.of(9, 30), "Roberto Castro Silva", "70003214", TipoCitaEnum.CONTROL, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO),
+                cita(119L, LUNES, LocalTime.of(11, 0), "Valeria Gómez Morales", "70008765", TipoCitaEnum.NUEVO, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO),
+                cita(129L, LocalDate.of(2026, 11, 11), LocalTime.of(12, 30), "Pedro Huamán Díaz", "70003018", TipoCitaEnum.CONTROL, EstadoCitaEnum.CANCELADA, EstadoPagoEnum.RECHAZADO),
+                cita(131L, LocalDate.of(2026, 11, 13), LocalTime.of(12, 0), "María Rojas Vega", "70008193", TipoCitaEnum.CONTROL, EstadoCitaEnum.PENDIENTE_PAGO, null)));
     }
 
-    /** Citas atendidas consecutivas desde la #000200, para probar la paginación. */
+    /**
+     * Citas atendidas consecutivas desde la #000200, para probar la paginación.
+     */
     private static ReporteCitasDto citasAtendidas(int cantidad) {
         List<VistaCita> citas = new ArrayList<>();
         for (int i = 0; i < cantidad; i++) {

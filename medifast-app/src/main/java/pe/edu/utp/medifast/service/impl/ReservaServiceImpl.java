@@ -48,6 +48,7 @@ import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.Auditoria;
 import pe.edu.utp.medifast.util.Auditoria.Evento;
+import pe.edu.utp.medifast.util.Paginacion;
 
 /** Implementación transaccional de disponibilidad y reserva (RN-01 a RN-09). */
 @Service
@@ -186,23 +187,26 @@ public class ReservaServiceImpl implements ReservaService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public MisCitasDto historial(Long idPaciente) {
+	public MisCitasDto historial(Long idPaciente, String pagina) {
 		requirePaciente(idPaciente);
 		LocalDateTime ahora = LocalDateTime.now(clock);
 		Map<String, BigDecimal> preciosPorTarifa = new HashMap<>();
-		CitaPacienteDto proxima = null;
-		List<CitaPacienteDto> historial = new ArrayList<>();
-		for (VistaCita cita : vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(idPaciente)) {
-			CitaPacienteDto dto = paraPaciente(cita, ahora, preciosPorTarifa);
-			// RN-09 garantiza una sola activa; si la BD tuviera más, las demás quedan en el historial.
-			boolean activa = cita.getEstado() == EstadoCitaEnum.PROGRAMADA || dto.pagoPendiente();
-			if (activa && proxima == null) {
-				proxima = dto;
-			} else {
-				historial.add(dto);
-			}
-		}
-		return new MisCitasDto(Optional.ofNullable(proxima), List.copyOf(historial));
+		// RN-09 garantiza una sola activa; si la BD tuviera más, las demás quedan en el historial. Una
+		// PENDIENTE_PAGO vencida que RF16 aún no canceló también va al historial.
+		Optional<CitaPacienteDto> proxima = vistaCitaDao.findFirstByIdPacienteAndEstadoIn(idPaciente, ESTADOS_ACTIVOS)
+				.map(cita -> paraPaciente(cita, ahora, preciosPorTarifa))
+				.filter(dto -> dto.cita().getEstado() == EstadoCitaEnum.PROGRAMADA || dto.pagoPendiente());
+		// Los id_cita empiezan en 1: sin próxima, 0 no excluye ninguna.
+		long excluida = proxima.map(dto -> dto.cita().getIdCita()).orElse(0L);
+		Paginacion paginacion = Paginacion.de(pagina,
+				Math.toIntExact(citaDao.countByPacienteIdAndIdNot(idPaciente, excluida)));
+		List<CitaPacienteDto> historial = paginacion.totalFilas() == 0
+				? List.of()
+				: vistaCitaDao.findAllByIdPacienteAndIdCitaNotOrderByFechaDescHoraInicioDesc(idPaciente, excluida,
+								paginacion.pageable()).stream()
+						.map(cita -> paraPaciente(cita, ahora, preciosPorTarifa))
+						.toList();
+		return new MisCitasDto(proxima, historial, paginacion);
 	}
 
 	@Override

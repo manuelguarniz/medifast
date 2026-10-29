@@ -180,10 +180,11 @@ BEGIN
                       LEAST(TIMESTAMP(v_fecha - INTERVAL 2 DAY, '18:00:00'), NOW() - INTERVAL 1 HOUR));
 
     INSERT INTO cita (id_paciente, id_medico, tipo_cita, estado, expira_en, observacion,
-                      cancelada_por, creado_en)
+                      cancelada_por, fecha, hora_inicio, hora_fin, creado_en)
     VALUES (v_paciente, v_medico, v_tipo, p_estado,
             IF(p_estado = 'PENDIENTE_PAGO', NOW() + INTERVAL 15 MINUTE, NULL),
-            p_observacion, p_cancelada_por, v_creado);
+            p_observacion, p_cancelada_por,
+            v_fecha, p_hora, ADDTIME(p_hora, SEC_TO_TIME(v_duracion * 60)), v_creado);
     SET v_cita = LAST_INSERT_ID();
 
     -- Bloques que cubren la duración de la tarifa (CANCELADA => bloque liberado)

@@ -51,6 +51,7 @@ import pe.edu.utp.medifast.service.ConfirmacionPdfService;
 import pe.edu.utp.medifast.service.ConstanciaService;
 import pe.edu.utp.medifast.service.ReservaService;
 import pe.edu.utp.medifast.util.Auditoria;
+import pe.edu.utp.medifast.util.Paginacion;
 
 @WebMvcTest(MisCitasController.class)
 @Import({ SecurityConfig.class, RedireccionPorRol.class, UsuarioDetailsService.class,
@@ -93,8 +94,8 @@ class MisCitasControllerTest {
 		CitaPacienteDto confirmada = dto(124L, EstadoCitaEnum.PROGRAMADA, EstadoPagoEnum.POR_VALIDAR, false, 0, null);
 		CitaPacienteDto cancelada = dto(117L, EstadoCitaEnum.CANCELADA, EstadoPagoEnum.RECHAZADO, false, 0,
 				"Constancia ilegible.");
-		when(reservaService.historial(ID_PACIENTE))
-				.thenReturn(new MisCitasDto(Optional.of(confirmada), List.of(cancelada)));
+		when(reservaService.historial(ID_PACIENTE, null))
+				.thenReturn(misCitas(Optional.of(confirmada), List.of(cancelada)));
 
 		mockMvc.perform(get("/paciente/citas").with(user("70000001").roles("PACIENTE")))
 				.andExpect(status().isOk())
@@ -119,7 +120,7 @@ class MisCitasControllerTest {
 	@Test
 	void ofreceContinuarPagoConContadorSiLaReservaSigueVigente() throws Exception {
 		CitaPacienteDto pendiente = dto(124L, EstadoCitaEnum.PENDIENTE_PAGO, null, false, 768, null);
-		when(reservaService.historial(ID_PACIENTE)).thenReturn(new MisCitasDto(Optional.of(pendiente), List.of()));
+		when(reservaService.historial(ID_PACIENTE, null)).thenReturn(misCitas(Optional.of(pendiente), List.of()));
 
 		mockMvc.perform(get("/paciente/citas").with(user("70000001").roles("PACIENTE")))
 				.andExpect(status().isOk())
@@ -136,7 +137,7 @@ class MisCitasControllerTest {
 
 	@Test
 	void sinCitasMuestraElEstadoVacioYPermiteReservar() throws Exception {
-		when(reservaService.historial(ID_PACIENTE)).thenReturn(new MisCitasDto(Optional.empty(), List.of()));
+		when(reservaService.historial(ID_PACIENTE, null)).thenReturn(misCitas(Optional.empty(), List.of()));
 
 		mockMvc.perform(get("/paciente/citas").with(user("70000001").roles("PACIENTE")))
 				.andExpect(status().isOk())
@@ -155,7 +156,7 @@ class MisCitasControllerTest {
 						"La constancia no corresponde al monto de la cita."),
 				dto(109L, EstadoCitaEnum.CANCELADA, null, false, 0, "Tiempo de reserva vencido."),
 				dto(101L, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO, false, 0, null));
-		when(reservaService.historial(ID_PACIENTE)).thenReturn(new MisCitasDto(Optional.empty(), historial));
+		when(reservaService.historial(ID_PACIENTE, null)).thenReturn(misCitas(Optional.empty(), historial));
 
 		mockMvc.perform(get("/paciente/citas").with(user("70000001").roles("PACIENTE")))
 				.andExpect(status().isOk())
@@ -181,7 +182,8 @@ class MisCitasControllerTest {
 		for (int i = 0; i < 13; i++) {
 			historial.add(dto(400L + i, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO, false, 0, null));
 		}
-		when(reservaService.historial(ID_PACIENTE)).thenReturn(new MisCitasDto(Optional.empty(), historial));
+		when(reservaService.historial(ID_PACIENTE, "2")).thenReturn(
+				new MisCitasDto(Optional.empty(), historial.subList(10, 13), Paginacion.de("2", historial.size())));
 
 		mockMvc.perform(get("/paciente/citas").param("tab", "historial").param("pagina", "2")
 						.with(user("70000001").roles("PACIENTE")))
@@ -192,6 +194,10 @@ class MisCitasControllerTest {
 						not(containsString("#000409")),
 						containsString("<span class=\"citas-contador\">13</span>"),
 						containsString("/paciente/citas?tab=historial&amp;pagina=1"))));
+	}
+
+	private static MisCitasDto misCitas(Optional<CitaPacienteDto> proxima, List<CitaPacienteDto> historial) {
+		return new MisCitasDto(proxima, historial, Paginacion.de(null, historial.size()));
 	}
 
 	@Test

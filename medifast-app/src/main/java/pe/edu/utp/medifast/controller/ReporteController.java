@@ -96,12 +96,11 @@ public class ReporteController {
         }
 
         ReporteCitasDto reporte = reporteService.citas(medico.getId(),
-                new FiltroReporteDto(fechas.desde(), fechas.hasta(), filtroEstado));
-        long total = reporte.filas().size();
+                new FiltroReporteDto(fechas.desde(), fechas.hasta(), filtroEstado), pagina);
+        long total = reporte.total();
         // Los indicadores y el Excel usan el resultado completo; solo la tabla se pagina.
-        Paginacion paginacion = Paginacion.de(pagina, reporte.filas().size());
-        model.addAttribute("filas", paginacion.recortar(reporte.filas()).stream()
-                .map(ReporteController::filaCita).toList());
+        Paginacion paginacion = reporte.paginacion();
+        model.addAttribute("filas", reporte.filas().stream().map(ReporteController::filaCita).toList());
         model.addAttribute("paginacion", paginacion);
         model.addAttribute("total", total);
         model.addAttribute("atendidas", reporte.total(EstadoCitaEnum.ATENDIDA));
@@ -151,10 +150,9 @@ public class ReporteController {
         }
 
         ResumenPagosDto resumen = reporteService.pagos(medico.getId(),
-                new FiltroReporteDto(fechas.desde(), fechas.hasta()));
-        Paginacion paginacion = Paginacion.de(pagina, resumen.pagos().size());
-        model.addAttribute("filas", paginacion.recortar(resumen.pagos()).stream()
-                .map(ReporteController::filaPago).toList());
+                new FiltroReporteDto(fechas.desde(), fechas.hasta()), pagina);
+        Paginacion paginacion = resumen.paginacion();
+        model.addAttribute("filas", resumen.pagos().stream().map(ReporteController::filaPago).toList());
         model.addAttribute("paginacion", paginacion);
         model.addAttribute("rango", paginacion.contador("pago", "pagos"));
         model.addAttribute("cantidad", resumen.cantidad());
@@ -253,7 +251,7 @@ public class ReporteController {
                         EtiquetasEstado.cita(cita.getEstado()),
                         EtiquetasEstado.pago(cita.getEstadoPago())))
                 .toList();
-        long total = resultado.filas().size();
+        long total = resultado.total();
         List<List<Object>> resumen = new ArrayList<>();
         resumen.add(List.of("Total de citas", total));
         for (EstadoCitaEnum e : EstadoCitaEnum.values()) {

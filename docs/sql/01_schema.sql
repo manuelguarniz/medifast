@@ -182,6 +182,10 @@ CREATE TABLE cita (
     expira_en           DATETIME     NULL,
     observacion         VARCHAR(500) NULL,
     cancelada_por       ENUM ('SISTEMA', 'MEDICO') NULL,
+    -- Inicio y fin de sus bloques; se fijan al reservar (rendimiento de v_cita)
+    fecha               DATE         NOT NULL,
+    hora_inicio         TIME         NOT NULL,
+    hora_fin            TIME         NOT NULL,
     -- RN-09: vale id_paciente solo mientras la cita está activa; NULL en otro caso
     paciente_activo     BIGINT AS (IF(estado IN ('PENDIENTE_PAGO', 'PROGRAMADA'), id_paciente, NULL)) STORED,
     creado_en           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -192,12 +196,16 @@ CREATE TABLE cita (
     CONSTRAINT ck_cita_cancelacion CHECK (
         estado <> 'CANCELADA' OR (observacion IS NOT NULL AND cancelada_por IS NOT NULL)
     ),
+    CONSTRAINT ck_cita_horas CHECK (hora_fin > hora_inicio),
     CONSTRAINT fk_cita_paciente FOREIGN KEY (id_paciente)
         REFERENCES paciente (id_paciente) ON DELETE RESTRICT,
     CONSTRAINT fk_cita_medico FOREIGN KEY (id_medico)
         REFERENCES medico (id_medico) ON DELETE RESTRICT,
     INDEX idx_cita_medico_estado (id_medico, estado),
     INDEX idx_cita_paciente_creado (id_paciente, creado_en),
+    -- Agenda y reportes del médico; historial del paciente
+    INDEX idx_cita_medico_fecha (id_medico, fecha, hora_inicio),
+    INDEX idx_cita_paciente_fecha (id_paciente, fecha, hora_inicio),
     INDEX idx_cita_estado_expira (estado, expira_en)
 ) ENGINE = InnoDB;
 
@@ -242,12 +250,15 @@ CREATE TABLE pago (
     CONSTRAINT ck_pago_tipo CHECK (comprobante_tipo IN ('image/jpeg', 'image/png', 'application/pdf')),
     CONSTRAINT fk_pago_cita FOREIGN KEY (id_cita)
         REFERENCES cita (id_cita) ON DELETE RESTRICT,
-    INDEX idx_pago_estado_fecha (estado, fecha_pago)
+    INDEX idx_pago_estado_fecha (estado, fecha_pago),
+    -- Reporte de pagos (P10): filtra por fecha de validación
+    INDEX idx_pago_estado_validado (estado, validado_en)
 ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------------------------------
--- v_cita: cita + paciente + médico + inicio/fin (desde sus bloques) + pago
--- La fecha y la hora no se guardan en cita: salen de MIN/MAX de sus bloques.
+-- v_cita: cita + paciente + médico + inicio/fin + pago
+-- Sin tablas derivadas, para que MySQL la fusione con la consulta y use los
+-- índices de cita.
 -- -----------------------------------------------------------------------------
 CREATE VIEW v_cita AS
 SELECT c.id_cita,
@@ -259,9 +270,9 @@ SELECT c.id_cita,
        CONCAT(m.nombres, ' ', m.apellidos) AS medico,
        c.tipo_cita,
        c.estado,
-       b.fecha,
-       b.hora_inicio,
-       b.hora_fin,
+       c.fecha,
+       c.hora_inicio,
+       c.hora_fin,
        pg.id_pago,
        pg.estado                          AS estado_pago,
        pg.monto,
@@ -273,13 +284,6 @@ FROM cita c
          JOIN paciente p ON p.id_paciente = c.id_paciente
          JOIN usuario up ON up.id_usuario = p.id_usuario
          JOIN medico m ON m.id_medico = c.id_medico
-         JOIN (SELECT ch.id_cita,
-                      MIN(h.fecha)       AS fecha,
-                      MIN(h.hora_inicio) AS hora_inicio,
-                      MAX(h.hora_fin)    AS hora_fin
-               FROM cita_horario ch
-                        JOIN horario h ON h.id_horario = ch.id_horario
-               GROUP BY ch.id_cita) b ON b.id_cita = c.id_cita
          LEFT JOIN pago pg ON pg.id_cita = c.id_cita;
 
 -- -----------------------------------------------------------------------------

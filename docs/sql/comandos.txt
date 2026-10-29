@@ -1,0 +1,143 @@
+==============================================================================
+MEDIFAST — Comandos de base de datos (MySQL 8.4)
+==============================================================================
+
+Todos los comandos se ejecutan desde la raíz del repositorio.
+Cada sección trae dos variantes:
+  [docker] contenedor medifast-mysql de docker-compose.yml (root / root)
+  [local]  MySQL instalado en la máquina (pide la contraseña de root)
+
+Los scripts se ejecutan con root: medifast_app solo tiene SELECT, INSERT,
+UPDATE y DELETE (no puede crear tablas, procedimientos ni eventos).
+
+
+------------------------------------------------------------------------------
+1. LEVANTAR / REINICIAR LA BASE (docker)
+------------------------------------------------------------------------------
+
+# Levantar. La primera vez ejecuta solo 01, 02 y 05.
+docker compose up -d
+
+# Ver que esté lista (estado "healthy")
+docker compose ps
+
+# Borrar todo (incluido el volumen) y empezar de cero
+docker compose down -v && docker compose up -d
+
+# Consola MySQL
+docker exec -it medifast-mysql mysql -uroot -proot medifast
+
+
+------------------------------------------------------------------------------
+2. EJECUTAR LOS SCRIPTS (en este orden)
+------------------------------------------------------------------------------
+
+01_schema.sql              Crea la BD, tablas, vista v_cita y el usuario
+                           medifast_app. Re-ejecutable (BORRA las tablas).
+02_datos_prueba.sql        Datos de prueba. Después de 01.
+03_consultas.sql           Consultas de entrega. Lleva INSERT que deben
+                           fallar: se ejecuta con --force.
+04_migracion_auditoria.sql Solo para bases creadas con un 01 antiguo.
+05_evento_vencimiento.sql  Evento que vence reservas cada minuto (RF16).
+06_citas_historicas.sql    Opcional: ~5 años de citas (>10 000). No re-ejecutable.
+07_citas_volumen.sql       Opcional: completa 100 000 citas. No re-ejecutable.
+08_migracion_rendimiento.sql Solo para bases creadas con un 01 antiguo.
+
+--- [docker] ---
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/01_schema.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/02_datos_prueba.sql
+docker exec -i medifast-mysql mysql -uroot -proot --force < docs/sql/03_consultas.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/04_migracion_auditoria.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/05_evento_vencimiento.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/06_citas_historicas.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/07_citas_volumen.sql
+docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/08_migracion_rendimiento.sql
+
+--- [local] ---
+mysql -u root -p < docs/sql/01_schema.sql
+mysql -u root -p < docs/sql/02_datos_prueba.sql
+mysql -u root -p --force medifast < docs/sql/03_consultas.sql
+mysql -u root -p < docs/sql/04_migracion_auditoria.sql
+mysql -u root -p < docs/sql/05_evento_vencimiento.sql
+mysql -u root -p < docs/sql/06_citas_historicas.sql
+mysql -u root -p < docs/sql/07_citas_volumen.sql
+mysql -u root -p < docs/sql/08_migracion_rendimiento.sql
+
+# Verificar el evento de vencimiento
+docker exec -it medifast-mysql mysql -uroot -proot -e "SHOW VARIABLES LIKE 'event_scheduler'; SHOW EVENTS FROM medifast;"
+
+# Contar citas cargadas
+docker exec -it medifast-mysql mysql -uroot -proot -e "SELECT COUNT(*) FROM medifast.cita;"
+
+
+------------------------------------------------------------------------------
+3. GENERAR BACKUP
+------------------------------------------------------------------------------
+
+Opciones usadas:
+  --databases medifast   incluye CREATE DATABASE / USE (el restore no
+                         necesita que la BD exista)
+  --single-transaction   copia consistente de InnoDB sin bloquear tablas
+  --routines --events --triggers
+                         incluye procedimientos, ev_vencer_reservas y triggers
+  --set-gtid-purged=OFF  evita errores de GTID al restaurar en otro servidor
+
+--- [docker] ---
+mkdir -p backups
+docker exec medifast-mysql mysqldump -uroot -proot \
+  --databases medifast --single-transaction --routines --events --triggers \
+  --set-gtid-purged=OFF \
+  > backups/medifast_$(date +%Y%m%d_%H%M%S).sql
+
+# Comprimido (recomendado con 100 000 citas)
+docker exec medifast-mysql mysqldump -uroot -proot \
+  --databases medifast --single-transaction --routines --events --triggers \
+  --set-gtid-purged=OFF \
+  | gzip > backups/medifast_$(date +%Y%m%d_%H%M%S).sql.gz
+
+--- [local] ---
+mkdir -p backups
+mysqldump -u root -p \
+  --databases medifast --single-transaction --routines --events --triggers \
+  --set-gtid-purged=OFF \
+  > backups/medifast_$(date +%Y%m%d_%H%M%S).sql
+
+# Solo estructura (sin datos)
+mysqldump -u root -p --databases medifast --no-data --routines --events \
+  --triggers --set-gtid-purged=OFF > backups/medifast_estructura.sql
+
+Nota: no subir la carpeta backups/ al repositorio (contiene datos y hashes de
+contraseñas). Agregarla a .gitignore.
+
+
+------------------------------------------------------------------------------
+4. RESTAURAR BACKUP
+------------------------------------------------------------------------------
+
+El backup reemplaza las tablas existentes de medifast (DROP TABLE + CREATE).
+Cambiar el nombre del archivo por el backup que se quiera restaurar.
+
+--- [docker] ---
+docker exec -i medifast-mysql mysql -uroot -proot < backups/medifast_20261028_120000.sql
+
+# Desde un .sql.gz
+gunzip -c backups/medifast_20261028_120000.sql.gz | docker exec -i medifast-mysql mysql -uroot -proot
+
+--- [local] ---
+mysql -u root -p < backups/medifast_20261028_120000.sql
+gunzip -c backups/medifast_20261028_120000.sql.gz | mysql -u root -p
+
+# Restaurar en una base limpia (borra la BD actual antes)
+docker exec -i medifast-mysql mysql -uroot -proot -e "DROP DATABASE IF EXISTS medifast;"
+docker exec -i medifast-mysql mysql -uroot -proot < backups/medifast_20261028_120000.sql
+
+Notas:
+  - El usuario medifast_app NO va en el backup (los usuarios viven en la BD
+    mysql). En un servidor nuevo, crearlo antes de levantar la aplicación:
+      docker exec -i medifast-mysql mysql -uroot -proot -e \
+        "CREATE USER IF NOT EXISTS 'medifast_app'@'%' IDENTIFIED BY 'medifast_app';
+         GRANT SELECT, INSERT, UPDATE, DELETE ON medifast.* TO 'medifast_app'@'%';"
+  - El evento ev_vencer_reservas se restaura con el backup, pero necesita
+    event_scheduler = ON (docker-compose.yml ya lo activa).
+  - Las fechas de 02_datos_prueba.sql son relativas al día en que se cargaron:
+    un backup antiguo trae citas "futuras" que ya pueden estar en el pasado.

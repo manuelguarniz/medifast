@@ -47,17 +47,19 @@ public interface ReservaService {
 	/**
 	 * Citas del paciente para "Mis citas" (P5, RF10): separa la cita activa del resto y marca como vencidas las
 	 * {@code PENDIENTE_PAGO} cuyo plazo pasó y que RF16 aún no canceló. Si la cita no tiene pago, el monto sale de
-	 * la tarifa de su tipo (RN-03).
+	 * la tarifa de su tipo (RN-03). Del historial lee de la BD solo la página pedida; una página inválida o fuera de
+	 * rango se ajusta a la más cercana.
 	 *
 	 * @param idPaciente paciente autenticado
-	 * @return cita activa, si existe, y el historial de la más reciente a la más antigua
+	 * @param pagina número de página del historial (desde 1), tal como llega en la URL
+	 * @return cita activa, si existe, y la página del historial de la más reciente a la más antigua
 	 * @throws jakarta.persistence.EntityNotFoundException si no existe el paciente o la tarifa de una cita sin pago
 	 */
-	MisCitasDto historial(Long idPaciente);
+	MisCitasDto historial(Long idPaciente, String pagina);
 
 	/**
 	 * Una cita del paciente para la confirmación o el detalle (P4, RF15), con el monto y el plazo calculados igual
-	 * que en {@link #historial(Long)}.
+	 * que en {@link #historial(Long, String)}.
 	 *
 	 * @param idCita cita solicitada
 	 * @param idPaciente paciente autenticado

@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import pe.edu.utp.medifast.dao.CitaDao;
@@ -52,6 +53,7 @@ import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.EstadoPagoEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.util.Auditoria;
+import pe.edu.utp.medifast.util.Paginacion;
 import pe.edu.utp.medifast.util.Auditoria.Evento;
 
 @ExtendWith(MockitoExtension.class)
@@ -263,25 +265,42 @@ class ReservaServiceImplTest {
 		VistaCita programada = vista(124L, EstadoCitaEnum.PROGRAMADA, null, EstadoPagoEnum.POR_VALIDAR, "150.00");
 		VistaCita cancelada = vista(117L, EstadoCitaEnum.CANCELADA, null, EstadoPagoEnum.RECHAZADO, "150.00");
 		VistaCita noAsistio = vista(96L, EstadoCitaEnum.NO_ASISTIO, null, EstadoPagoEnum.VALIDADO, "150.00");
-		when(vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(ID_PACIENTE))
-				.thenReturn(List.of(programada, cancelada, noAsistio));
+		when(vistaCitaDao.findFirstByIdPacienteAndEstadoIn(any(), any())).thenReturn(Optional.of(programada));
+		when(citaDao.countByPacienteIdAndIdNot(ID_PACIENTE, 124L)).thenReturn(2L);
+		when(vistaCitaDao.findAllByIdPacienteAndIdCitaNotOrderByFechaDescHoraInicioDesc(ID_PACIENTE, 124L,
+				PageRequest.of(0, Paginacion.POR_PAGINA))).thenReturn(List.of(cancelada, noAsistio));
 
-		MisCitasDto citas = servicio.historial(ID_PACIENTE);
+		MisCitasDto citas = servicio.historial(ID_PACIENTE, null);
 
 		assertThat(citas.proxima()).get().extracting(dto -> dto.cita()).isSameAs(programada);
 		assertThat(citas.historial()).extracting(dto -> dto.cita()).containsExactly(cancelada, noAsistio);
+		assertThat(citas.paginacion().totalFilas()).isEqualTo(2);
 		assertThat(citas.proxima().get().permiteDetalle()).isTrue();
 		assertThat(citas.proxima().get().tieneConstancia()).isTrue();
+	}
+
+	@Test
+	void historialLeeDeLaBdSoloLaPaginaPedida() {
+		when(vistaCitaDao.findFirstByIdPacienteAndEstadoIn(any(), any())).thenReturn(Optional.empty());
+		when(citaDao.countByPacienteIdAndIdNot(ID_PACIENTE, 0L)).thenReturn(23L);
+		VistaCita atendida = vista(5L, EstadoCitaEnum.ATENDIDA, null, EstadoPagoEnum.VALIDADO, "80.00");
+		when(vistaCitaDao.findAllByIdPacienteAndIdCitaNotOrderByFechaDescHoraInicioDesc(ID_PACIENTE, 0L,
+				PageRequest.of(2, Paginacion.POR_PAGINA))).thenReturn(List.of(atendida));
+
+		MisCitasDto citas = servicio.historial(ID_PACIENTE, "99");
+
+		assertThat(citas.paginacion().actual()).isEqualTo(3);
+		assertThat(citas.historial()).extracting(dto -> dto.cita()).containsExactly(atendida);
 	}
 
 	@Test
 	void historialCalculaElTiempoRestanteYUsaLaTarifaSiAunNoHayPago() {
 		LocalDateTime expira = LocalDateTime.now(RELOJ_FIJO).plusMinutes(12).plusSeconds(48);
 		VistaCita pendiente = vista(124L, EstadoCitaEnum.PENDIENTE_PAGO, expira, null, null);
-		when(vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(ID_PACIENTE))
-				.thenReturn(List.of(pendiente));
+		when(vistaCitaDao.findFirstByIdPacienteAndEstadoIn(any(), any())).thenReturn(Optional.of(pendiente));
+		when(citaDao.countByPacienteIdAndIdNot(ID_PACIENTE, 124L)).thenReturn(0L);
 
-		MisCitasDto citas = servicio.historial(ID_PACIENTE);
+		MisCitasDto citas = servicio.historial(ID_PACIENTE, null);
 
 		assertThat(citas.historial()).isEmpty();
 		assertThat(citas.proxima()).hasValueSatisfying(dto -> {
@@ -298,10 +317,12 @@ class ReservaServiceImplTest {
 	void historialMarcaComoVencidaLaPendienteCuyoPlazoPasoYLaPasaAlHistorial() {
 		VistaCita vencida = vista(130L, EstadoCitaEnum.PENDIENTE_PAGO,
 				LocalDateTime.now(RELOJ_FIJO).minusMinutes(1), null, null);
-		when(vistaCitaDao.findAllByIdPacienteOrderByFechaDescHoraInicioDesc(ID_PACIENTE))
-				.thenReturn(List.of(vencida));
+		when(vistaCitaDao.findFirstByIdPacienteAndEstadoIn(any(), any())).thenReturn(Optional.of(vencida));
+		when(citaDao.countByPacienteIdAndIdNot(ID_PACIENTE, 0L)).thenReturn(1L);
+		when(vistaCitaDao.findAllByIdPacienteAndIdCitaNotOrderByFechaDescHoraInicioDesc(ID_PACIENTE, 0L,
+				PageRequest.of(0, Paginacion.POR_PAGINA))).thenReturn(List.of(vencida));
 
-		MisCitasDto citas = servicio.historial(ID_PACIENTE);
+		MisCitasDto citas = servicio.historial(ID_PACIENTE, null);
 
 		assertThat(citas.proxima()).isEmpty();
 		assertThat(citas.historial()).singleElement().satisfies(dto -> {
@@ -315,7 +336,7 @@ class ReservaServiceImplTest {
 	void historialRechazaPacienteInexistente() {
 		when(pacienteDao.findById(99L)).thenReturn(Optional.empty());
 
-		assertThatThrownBy(() -> servicio.historial(99L))
+		assertThatThrownBy(() -> servicio.historial(99L, null))
 				.isInstanceOf(jakarta.persistence.EntityNotFoundException.class);
 	}
 

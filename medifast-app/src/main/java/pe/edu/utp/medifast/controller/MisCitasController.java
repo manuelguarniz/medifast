@@ -67,11 +67,10 @@ public class MisCitasController {
 	public String mostrar(@RequestParam(required = false) String tab, @RequestParam(required = false) String pagina,
 			Authentication authentication, Model model) {
 		Long idPaciente = usuarioActual.idPaciente(authentication);
-		MisCitasDto citas = reservaService.historial(idPaciente);
+		MisCitasDto citas = reservaService.historial(idPaciente, pagina);
 		CitaView proxima = citas.proxima().map(MisCitasController::vista).orElse(null);
-		Paginacion paginacion = Paginacion.de(pagina, citas.historial().size());
-		List<CitaView> historial = paginacion.recortar(citas.historial()).stream().map(MisCitasController::vista)
-				.toList();
+		Paginacion paginacion = citas.paginacion();
+		List<CitaView> historial = citas.historial().stream().map(MisCitasController::vista).toList();
 		String pestana = switch (tab == null ? "" : tab) {
 			case "proximas", "historial" -> tab;
 			default -> proxima == null && !historial.isEmpty() ? "historial" : "proximas";

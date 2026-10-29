@@ -149,8 +149,9 @@ BEGIN
                                              SEC_TO_TIME(FLOOR(7 * 3600 + RAND() * 15 * 3600)));
 
                     INSERT INTO cita (id_paciente, id_medico, tipo_cita, estado, observacion,
-                                      cancelada_por, creado_en, actualizado_en)
-                    VALUES (v_paciente, v_medico, v_tipo, v_estado, v_obs, v_cancelada, v_creado,
+                                      cancelada_por, fecha, hora_inicio, hora_fin, creado_en, actualizado_en)
+                    VALUES (v_paciente, v_medico, v_tipo, v_estado, v_obs, v_cancelada,
+                            v_fecha, v_hora, ADDTIME(v_hora, SEC_TO_TIME(v_duracion * 60)), v_creado,
                             IF(v_estado = 'CANCELADA', v_creado + INTERVAL 15 MINUTE,
                                TIMESTAMP(v_fecha, ADDTIME(v_hora, SEC_TO_TIME(v_duracion * 60)))));
                     SET v_cita = LAST_INSERT_ID();

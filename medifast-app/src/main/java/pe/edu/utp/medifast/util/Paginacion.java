@@ -5,11 +5,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
- * Página de un listado en memoria (reportes P9 y P10, agenda P7 e historial P5). {@code inicio} y {@code fin}
- * delimitan las filas (fin exclusivo); {@code paginas} trae los números a mostrar, con {@code null} donde va "…"
- * (siempre la primera, la última y las vecinas de la actual).
+ * Página de un listado (reportes P9 y P10, agenda P7 e historial P5). {@code inicio} y {@code fin} delimitan las
+ * filas (fin exclusivo); {@code paginas} trae los números a mostrar, con {@code null} donde va "…" (siempre la
+ * primera, la última y las vecinas de la actual). Los listados que pueden crecer sin límite (P5, P9, P10) leen de la
+ * BD solo la página con {@link #pageable()}; la agenda (P7), acotada a un día o una semana, la recorta en memoria con
+ * {@link #recortar(List)}.
  *
  * @param actual página mostrada, desde 1
  * @param totalPaginas al menos 1, aunque no haya filas
@@ -17,8 +21,10 @@ import org.apache.commons.lang3.StringUtils;
  * @param inicio índice de la primera fila de la página
  * @param fin índice siguiente a la última fila de la página
  * @param paginas números de la barra de paginación
+ * @param porPagina filas por página
  */
-public record Paginacion(int actual, int totalPaginas, int totalFilas, int inicio, int fin, List<Integer> paginas) {
+public record Paginacion(int actual, int totalPaginas, int totalFilas, int inicio, int fin, List<Integer> paginas,
+		int porPagina) {
 
 	/** Filas por página en todos los listados paginados. */
 	public static final int POR_PAGINA = 10;
@@ -41,7 +47,12 @@ public record Paginacion(int actual, int totalPaginas, int totalFilas, int inici
 			}
 		}
 		return new Paginacion(actual, totalPaginas, totalFilas, inicio, Math.min(inicio + porPagina, totalFilas),
-				Collections.unmodifiableList(paginas));
+				Collections.unmodifiableList(paginas), porPagina);
+	}
+
+	/** El listado completo en una sola página (exportación a Excel). */
+	public static Paginacion completa(int totalFilas) {
+		return de(null, totalFilas, Math.max(1, totalFilas));
 	}
 
 	private static int leer(String pagina) {
@@ -50,6 +61,11 @@ public record Paginacion(int actual, int totalPaginas, int totalFilas, int inici
 		} catch (NumberFormatException e) {
 			return 1;
 		}
+	}
+
+	/** La página actual como {@code LIMIT}/{@code OFFSET} para una consulta de Spring Data. */
+	public Pageable pageable() {
+		return PageRequest.of(actual - 1, porPagina);
 	}
 
 	/** Filas de la página actual; {@code filas} debe ser el listado completo. */

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="observacion(id, accion, titulo)" class="modal fade" th:id="${id}" tabindex="-1" aria-hidden="true"
+        th:attr="aria-labelledby=|titulo-${id}|">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <form method="post" th:action="${accion}" class="medifast-modal-form">
+
+                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}">
+
+                    <div class="modal-header">
+                        <h2 class="modal-title fs-5" th:id="|titulo-${id}|" th:text="${titulo}">
+                            Especificar observación
+                        </h2>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <label th:for="|observacion-${id}|" class="form-label fw-semibold">
+                            Motivo u observación
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <textarea class="form-control" th:id="|observacion-${id}|" name="observacion" rows="4"
+                            maxlength="500" minlength="1" required placeholder="Escribe el motivo de esta acción..."
+                            th:attr="aria-describedby=|ayuda-${id}|"></textarea>
+
+                        <div class="form-text" th:id="|ayuda-${id}|">
+                            Obligatorio. Máximo 500 caracteres.
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Volver
+                        </button>
+
+                        <button type="submit" class="btn btn-danger">
+                            Confirmar
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

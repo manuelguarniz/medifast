@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="vacio(mensaje)" class="medifast-tabla-vacia" role="status">
+
+        <div class="medifast-tabla-vacia-icono" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M9 3v18" />
+                <path d="M13 14h4M13 17h3" />
+            </svg>
+        </div>
+
+        <p class="mb-0" th:text="${mensaje}">
+            No se encontraron registros.
+        </p>
+    </div>
+
+</body>
+
+</html>

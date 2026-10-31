@@ -5676,3 +5676,209 @@ a.registro-submit.confirmacion-boton:hover {
         margin-top: 24px;
     }
 }
+
+/* ==========================================================
+   ISSUE #2 - COMPONENTES GLOBALES DE MEDIFAST
+   ========================================================== */
+
+/* Tablas responsive */
+.medifast-tabla-contenedor {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+.medifast-tabla-contenedor > table {
+    margin-bottom: 0;
+}
+
+.medifast-tabla-contenedor th,
+.medifast-tabla-contenedor td {
+    vertical-align: middle;
+}
+
+/* Estado vacío */
+.medifast-tabla-vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 190px;
+    padding: 28px 18px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #64748b;
+    text-align: center;
+}
+
+.medifast-tabla-vacia-icono {
+    display: grid;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 14px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+/* Badges de estado */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.badge.text-bg-warning {
+    color: #212529 !important;
+}
+
+/* Modales reutilizables */
+.medifast-modal-form .modal-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.medifast-modal-form .modal-footer {
+    border-top: 1px solid #e2e8f0;
+}
+
+.medifast-modal-form textarea {
+    resize: vertical;
+    min-height: 110px;
+    max-height: 300px;
+}
+
+.medifast-modal-form textarea:focus {
+    border-color: #0d5c4d;
+    box-shadow: 0 0 0 0.2rem rgba(13, 92, 77, 0.15);
+}
+
+/* Páginas de error */
+.medifast-error-card {
+    width: min(100%, 580px);
+    margin: 32px auto;
+    padding: 48px 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.medifast-error-codigo {
+    display: block;
+    margin-bottom: 12px;
+    color: #0d5c4d;
+    font-size: clamp(64px, 12vw, 96px);
+    font-weight: 800;
+    line-height: 1;
+}
+
+.medifast-error-card h1 {
+    margin-bottom: 16px;
+    color: #0f172a;
+    font-size: clamp(23px, 4vw, 30px);
+    font-weight: 700;
+}
+
+.medifast-error-card p {
+    max-width: 420px;
+    margin: 0 auto 28px;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* ==========================================================
+   RESPONSIVE - MOBILE FIRST
+   ========================================================== */
+
+@media (max-width: 575.98px) {
+    .medifast-error-card {
+        margin: 16px auto;
+        padding: 36px 20px;
+    }
+
+    .medifast-modal-form .modal-footer {
+        flex-wrap: wrap;
+    }
+
+    .medifast-modal-form .modal-footer > button {
+        flex: 1 1 120px;
+    }
+
+    .medifast-tabla-contenedor {
+        border-radius: 8px;
+    }
+
+    .medifast-tabla-contenedor table {
+        min-width: 620px;
+    }
+
+    .medifast-tabla-vacia {
+        min-height: 160px;
+        padding: 24px 16px;
+    }
+}
+
+/* ==========================================================
+   ISSUE #2 - IDENTIDAD VISUAL DE LAS PÁGINAS DE ERROR
+   ========================================================== */
+
+.medifast-error-nav {
+    background: #0d5c4d;
+}
+
+/* Logo y enlaces */
+.medifast-error-nav .reserva-brand {
+    text-decoration: none;
+}
+
+.medifast-error-nav .paciente-nav-menu a:hover,
+.medifast-error-nav .paciente-nav-menu form button:hover {
+    color: #9fe0c4;
+}
+
+/* Botón principal */
+.medifast-error-boton {
+    padding: 10px 22px;
+    border: 1px solid #0d5c4d;
+    border-radius: 8px;
+    background: #0d5c4d;
+    color: #fff;
+    font-weight: 600;
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.medifast-error-boton:hover {
+    transform: translateY(-1px);
+    border-color: #084b40;
+    background: #084b40;
+    color: #fff;
+}
+
+.medifast-error-boton:focus-visible {
+    outline: 3px solid rgba(13, 92, 77, .3);
+    outline-offset: 3px;
+}
+
+/* Código de error */
+.medifast-error-codigo {
+    color: #0d5c4d;
+}
+
+/* Responsive */
+@media (max-width: 575.98px) {
+    .medifast-error-card {
+        margin: 16px auto;
+        padding: 36px 20px;
+    }
+
+    .medifast-error-boton {
+        max-width: 100%;
+    }
+}

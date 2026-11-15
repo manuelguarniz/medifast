@@ -404,15 +404,6 @@ class AgendaControllerTest {
 				.andExpect(status().isForbidden());
 	}
 
-	@Test
-	void inicialesDelNombreYDelApellidoPaterno() {
-		assertThat(AgendaController.iniciales("Andrea Sofía Salazar Pérez")).isEqualTo("AS");
-		assertThat(AgendaController.iniciales("Carlos Mendoza Ríos")).isEqualTo("CM");
-		assertThat(AgendaController.iniciales("Ana Díaz")).isEqualTo("AD");
-		assertThat(AgendaController.iniciales("Ana")).isEqualTo("A");
-		assertThat(AgendaController.iniciales(null)).isEqualTo("?");
-	}
-
 	private FiltroAgendaDto filtroUsado() {
 		ArgumentCaptor<FiltroAgendaDto> filtro = ArgumentCaptor.forClass(FiltroAgendaDto.class);
 		verify(gestionCitaService).agenda(eq(ID_MEDICO), filtro.capture());

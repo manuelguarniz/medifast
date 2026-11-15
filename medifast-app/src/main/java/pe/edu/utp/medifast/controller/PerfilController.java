@@ -1,8 +1,7 @@
 package pe.edu.utp.medifast.controller;
 
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Locale;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -23,6 +22,7 @@ import pe.edu.utp.medifast.exception.CorreoDuplicadoException;
 import pe.edu.utp.medifast.model.Paciente;
 import pe.edu.utp.medifast.security.UsuarioActual;
 import pe.edu.utp.medifast.service.PacienteService;
+import pe.edu.utp.medifast.util.FormatoVista;
 
 /**
  * P6 — Mi perfil (RF11): dos formularios independientes, uno para los datos personales y otro para la contraseña.
@@ -34,10 +34,10 @@ import pe.edu.utp.medifast.service.PacienteService;
 public class PerfilController {
 
 	private static final String VISTA = "paciente/perfil";
-	private static final ZoneId ZONA = ZoneId.of("America/Lima");
 
 	private final PacienteService pacienteService;
 	private final UsuarioActual usuarioActual;
+	private final Clock clock;
 
 	@GetMapping
 	public String perfil(Authentication authentication, Model model) {
@@ -93,19 +93,11 @@ public class PerfilController {
 	}
 
 	/** La cabecera de la card y el documento salen de lo guardado, no de lo que se está editando. */
-	private static void prepararVista(Model model, Paciente paciente) {
+	private void prepararVista(Model model, Paciente paciente) {
 		model.addAttribute("nombrePaciente", paciente.getNombres() + " " + paciente.getApellidos());
-		model.addAttribute("inicialesPaciente", iniciales(paciente.getNombres(), paciente.getApellidos()));
+		model.addAttribute("inicialesPaciente", FormatoVista.iniciales(paciente.getNombres(), paciente.getApellidos()));
 		model.addAttribute("tipoDocumento", paciente.getUsuario().getTipoDocumento());
 		model.addAttribute("numeroDocumento", paciente.getUsuario().getNumeroDocumento());
-		model.addAttribute("hoy", LocalDate.now(ZONA));
-	}
-
-	private static String iniciales(String nombres, String apellidos) {
-		return (primeraInicial(nombres) + primeraInicial(apellidos)).toUpperCase(Locale.ROOT);
-	}
-
-	private static String primeraInicial(String nombres) {
-		return nombres.trim().split("\\s+")[0].substring(0, 1);
+		model.addAttribute("hoy", LocalDate.now(clock));
 	}
 }

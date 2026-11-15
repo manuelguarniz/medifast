@@ -59,7 +59,7 @@ public record Paginacion(int actual, int totalPaginas, int totalFilas, int inici
 
 	/** "4 citas" con una sola página; "Mostrando 11–20 de 23 citas" con varias. */
 	public String contador(String singular, String plural) {
-		String total = totalFilas == 1 ? "1 " + singular : totalFilas + " " + plural;
+		String total = FormatoVista.cantidad(totalFilas, singular, plural);
 		return varias() ? "Mostrando " + (inicio + 1) + "–" + fin + " de " + total : total;
 	}
 

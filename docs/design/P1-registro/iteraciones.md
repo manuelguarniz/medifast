@@ -10,10 +10,10 @@
   - Falta el enlace "¿Ya tienes cuenta? Inicia sesión".
   - Tipografía distinta de Inter.
 
-| Versión | Fecha      | Resultado | Estado       |
-| ------- | ---------- | --------- | ------------ |
-| v1      | 2026-10-25 | [v1.png](v1.png) | Revisada, requiere cambios |
-| v2      | 2026-10-25 | [v2.png](v2.png) | ✅ Aprobada, con 4 ajustes a completar en Figma |
+| Versión | Fecha      | Resultado       | Estado                                          |
+| -------- | ---------- | --------------- | ----------------------------------------------- |
+| v1       | 2026-10-25 | [v1.png](v1.png) | Revisada, requiere cambios                      |
+| v2       | 2026-10-25 | [v2.png](v2.png) | ✅ Aprobada, con 4 ajustes a completar en Figma |
 
 ---
 
@@ -56,7 +56,6 @@ MÓVIL (360px)
 No incluir: checkbox de términos de uso, selector de rol, tipos de documento distintos de DNI y CE (nada de pasaporte), registro con Google/Facebook, numeración de pasos ("01 /"), verificación por correo o SMS, ni campos clínicos (alergias, antecedentes, seguro).
 ```
 
-
 **Resultado:** 4 frames: móvil con errores, móvil normal, escritorio con errores y escritorio normal.
 
 ![P1 v1](v1.png)
@@ -73,22 +72,22 @@ No incluir: checkbox de términos de uso, selector de rol, tipos de documento di
 
 **Lo que hay que corregir:**
 
-| # | Problema | Dónde | Severidad | Veces |
-| --- | --- | --- | --- | --- |
-| 1 | Logo roto: un ícono de pulso suelto con un texto diminuto "Consultorio Barrantes" al lado, y "MEDIFAST / Consultorio Medifast" separado a la derecha. Falta el cuadrado menta con el ícono | Todas, navbar | Alta | 1.ª |
-| 2 | La navbar móvil tiene una flecha atrás, el título "Resumen Cita", "Iniciar sesión" partido en dos líneas y un ícono de usuario | Móvil (ambos) | Alta | 1.ª |
-| 3 | El subtítulo dice "…acceder a tu historial clínico en el Consultorio Barrantes" (información clínica fuera de alcance y marca incorrecta) | Móvil, errores | Alta | 1.ª |
-| 4 | La card inferior "Atención segura y confidencial: Tus datos médicos se protegen bajo estricto secreto profesional…" habla de datos médicos; además, el prompt pedía no mostrar el recuadro de seguridad en móvil | Móvil, errores | Alta | 1.ª |
-| 5 | Los inputs móviles tienen fondo lavanda y no tienen borde; en error usan relleno rosa, un ícono dentro del campo y un triángulo. No coinciden con escritorio | Móvil (ambos) | Media | 1.ª |
-| 6 | Etiquetas auxiliares a la derecha de los labels ("Obligatorio", "8 dígitos", "En uso", "Discrepancia", "Identificación") | Móvil (ambos) | Media | 1.ª |
-| 7 | En el estado de error, las contraseñas se ven en texto plano ("secret123", "different") | Móvil, errores | Media | 1.ª |
-| 8 | El select muestra "DNI - Documento Nacional de Identidad", que se monta sobre la flecha. Debe decir solo "DNI" | Móvil (ambos) | Media | 1.ª |
-| 9 | La alerta general "Por favor revisa y corrige los campos…" solo aparece en móvil y con un estilo distinto del prompt base | Ambas, errores | Media | 1.ª |
-| 10 | Los campos válidos del escritorio con errores no tienen borde (solo sombra); en el frame normal sí lo tienen | Escritorio, errores | Media | 1.ª |
-| 11 | Panel izquierdo con cards inventadas: "Atención Médica Digital" y "Dr. Moisés Barrantes C. · Medicina General y Especializada" (la especialidad correcta es Medicina Interna y Reumatología). Las píldoras cambian en cada frame ("Portal Pacientes", "Portal Paciente Oficial", "Portal de Pacientes", "Acceso Seguro a Citas") | Ambas | Media | 1.ª |
-| 12 | El celular tiene el prefijo "+51" con bandera solo en el móvil normal | Móvil, normal | Baja | 1.ª |
-| 13 | El subtítulo bajo "Datos del paciente" cambia en cada frame de escritorio | Escritorio | Baja | 1.ª |
-| 14 | El fondo del pie de página es lavanda, no #f8fafc | Todas | Baja | 1.ª |
+| #  | Problema                                                                                                                                                                                                                                                                                                                               | Dónde              | Severidad | Veces |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------- | ----- |
+| 1  | Logo roto: un ícono de pulso suelto con un texto diminuto "Consultorio Barrantes" al lado, y "MEDIFAST / Consultorio Medifast" separado a la derecha. Falta el cuadrado menta con el ícono                                                                                                                                           | Todas, navbar       | Alta      | 1.ª  |
+| 2  | La navbar móvil tiene una flecha atrás, el título "Resumen Cita", "Iniciar sesión" partido en dos líneas y un ícono de usuario                                                                                                                                                                                                   | Móvil (ambos)      | Alta      | 1.ª  |
+| 3  | El subtítulo dice "…acceder a tu historial clínico en el Consultorio Barrantes" (información clínica fuera de alcance y marca incorrecta)                                                                                                                                                                                         | Móvil, errores     | Alta      | 1.ª  |
+| 4  | La card inferior "Atención segura y confidencial: Tus datos médicos se protegen bajo estricto secreto profesional…" habla de datos médicos; además, el prompt pedía no mostrar el recuadro de seguridad en móvil                                                                                                                | Móvil, errores     | Alta      | 1.ª  |
+| 5  | Los inputs móviles tienen fondo lavanda y no tienen borde; en error usan relleno rosa, un ícono dentro del campo y un triángulo. No coinciden con escritorio                                                                                                                                                                        | Móvil (ambos)      | Media     | 1.ª  |
+| 6  | Etiquetas auxiliares a la derecha de los labels ("Obligatorio", "8 dígitos", "En uso", "Discrepancia", "Identificación")                                                                                                                                                                                                             | Móvil (ambos)      | Media     | 1.ª  |
+| 7  | En el estado de error, las contraseñas se ven en texto plano ("secret123", "different")                                                                                                                                                                                                                                               | Móvil, errores     | Media     | 1.ª  |
+| 8  | El select muestra "DNI - Documento Nacional de Identidad", que se monta sobre la flecha. Debe decir solo "DNI"                                                                                                                                                                                                                         | Móvil (ambos)      | Media     | 1.ª  |
+| 9  | La alerta general "Por favor revisa y corrige los campos…" solo aparece en móvil y con un estilo distinto del prompt base                                                                                                                                                                                                            | Ambas, errores      | Media     | 1.ª  |
+| 10 | Los campos válidos del escritorio con errores no tienen borde (solo sombra); en el frame normal sí lo tienen                                                                                                                                                                                                                         | Escritorio, errores | Media     | 1.ª  |
+| 11 | Panel izquierdo con cards inventadas: "Atención Médica Digital" y "Dr. Moisés Barrantes C. · Medicina General y Especializada" (la especialidad correcta es Medicina Interna y Reumatología). Las píldoras cambian en cada frame ("Portal Pacientes", "Portal Paciente Oficial", "Portal de Pacientes", "Acceso Seguro a Citas") | Ambas               | Media     | 1.ª  |
+| 12 | El celular tiene el prefijo "+51" con bandera solo en el móvil normal                                                                                                                                                                                                                                                                 | Móvil, normal      | Baja      | 1.ª  |
+| 13 | El subtítulo bajo "Datos del paciente" cambia en cada frame de escritorio                                                                                                                                                                                                                                                             | Escritorio          | Baja      | 1.ª  |
+| 14 | El fondo del pie de página es lavanda, no #f8fafc                                                                                                                                                                                                                                                                                     | Todas               | Baja      | 1.ª  |
 
 **Aprendizaje:** Stitch rellenó el panel izquierdo con cards que nadie pidió y, en móvil, cambió el estilo de los inputs. Conviene listar el contenido exacto del panel y pedir que el móvil copie los inputs del frame de escritorio que ya está bien.
 
@@ -146,14 +145,14 @@ No agregues historial clínico, datos médicos, flecha atrás ni ícono de usuar
 
 **Pendiente:**
 
-| # | Problema | Dónde | Severidad | Veces |
-| --- | --- | --- | --- | --- |
-| 15 | Ícono del logo distinto: pulso en el escritorio normal y corazón con pulso en los otros 3 frames | Todas, navbar | Baja | 1.ª |
-| 16 | "Crear cuenta": texto en peso normal y flecha "→" tipográfica en el móvil con errores y en el escritorio normal; en los otros dos frames está en negrita, con ícono de flecha | Ambas | Baja | 1.ª |
-| 17 | Los inputs con error del escritorio tienen un relleno rosa muy tenue; en móvil, el fondo es blanco | Escritorio, errores | Baja | 1.ª |
-| 18 | En la cabecera del móvil con errores, el texto "Regístrate para reservar…" es menta; en el móvil normal es blanco | Móvil, errores | Baja | 1.ª |
-| 19 | El campo de correo tiene un ícono de sobre solo en el escritorio con errores; en los demás frames no lo tiene | Escritorio, errores | Baja | 1.ª |
-| 20 | La píldora "Portal de pacientes" va en mayúsculas en escritorio y en tipo oración en móvil, y no sigue el estilo de la píldora de P0 (fondo blanco, texto #0d5c4d y punto verde) | Ambas | Baja | 1.ª |
+| #  | Problema                                                                                                                                                                              | Dónde              | Severidad | Veces |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------- | ----- |
+| 15 | Ícono del logo distinto: pulso en el escritorio normal y corazón con pulso en los otros 3 frames                                                                                    | Todas, navbar       | Baja      | 1.ª  |
+| 16 | "Crear cuenta": texto en peso normal y flecha "→" tipográfica en el móvil con errores y en el escritorio normal; en los otros dos frames está en negrita, con ícono de flecha    | Ambas               | Baja      | 1.ª  |
+| 17 | Los inputs con error del escritorio tienen un relleno rosa muy tenue; en móvil, el fondo es blanco                                                                                   | Escritorio, errores | Baja      | 1.ª  |
+| 18 | En la cabecera del móvil con errores, el texto "Regístrate para reservar…" es menta; en el móvil normal es blanco                                                                 | Móvil, errores     | Baja      | 1.ª  |
+| 19 | El campo de correo tiene un ícono de sobre solo en el escritorio con errores; en los demás frames no lo tiene                                                                       | Escritorio, errores | Baja      | 1.ª  |
+| 20 | La píldora "Portal de pacientes" va en mayúsculas en escritorio y en tipo oración en móvil, y no sigue el estilo de la píldora de P0 (fondo blanco, texto #0d5c4d y punto verde) | Ambas               | Baja      | 1.ª  |
 
 ### Decisión
 
@@ -177,19 +176,19 @@ Se tomaron con el usuario el 2026-10-25:
 
 El diseño muestra 4 errores de ejemplo. Esta es la lista completa que deben usar las anotaciones de Bean Validation y la plantilla, todas con el mismo estilo de error en línea:
 
-| Campo | Regla (RF02 / RN-12) | Mensaje |
-| --- | --- | --- |
-| Tipo de documento | Obligatorio: DNI o CE | "Selecciona el tipo de documento." |
-| Número de documento | DNI: 8 dígitos | "El DNI debe tener 8 dígitos." |
-| Número de documento | CE: alfanumérico de 9 a 12 caracteres | "El CE debe tener entre 9 y 12 caracteres (letras y números)." |
-| Número de documento | Único (RN-12) | "Este número de documento ya está registrado." |
-| Nombres / Apellidos | Obligatorios | "Ingresa tus nombres." / "Ingresa tus apellidos." |
-| Fecha de nacimiento | Obligatoria y en el pasado | "Ingresa una fecha de nacimiento anterior a hoy." |
-| Celular | 9 dígitos, empieza con 9 | "Ingresa 9 dígitos que empiecen con 9." |
-| Correo electrónico | Formato válido | "Ingresa un correo válido." |
-| Correo electrónico | Único (RN-12) | "Este correo ya está registrado." |
-| Contraseña | Mínimo 8 caracteres | "La contraseña debe tener al menos 8 caracteres." |
-| Confirmar contraseña | Igual a la contraseña | "Las contraseñas no coinciden." |
+| Campo                 | Regla (RF02 / RN-12)                   | Mensaje                                                         |
+| --------------------- | -------------------------------------- | --------------------------------------------------------------- |
+| Tipo de documento     | Obligatorio: DNI o CE                  | "Selecciona el tipo de documento."                              |
+| Número de documento  | DNI: 8 dígitos                        | "El DNI debe tener 8 dígitos."                                 |
+| Número de documento  | CE: alfanumérico de 9 a 12 caracteres | "El CE debe tener entre 9 y 12 caracteres (letras y números)." |
+| Número de documento  | Único (RN-12)                         | "Este número de documento ya está registrado."                |
+| Nombres / Apellidos   | Obligatorios                           | "Ingresa tus nombres." / "Ingresa tus apellidos."               |
+| Fecha de nacimiento   | Obligatoria y en el pasado             | "Ingresa una fecha de nacimiento anterior a hoy."               |
+| Celular               | 9 dígitos, empieza con 9              | "Ingresa 9 dígitos que empiecen con 9."                        |
+| Correo electrónico   | Formato válido                        | "Ingresa un correo válido."                                    |
+| Correo electrónico   | Único (RN-12)                         | "Este correo ya está registrado."                              |
+| Contraseña           | Mínimo 8 caracteres                   | "La contraseña debe tener al menos 8 caracteres."              |
+| Confirmar contraseña | Igual a la contraseña                 | "Las contraseñas no coinciden."                                |
 
 Al elegir CE, el placeholder del número de documento cambia a "9 a 12 caracteres". Al volver a mostrar el formulario con errores, las contraseñas se vacían.
 

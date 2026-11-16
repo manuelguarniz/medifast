@@ -10,6 +10,8 @@ Seguimiento de la [rúbrica del APF3](rubrica_apf3.txt): qué evidencia respalda
 
 Un elemento pasa a ✅ solo cuando hay una implementación, archivo, prueba, captura o demo que lo demuestre; no basta con que esté descrito en el README.
 
+**Estado de verificación del código (2026-11-15):** `./mvnw -q test` terminó correctamente: 260 pruebas, 0 fallos, 0 errores y 0 omitidas. Este resultado corresponde a pruebas automatizadas; **no sustituye las pruebas manuales de aceptación**, que siguen pendientes y están listadas en §3.5. La cobertura de la capa `service` no se ha confirmado.
+
 ---
 
 ## 1. Cobertura de la rúbrica
@@ -36,12 +38,12 @@ Un elemento pasa a ✅ solo cuando hay una implementación, archivo, prueba, cap
 | Diagramas funcionales F-01 a F-06 | ✔ | ✔ | 🟡 Borrador, revisar |
 | Diagramas técnicos T-01 a T-05 | ✔ | ✔ | 🟡 Borrador, revisar |
 | Prototipo Figma P0–P10 (README §7.2) | Deseable | ✔ | 🟡 Enlace agregado; faltan los ajustes listados en el README |
-| Aplicación Spring Boot: 11 pantallas y 16 RF | ✔ | ✔ | 🟡 En progreso (login y seguridad) |
-| Spring Security + bcrypt + roles + CSRF | ✔ | ✔ | 🟡 En progreso |
-| Uso real de Guava, Commons Lang3/IO, POI y Logback | ✔ | ✔ | 🟡 En progreso |
-| Confirmación PDF con OpenPDF | ✔ | ✔ | 🟡 Pendiente |
-| Reportes de citas y pagos exportables a Excel | ✔ | ✔ | 🟡 Pendiente |
-| Pruebas TDD de RN-01 a RN-14 | ✔ | ✔ | 🟡 En progreso |
+| Aplicación Spring Boot: 11 pantallas y 16 RF | ✔ | ✔ | 🟡 Implementación presente; falta aceptación manual P0–P10 |
+| Spring Security + bcrypt + roles + CSRF | ✔ | ✔ | 🟡 Configurado y cubierto parcialmente por pruebas; falta validación manual |
+| Uso real de Guava, Commons Lang3/IO, POI y Logback | ✔ | ✔ | 🟡 Uso presente; falta reunir evidencia de ejecución y revisión final |
+| Confirmación PDF con OpenPDF | ✔ | ✔ | 🟡 Implementado y con pruebas automatizadas; falta comprobar descarga manual |
+| Reportes de citas y pagos exportables a Excel | ✔ | ✔ | 🟡 Implementados y con pruebas automatizadas; falta comprobar descarga manual |
+| Pruebas TDD de RN-01 a RN-14 | ✔ | ✔ | 🟡 Suite automatizada en verde; faltan pruebas integradas y evidencia del flujo TDD |
 | Cobertura ≥ 60 % en `service` (JaCoCo) | | ✔ | 🟡 Pendiente |
 | Capturas P0–P10 en `docs/capturas/` | ✔ | ✔ | 🟡 Pendiente |
 | Correcciones a APF1, APF2 y Project Charter (MySQL, Consultorio Medifast, alcance) | ✔ | | 🟡 Pendiente |
@@ -73,9 +75,10 @@ Un elemento pasa a ✅ solo cuando hay una implementación, archivo, prueba, cap
 
 ### 3.3 Pruebas
 
-- [ ] `./mvnw test` (o `.\mvnw.cmd test`) pasa en verde.
+- [x] `./mvnw -q test` (o `.\mvnw.cmd -q test`) pasa en verde: 260 pruebas, 0 fallos, 0 errores, 0 omitidas (ejecución del 2026-11-15).
 - [ ] Cada regla RN-01 a RN-14 implementada tiene su prueba, con Mockito donde corresponde.
-- [ ] El reporte de JaCoCo se genera en `medifast-app/target/site/jacoco/index.html`. El porcentaje de cobertura solo se informa a partir de ese reporte.
+- [ ] Regenerar el reporte de JaCoCo y verificar en él la cobertura de la capa `service`; el porcentaje solo se informa a partir de ese reporte.
+- [ ] Añadir/verificar pruebas de integración con MySQL para constraints, concurrencia y evento de vencimiento; la suite actual no demuestra esos comportamientos en una BD real.
 
 ### 3.4 Interfaces (P0–P10)
 
@@ -100,7 +103,20 @@ Además:
 - [ ] El acceso se restringe por rol (`/paciente/**`, `/medico/**`).
 - [ ] Las pantallas aplican los ajustes del prototipo listados en el README §7.2.
 
-### 3.5 Coherencia de la documentación
+### 3.5 Pruebas manuales pendientes
+
+Marcar cada punto solo después de ejecutarlo y guardar la evidencia correspondiente. La implementación estática y las pruebas unitarias no cuentan como prueba manual.
+
+- [ ] Ejecutar los recorridos completos de paciente y médico descritos en §4.3, incluyendo confirmación PDF y exportaciones Excel.
+- [ ] En MySQL, comprobar `event_scheduler = ON`, la existencia de `ev_vencer_reservas` y que una reserva vencida se cancela y libera sus bloques. Probar también el límite exacto de expiración.
+- [ ] Comprobar la generación de horarios de RF06 al iniciar la aplicación y en la ejecución diaria; confirmar que no crea bloques duplicados.
+- [ ] Probar reserva simultánea del mismo horario y del mismo paciente contra MySQL para validar RN-01 y RN-09.
+- [ ] Probar carga de constancias válidas, archivo malformado o con formato no permitido, tamaño superior a 5 MB y acceso de un usuario no autorizado.
+- [ ] Recorrer P0–P10 en escritorio y viewport de 360 px; guardar capturas en `docs/capturas/`.
+- [ ] Verificar instalación limpia, consultas de `docs/sql/03_consultas.sql`, ejecución de scripts y rendimiento con 1.000 citas.
+- [ ] Realizar prueba de usabilidad y obtener validación del Dr. Barrantes.
+
+### 3.6 Coherencia de la documentación
 
 - [ ] README, código, SQL, diagramas, prototipo e informe usan las mismas decisiones: Consultorio Medifast, MySQL 8.4, Java 21, Spring Boot + Thymeleaf, P0–P10, RF01–RF16, RN-01–RN-14, Yape simulado.
 - [ ] Los informes anteriores ya no mencionan PostgreSQL, tablas clínicas ni requerimientos descartados.

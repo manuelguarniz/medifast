@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Error interno')}"></head>
+
+<body class="bg-light">
+    <nav th:replace="~{fragments/layout :: navbarErrores}"></nav>
+
+    <main class="container py-5">
+        <div class="medifast-error-card text-center">
+            <span class="medifast-error-codigo">500</span>
+
+            <h1>Ocurrió un error inesperado</h1>
+
+            <p>
+                No pudimos procesar tu solicitud.
+                Inténtalo nuevamente más tarde.
+            </p>
+
+            <a th:href="@{/}" class="btn medifast-error-boton">
+                Volver al inicio
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+
+</html>

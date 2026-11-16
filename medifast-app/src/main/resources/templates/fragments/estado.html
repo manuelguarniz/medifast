@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<span th:fragment="cita(estado)"
+      class="badge rounded-pill"
+      th:with="codigo=${estado == null ? '' : estado.toString()}"
+      th:classappend="${codigo == 'PENDIENTE_PAGO'} ? 'text-bg-warning' :
+                     (${codigo == 'PROGRAMADA'} ? 'text-bg-primary' :
+                     (${codigo == 'ATENDIDA'} ? 'text-bg-success' :
+                     (${codigo == 'NO_ASISTIO'} ? 'text-bg-secondary' :
+                     (${codigo == 'CANCELADA'} ? 'text-bg-danger' :
+                     'text-bg-secondary'))))"
+      th:text="${codigo == 'PENDIENTE_PAGO'} ? 'Pendiente de pago' :
+               (${codigo == 'PROGRAMADA'} ? 'Programada' :
+               (${codigo == 'ATENDIDA'} ? 'Atendida' :
+               (${codigo == 'NO_ASISTIO'} ? 'No asistió' :
+               (${codigo == 'CANCELADA'} ? 'Cancelada' :
+               'Sin estado'))))">
+    Estado
+</span>
+
+<span th:fragment="pago(estado)"
+      class="badge rounded-pill"
+      th:with="codigo=${estado == null ? '' : estado.toString()}"
+      th:classappend="${codigo == 'POR_VALIDAR'} ? 'text-bg-warning' :
+                     (${codigo == 'VALIDADO'} ? 'text-bg-success' :
+                     (${codigo == 'RECHAZADO'} ? 'text-bg-danger' :
+                     'text-bg-secondary')))"
+      th:text="${codigo == 'POR_VALIDAR'} ? 'Por validar' :
+               (${codigo == 'VALIDADO'} ? 'Validado' :
+               (${codigo == 'RECHAZADO'} ? 'Rechazado' :
+               'Sin pago'))">
+    Estado de pago
+</span>
+
+</body>
+</html>

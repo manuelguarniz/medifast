@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <th:block th:fragment="flash">
+        <div class="container mt-3" aria-live="polite" th:if="${exito != null or error != null or info != null}">
+            <div th:if="${exito != null}" class="alert alert-success alert-dismissible fade show" role="status">
+                <span th:text="${exito}">Operación realizada correctamente.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+
+            <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}">Ocurrió un error.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+
+            <div th:if="${info != null}" class="alert alert-info alert-dismissible fade show" role="status">
+                <span th:text="${info}">Información importante.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        </div>
+    </th:block>
+</body>
+
+</html>

@@ -1,5 +1,8 @@
 package pe.edu.utp.medifast.controller;
 
+import java.time.Clock;
+import java.time.LocalDate;
+
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -11,8 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import java.time.LocalDate;
-import java.time.ZoneId;
+
 import pe.edu.utp.medifast.dto.RegistroDto;
 import pe.edu.utp.medifast.exception.CorreoDuplicadoException;
 import pe.edu.utp.medifast.exception.DocumentoDuplicadoException;
@@ -23,10 +25,14 @@ import pe.edu.utp.medifast.service.PacienteService;
 @Controller
 public class AuthController {
 
-	private final PacienteService pacienteService;
+	private static final String VISTA_REGISTRO = "registro";
 
-	public AuthController(PacienteService pacienteService) {
+	private final PacienteService pacienteService;
+	private final Clock clock;
+
+	public AuthController(PacienteService pacienteService, Clock clock) {
 		this.pacienteService = pacienteService;
+		this.clock = clock;
 	}
 
 	@GetMapping("/login")
@@ -47,40 +53,34 @@ public class AuthController {
 		if (!model.containsAttribute("registro")) {
 			model.addAttribute("registro", RegistroDto.vacio());
 		}
-		prepararFormulario(model);
-		return "registro";
+		return formulario(model);
 	}
 
 	@PostMapping("/registro")
 	public String registrar(@Valid @ModelAttribute("registro") RegistroDto registro, BindingResult errores,
 			Model model, RedirectAttributes redirectAttributes) {
-		if (errores.hasErrors()) {
-			prepararFormulario(model);
-			return "registro";
+		if (!errores.hasErrors()) {
+			try {
+				pacienteService.registrar(registro);
+				redirectAttributes.addFlashAttribute("numeroDocumento", registro.numeroDocumentoNormalizado());
+				return "redirect:/login?registrado";
+			} catch (DocumentoDuplicadoException ex) {
+				errores.rejectValue("numeroDocumento", "duplicado", ex.getMessage());
+			} catch (CorreoDuplicadoException ex) {
+				errores.rejectValue("correo", "duplicado", ex.getMessage());
+			}
 		}
-
-		try {
-			pacienteService.registrar(registro);
-		} catch (DocumentoDuplicadoException ex) {
-			errores.rejectValue("numeroDocumento", "duplicado", ex.getMessage());
-			prepararFormulario(model);
-			return "registro";
-		} catch (CorreoDuplicadoException ex) {
-			errores.rejectValue("correo", "duplicado", ex.getMessage());
-			prepararFormulario(model);
-			return "registro";
-		}
-
-		redirectAttributes.addFlashAttribute("numeroDocumento", registro.numeroDocumentoNormalizado());
-		return "redirect:/login?registrado";
+		return formulario(model);
 	}
 
-	private static void prepararFormulario(Model model) {
+	/** P1 con los datos y errores que ya están en el modelo. */
+	private String formulario(Model model) {
 		model.addAttribute("tiposDocumento", TipoDocumentoEnum.values());
-		model.addAttribute("hoy", LocalDate.now(ZoneId.of("America/Lima")));
+		model.addAttribute("hoy", LocalDate.now(clock));
 		RegistroDto registro = (RegistroDto) model.getAttribute("registro");
 		model.addAttribute("maximoDocumento",
 				registro.tipoDocumento() == TipoDocumentoEnum.DNI ? 8 : 12);
+		return VISTA_REGISTRO;
 	}
 
 	private static String destinoPorRol(Authentication authentication) {

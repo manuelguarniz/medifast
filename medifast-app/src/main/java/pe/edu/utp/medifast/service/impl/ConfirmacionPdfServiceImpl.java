@@ -2,12 +2,9 @@ package pe.edu.utp.medifast.service.impl;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 import org.openpdf.text.Document;
 import org.openpdf.text.Element;
@@ -31,14 +28,16 @@ import pe.edu.utp.medifast.model.VistaCita;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.service.ConfirmacionPdfService;
 import pe.edu.utp.medifast.util.EtiquetasEstado;
+import pe.edu.utp.medifast.util.FormatoVista;
 
 /** Arma la confirmación de RF15 en A5 a partir de {@code v_cita}; no incluye datos clínicos (RN-10). */
 @Service
 public class ConfirmacionPdfServiceImpl implements ConfirmacionPdfService {
 
-	private static final Locale LOCALE = Locale.forLanguageTag("es-PE");
-	private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", LOCALE);
-	private static final DateTimeFormatter GENERADO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", LOCALE);
+	private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy",
+			FormatoVista.LOCALE);
+	private static final DateTimeFormatter GENERADO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm",
+			FormatoVista.LOCALE);
 	private static final Color VERDE = new Color(0x0d, 0x5c, 0x4d);
 	private static final Color GRIS = new Color(0x64, 0x74, 0x8b);
 	private static final Color BORDE = new Color(0xe2, 0xe8, 0xf0);
@@ -67,7 +66,8 @@ public class ConfirmacionPdfServiceImpl implements ConfirmacionPdfService {
 		ByteArrayOutputStream salida = new ByteArrayOutputStream();
 		Document documento = new Document(PageSize.A5, 36, 36, 40, 36);
 		PdfWriter.getInstance(documento, salida);
-		documento.addTitle("Confirmación de cita #%06d".formatted(cita.getIdCita()));
+		String numeroCita = FormatoVista.numeroCita(cita.getIdCita());
+		documento.addTitle("Confirmación de cita " + numeroCita);
 		documento.open();
 
 		documento.add(new Paragraph("MEDIFAST", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, Font.NORMAL, VERDE)));
@@ -76,21 +76,21 @@ public class ConfirmacionPdfServiceImpl implements ConfirmacionPdfService {
 				FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15, Font.NORMAL, Color.BLACK));
 		titulo.setSpacingBefore(18);
 		documento.add(titulo);
-		Paragraph numero = new Paragraph("N.º #%06d".formatted(cita.getIdCita()), fuente(11, GRIS));
+		Paragraph numero = new Paragraph("N.º " + numeroCita, fuente(11, GRIS));
 		numero.setSpacingAfter(12);
 		documento.add(numero);
 
 		PdfPTable tabla = new PdfPTable(new float[] { 2, 3 });
 		tabla.setWidthPercentage(100);
 		fila(tabla, "Paciente", cita.getPaciente());
-		fila(tabla, "Médico", "Dr. " + cita.getMedico());
+		fila(tabla, "Médico", FormatoVista.doctor(cita.getMedico()));
 		if (!especialidad.isBlank()) {
 			fila(tabla, "Especialidad", especialidad);
 		}
-		fila(tabla, "Fecha", capitalizar(cita.getFecha().format(FECHA)));
-		fila(tabla, "Hora", rango(cita.getHoraInicio(), cita.getHoraFin()));
+		fila(tabla, "Fecha", FormatoVista.capitalizar(cita.getFecha().format(FECHA)));
+		fila(tabla, "Hora", FormatoVista.rangoHoras12Espaciado(cita.getHoraInicio(), cita.getHoraFin()));
 		fila(tabla, "Tipo", EtiquetasEstado.tipo(cita.getTipoCita()));
-		fila(tabla, "Monto", monto(cita.getMonto()));
+		fila(tabla, "Monto", FormatoVista.solesOGuion(cita.getMonto()));
 		fila(tabla, "Estado de la cita", EtiquetasEstado.cita(cita.getEstado()));
 		fila(tabla, "Estado del pago", EtiquetasEstado.pago(cita.getEstadoPago()));
 		documento.add(tabla);
@@ -122,29 +122,5 @@ public class ConfirmacionPdfServiceImpl implements ConfirmacionPdfService {
 
 	private static Font fuente(float tamano, Color color) {
 		return FontFactory.getFont(FontFactory.HELVETICA, tamano, Font.NORMAL, color);
-	}
-
-	private static String monto(BigDecimal monto) {
-		return monto == null ? "—" : "S/ " + String.format(Locale.ROOT, "%.2f", monto);
-	}
-
-	/** "10:30 – 11:30 a. m."; el periodo se repite solo si cambia, como en P2. */
-	private static String rango(LocalTime inicio, LocalTime fin) {
-		return periodo(inicio).equals(periodo(fin))
-				? hora12(inicio) + " – " + hora12(fin) + " " + periodo(fin)
-				: hora12(inicio) + " " + periodo(inicio) + " – " + hora12(fin) + " " + periodo(fin);
-	}
-
-	private static String hora12(LocalTime hora) {
-		int hora12 = hora.getHour() % 12 == 0 ? 12 : hora.getHour() % 12;
-		return "%d:%02d".formatted(hora12, hora.getMinute());
-	}
-
-	private static String periodo(LocalTime hora) {
-		return hora.getHour() < 12 ? "a. m." : "p. m.";
-	}
-
-	private static String capitalizar(String texto) {
-		return texto.isEmpty() ? texto : texto.substring(0, 1).toUpperCase(LOCALE) + texto.substring(1);
 	}
 }

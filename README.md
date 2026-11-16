@@ -776,7 +776,7 @@ erDiagram
 - **`pago` se crea al adjuntar la constancia**; mientras la cita está `PENDIENTE_PAGO` no existe la fila.
 - **El documento vive en `usuario`** porque es el login y no se edita (RN-12).
 - **Constancias** en la carpeta local `uploads/comprobantes/`; la BD guarda la ruta y el tipo MIME.
-- **Tareas automáticas como eventos de MySQL** (Event Scheduler): el vencimiento de reservas cada minuto (RF16) y la generación diaria de los bloques de `horario` a partir de `horario_semanal` (RN-08). Corren en la BD con su propio horario, sin depender de que la aplicación esté levantada; la aplicación solo lee el resultado.
+- **Tareas automáticas:** RF16 se ejecuta mediante el evento MySQL `ev_vencer_reservas`, cada minuto e independientemente de que la aplicación esté levantada. La generación de bloques de RF06/RN-08 se ejecuta desde la aplicación Spring Boot al iniciar y mediante una tarea diaria (`GeneracionHorarioJob`); por tanto, la generación diaria depende de que la aplicación esté activa. Ambas tareas deben verificarse en el entorno de ejecución.
 
 Modelos conceptual, lógico y físico, restricciones, índices y diccionario de datos: [docs/diagramas/base-de-datos.md](docs/diagramas/base-de-datos.md).
 
@@ -821,7 +821,8 @@ flowchart TB
     end
 
     DAO --> DB[("MySQL 8.4")]
-    EVT["Eventos de MySQL<br/>vencimiento de reservas (cada minuto)<br/>generación de horario (diaria)"] --> DB
+    EVT["Evento MySQL<br/>vencimiento de reservas (cada minuto)"] --> DB
+    JOB["Spring Boot<br/>generación de horario al iniciar y diaria"] --> DB
     ALS --> FS[("uploads/comprobantes")]
     LOG["Logback"] -.-> CTRL
     LOG -.-> SRV

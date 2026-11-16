@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -32,6 +34,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -62,6 +65,7 @@ import pe.edu.utp.medifast.security.UsuarioDetailsService;
 import pe.edu.utp.medifast.service.ReporteService;
 import pe.edu.utp.medifast.util.Auditoria;
 import pe.edu.utp.medifast.util.ExportadorReporte;
+import pe.edu.utp.medifast.util.Paginacion;
 import pe.edu.utp.medifast.util.Reporte;
 
 @WebMvcTest(ReporteController.class)
@@ -113,7 +117,7 @@ class ReporteControllerTest {
     @Test
     void reporteCitasPorDefectoEsEstaSemanaDeLunesASabado() throws Exception {
         ReporteCitasDto reporte = citasDeLaSemana();
-        when(reporteService.citas(ID_MEDICO, new FiltroReporteDto(LUNES, SABADO, null))).thenReturn(reporte);
+        when(reporteService.citas(eq(ID_MEDICO), eq(new FiltroReporteDto(LUNES, SABADO, null)), any())).thenAnswer(paginar(reporte));
 
         mockMvc.perform(get("/medico/reportes/citas").with(medico()))
                 .andExpect(status().isOk())
@@ -148,7 +152,7 @@ class ReporteControllerTest {
 
     @Test
     void reporteCitasAplicaRangoYEstado() throws Exception {
-        when(reporteService.citas(any(), any())).thenReturn(new ReporteCitasDto(List.of()));
+        when(reporteService.citas(any(), any(), any())).thenAnswer(paginar(new ReporteCitasDto(List.of())));
 
         mockMvc.perform(get("/medico/reportes/citas").param("desde", "2026-11-01").param("hasta", "2026-11-30")
                 .param("estado", "CANCELADA").with(medico()))
@@ -159,8 +163,8 @@ class ReporteControllerTest {
                         containsString("No hay citas en este período"),
                         containsString("reporte-exportar-deshabilitado"))));
 
-        verify(reporteService).citas(ID_MEDICO,
-                new FiltroReporteDto(LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 30), EstadoCitaEnum.CANCELADA));
+        verify(reporteService).citas(eq(ID_MEDICO),
+                eq(new FiltroReporteDto(LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 30), EstadoCitaEnum.CANCELADA)), isNull());
     }
 
     @Test
@@ -172,7 +176,7 @@ class ReporteControllerTest {
                         containsString("La fecha final debe ser igual o posterior a la inicial."),
                         not(containsString("Total de citas")))));
 
-        verify(reporteService, never()).citas(any(), any());
+        verify(reporteService, never()).citas(any(), any(), any());
     }
 
     @Test
@@ -230,7 +234,7 @@ class ReporteControllerTest {
     void reportePagosMuestraUnaFilaPorPagoConTotalEIndicadores() throws Exception {
         LocalDate domingo = LocalDate.of(2026, 11, 15);
 
-        when(reporteService.pagos(ID_MEDICO, new FiltroReporteDto(LUNES, domingo))).thenReturn(pagosDeLaSemana());
+        when(reporteService.pagos(eq(ID_MEDICO), eq(new FiltroReporteDto(LUNES, domingo)), any())).thenAnswer(paginar(pagosDeLaSemana()));
 
         mockMvc.perform(get("/medico/reportes/pagos").with(medico())).andExpect(status().isOk()).andExpect(view().name("medico/reporte-pagos")).andExpect(model().attribute("atajoActivo", "Esta semana")).andExpect(model().attribute("cantidad", 2L)).andExpect(model().attribute("totalSoles", "S/ 230.00")).andExpect(model().attribute("ticketPromedio", "S/ 115.00")).andExpect(model().attribute("contador", "2 pagos")).andExpect(content().string(allOf(
                 containsString("Filtra por la fecha de validación del pago."),
@@ -247,7 +251,7 @@ class ReporteControllerTest {
 
     @Test
     void reportePagosSinResultadosDeshabilitaExportar() throws Exception {
-        when(reporteService.pagos(any(), any())).thenReturn(new ResumenPagosDto(List.of()));
+        when(reporteService.pagos(any(), any(), any())).thenAnswer(paginar(new ResumenPagosDto(List.of())));
 
         mockMvc.perform(get("/medico/reportes/pagos").param("desde", "2026-11-15").param("hasta", "2026-11-15")
                 .with(medico()))
@@ -282,8 +286,8 @@ class ReporteControllerTest {
     @Test
     void reporteCitasPaginaLaTablaYConservaLosFiltros() throws Exception {
         ReporteCitasDto reporte = citasAtendidas(23);
-        when(reporteService.citas(ID_MEDICO, new FiltroReporteDto(LUNES, SABADO, EstadoCitaEnum.ATENDIDA)))
-                .thenReturn(reporte);
+        when(reporteService.citas(eq(ID_MEDICO), eq(new FiltroReporteDto(LUNES, SABADO, EstadoCitaEnum.ATENDIDA)), any()))
+                .thenAnswer(paginar(reporte));
 
         mockMvc.perform(get("/medico/reportes/citas").param("desde", "2026-11-09").param("hasta", "2026-11-14")
                 .param("estado", "ATENDIDA").param("pagina", "2").with(medico()))
@@ -302,7 +306,7 @@ class ReporteControllerTest {
     @Test
     void reporteCitasAjustaLaPaginaFueraDeRango() throws Exception {
         ReporteCitasDto reporte = citasAtendidas(23);
-        when(reporteService.citas(any(), any())).thenReturn(reporte);
+        when(reporteService.citas(any(), any(), any())).thenAnswer(paginar(reporte));
 
         mockMvc.perform(get("/medico/reportes/citas").param("pagina", "99").with(medico()))
                 .andExpect(model().attribute("contador", "Mostrando 21–23 de 23 citas"));
@@ -313,7 +317,7 @@ class ReporteControllerTest {
     @Test
     void reporteCitasSinPaginasExtraNoMuestraLaPaginacion() throws Exception {
         ReporteCitasDto reporte = citasDeLaSemana();
-        when(reporteService.citas(any(), any())).thenReturn(reporte);
+        when(reporteService.citas(any(), any(), any())).thenAnswer(paginar(reporte));
 
         mockMvc.perform(get("/medico/reportes/citas").with(medico()))
                 .andExpect(content().string(not(containsString("reporte-paginacion"))));
@@ -326,7 +330,7 @@ class ReporteControllerTest {
             pagos.add(new PagoValidadoDto(LocalDateTime.of(2026, 11, 9, 8, i), 300L + i, "Paciente " + i,
                     TipoDocumentoEnum.DNI, "7000" + (1000 + i), TipoCitaEnum.CONTROL, null, new BigDecimal("80.00")));
         }
-        when(reporteService.pagos(any(), any())).thenReturn(new ResumenPagosDto(pagos));
+        when(reporteService.pagos(any(), any(), any())).thenAnswer(paginar(new ResumenPagosDto(pagos)));
 
         mockMvc.perform(get("/medico/reportes/pagos").param("desde", "2026-11-09").param("hasta", "2026-11-15")
                 .param("pagina", "2").with(medico()))
@@ -381,6 +385,25 @@ class ReporteControllerTest {
                 cita(119L, LUNES, LocalTime.of(11, 0), "Valeria Gómez Morales", "70008765", TipoCitaEnum.NUEVO, EstadoCitaEnum.ATENDIDA, EstadoPagoEnum.VALIDADO),
                 cita(129L, LocalDate.of(2026, 11, 11), LocalTime.of(12, 30), "Pedro Huamán Díaz", "70003018", TipoCitaEnum.CONTROL, EstadoCitaEnum.CANCELADA, EstadoPagoEnum.RECHAZADO),
                 cita(131L, LocalDate.of(2026, 11, 13), LocalTime.of(12, 0), "María Rojas Vega", "70008193", TipoCitaEnum.CONTROL, EstadoCitaEnum.PENDIENTE_PAGO, null)));
+    }
+
+    /**
+     * Simula la paginación del servicio: recorta la página pedida (3.er argumento) y conserva los totales de todo el
+     * reporte.
+     */
+    private static Answer<ReporteCitasDto> paginar(ReporteCitasDto completo) {
+        return invocacion -> {
+            Paginacion paginacion = Paginacion.de(invocacion.getArgument(2), completo.filas().size());
+            return new ReporteCitasDto(paginacion.recortar(completo.filas()), completo.totales(), paginacion);
+        };
+    }
+
+    private static Answer<ResumenPagosDto> paginar(ResumenPagosDto completo) {
+        return invocacion -> {
+            Paginacion paginacion = Paginacion.de(invocacion.getArgument(2), completo.pagos().size());
+            return new ResumenPagosDto(paginacion.recortar(completo.pagos()), completo.cantidad(), completo.total(),
+                    paginacion);
+        };
     }
 
     /**

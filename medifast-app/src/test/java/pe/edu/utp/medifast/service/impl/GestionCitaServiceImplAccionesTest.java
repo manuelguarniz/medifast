@@ -295,8 +295,8 @@ class GestionCitaServiceImplAccionesTest {
 		Cita nueva = new Cita(paciente, medico, TipoCitaEnum.NUEVO, null);
 		ReflectionTestUtils.setField(nueva, "id", ID_CITA);
 		nueva.setEstado(estado);
-		nueva.agregarBloque(mock(Horario.class));
-		nueva.agregarBloque(mock(Horario.class));
+		nueva.agregarBloque(new Horario(medico, MIERCOLES, LocalTime.of(10, 30), LocalTime.of(11, 0)));
+		nueva.agregarBloque(new Horario(medico, MIERCOLES, LocalTime.of(11, 0), LocalTime.of(11, 30)));
 		return nueva;
 	}
 

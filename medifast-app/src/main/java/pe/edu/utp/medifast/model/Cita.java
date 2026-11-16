@@ -1,6 +1,8 @@
 package pe.edu.utp.medifast.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +31,9 @@ import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 
 /**
- * Reserva de un paciente con un médico (tabla {@code cita}, RN-02, RN-05, RN-09). La fecha y la hora no se
- * guardan aquí: salen de sus {@link #getBloques() bloques} (ver {@link VistaCita}).
+ * Reserva de un paciente con un médico (tabla {@code cita}, RN-02, RN-05, RN-09). La fecha y las horas son el
+ * inicio y el fin de sus {@link #getBloques() bloques}: se fijan al agregarlos y se guardan para que {@link VistaCita}
+ * no tenga que calcularlas.
  * <p>
  * La columna generada {@code paciente_activo} (RN-09) no se mapea: solo existe para el índice único en MySQL.
  */
@@ -75,6 +78,15 @@ public class Cita extends EntidadAuditable {
 	@Setter
 	private CanceladaPorEnum canceladaPor;
 
+	@Column(name = "fecha", nullable = false, updatable = false)
+	private LocalDate fecha;
+
+	@Column(name = "hora_inicio", nullable = false, updatable = false)
+	private LocalTime horaInicio;
+
+	@Column(name = "hora_fin", nullable = false, updatable = false)
+	private LocalTime horaFin;
+
 	@OneToMany(mappedBy = "cita", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private List<CitaHorario> bloques = new ArrayList<>();
 
@@ -85,8 +97,16 @@ public class Cita extends EntidadAuditable {
 		this.expiraEn = expiraEn;
 	}
 
-	/** Reserva un bloque para esta cita (RN-01). */
+	/** Reserva un bloque para esta cita (RN-01) y amplía su inicio y fin hasta cubrirlo. */
 	public void agregarBloque(Horario horario) {
+		if (bloques.isEmpty()) {
+			fecha = horario.getFecha();
+			horaInicio = horario.getHoraInicio();
+			horaFin = horario.getHoraFin();
+		} else {
+			horaInicio = horario.getHoraInicio().isBefore(horaInicio) ? horario.getHoraInicio() : horaInicio;
+			horaFin = horario.getHoraFin().isAfter(horaFin) ? horario.getHoraFin() : horaFin;
+		}
 		bloques.add(new CitaHorario(this, horario));
 	}
 

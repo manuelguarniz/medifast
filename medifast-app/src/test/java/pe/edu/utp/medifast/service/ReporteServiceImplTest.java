@@ -3,6 +3,7 @@ package pe.edu.utp.medifast.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,18 +17,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
+import pe.edu.utp.medifast.dao.CitaDao;
 import pe.edu.utp.medifast.dao.PagoDao;
 import pe.edu.utp.medifast.dao.VistaCitaDao;
+import pe.edu.utp.medifast.dto.ConteoEstadoDto;
 import pe.edu.utp.medifast.dto.FiltroReporteDto;
 import pe.edu.utp.medifast.dto.PagoValidadoDto;
 import pe.edu.utp.medifast.dto.ReporteCitasDto;
 import pe.edu.utp.medifast.dto.ResumenPagosDto;
+import pe.edu.utp.medifast.dto.TotalPagosDto;
 import pe.edu.utp.medifast.model.VistaCita;
 import pe.edu.utp.medifast.model.enums.EstadoCitaEnum;
 import pe.edu.utp.medifast.model.enums.TipoCitaEnum;
 import pe.edu.utp.medifast.model.enums.TipoDocumentoEnum;
 import pe.edu.utp.medifast.service.impl.ReporteServiceImpl;
+import pe.edu.utp.medifast.util.Paginacion;
 
 @ExtendWith(MockitoExtension.class)
 class ReporteServiceImplTest {
@@ -37,6 +43,9 @@ class ReporteServiceImplTest {
 
     @Mock
     private VistaCitaDao vistaCitaDao;
+
+    @Mock
+    private CitaDao citaDao;
 
     @InjectMocks
     private ReporteServiceImpl reporteService;
@@ -163,6 +172,58 @@ class ReporteServiceImplTest {
         reporteService.pagos(7L, new FiltroReporteDto(desde, hasta));
 
         verify(pagoDao).pagosValidados(7L, desde.atStartOfDay(), hastaExclusivo);
+    }
+
+    @Test
+    void paginaDeCitasLeeSoloEsaPaginaYCuentaLosTotalesEnLaBd() {
+        LocalDate desde = LocalDate.of(2020, 1, 1);
+        LocalDate hasta = LocalDate.of(2020, 12, 31);
+        VistaCita atendida = mock(VistaCita.class);
+        when(citaDao.contarPorEstado(1L, desde, hasta, null)).thenReturn(List.of(
+                new ConteoEstadoDto(EstadoCitaEnum.ATENDIDA, 6000L),
+                new ConteoEstadoDto(EstadoCitaEnum.CANCELADA, 1000L)));
+        when(vistaCitaDao.reporteCitas(1L, desde, hasta, null, PageRequest.of(4, Paginacion.POR_PAGINA)))
+                .thenReturn(List.of(atendida));
+
+        ReporteCitasDto resultado = reporteService.citas(1L, new FiltroReporteDto(desde, hasta, null), "5");
+
+        assertThat(resultado.filas()).containsExactly(atendida);
+        assertThat(resultado.total()).isEqualTo(7000L);
+        assertThat(resultado.total(EstadoCitaEnum.CANCELADA)).isEqualTo(1000L);
+        assertThat(resultado.total(EstadoCitaEnum.NO_ASISTIO)).isZero();
+        assertThat(resultado.paginacion().actual()).isEqualTo(5);
+        assertThat(resultado.paginacion().totalPaginas()).isEqualTo(700);
+    }
+
+    @Test
+    void paginaDeCitasSinResultadosNoConsultaLasFilas() {
+        LocalDate dia = LocalDate.of(2026, 10, 1);
+        when(citaDao.contarPorEstado(1L, dia, dia, null)).thenReturn(List.of());
+
+        ReporteCitasDto resultado = reporteService.citas(1L, new FiltroReporteDto(dia, dia, null), null);
+
+        assertThat(resultado.filas()).isEmpty();
+        assertThat(resultado.total()).isZero();
+        verifyNoInteractions(vistaCitaDao);
+    }
+
+    @Test
+    void paginaDePagosTomaCantidadYTotalDelPeriodoCompleto() {
+        LocalDate desde = LocalDate.of(2026, 11, 9);
+        LocalDate hasta = LocalDate.of(2026, 11, 15);
+        LocalDateTime hastaExclusivo = hasta.plusDays(1).atStartOfDay();
+        when(pagoDao.totalPagosValidados(1L, desde.atStartOfDay(), hastaExclusivo))
+                .thenReturn(new TotalPagosDto(12L, new BigDecimal("960")));
+        when(pagoDao.pagosValidados(1L, desde.atStartOfDay(), hastaExclusivo, PageRequest.of(1, Paginacion.POR_PAGINA)))
+                .thenReturn(List.of(pago(310L, "80.00"), pago(311L, "80.00")));
+
+        ResumenPagosDto resultado = reporteService.pagos(1L, new FiltroReporteDto(desde, hasta), "2");
+
+        assertThat(resultado.pagos()).hasSize(2);
+        assertThat(resultado.cantidad()).isEqualTo(12L);
+        assertThat(resultado.total()).isEqualByComparingTo("960.00");
+        assertThat(resultado.ticketPromedio()).isEqualByComparingTo("80.00");
+        assertThat(resultado.paginacion().contador("pago", "pagos")).isEqualTo("Mostrando 11–12 de 12 pagos");
     }
 
     private static PagoValidadoDto pago(long idCita, String monto) {

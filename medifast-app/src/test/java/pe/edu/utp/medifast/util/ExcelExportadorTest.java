@@ -95,4 +95,26 @@ class ExcelExportadorTest {
             assertThat(hoja.getRow(9).getCell(1).getCellStyle().getDataFormatString()).contains("S/");
         }
     }
+
+    @Test
+    void excelExportadorAjustaElAnchoAlTextoMasLargoSinContarElTitulo() throws Exception {
+        Reporte reporte = new Reporte(
+                "Un título muy largo que no debe ensanchar la primera columna",
+                "Filtros aplicados",
+                List.of("N.º", "Paciente"),
+                List.of(
+                        List.of("#000001", "Ana"),
+                        List.of("#000002", "Gabriela Rodríguez Otiniano")),
+                List.of("2 citas"));
+
+        byte[] bytes = exportador.exportar(reporte);
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(bytes))) {
+            var hoja = workbook.getSheetAt(0);
+
+            assertThat(hoja.getColumnWidth(0)).isEqualTo(("#000001".length() + 2) * 256);
+            assertThat(hoja.getColumnWidth(1)).isEqualTo(("Gabriela Rodríguez Otiniano".length() + 2) * 256);
+            assertThat(hoja.getRow(5).getCell(1).getStringCellValue()).isEqualTo("Gabriela Rodríguez Otiniano");
+        }
+    }
 }

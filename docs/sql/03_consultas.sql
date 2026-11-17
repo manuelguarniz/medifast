@@ -6,6 +6,10 @@
 -- para que el cliente continúe tras cada error esperado.
 -- =============================================================================
 
+-- Los literales del script están en UTF-8: fija la conexión aunque el cliente
+-- use otro juego de caracteres por defecto (p. ej. latin1 dentro del contenedor).
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE medifast;
 
 -- -----------------------------------------------------------------------------

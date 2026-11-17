@@ -3,7 +3,8 @@ spring:
     name: medifast
   datasource:
     # Usuario con privilegios mínimos creado en docs/sql/01_schema.sql
-    url: ${MEDIFAST_DB_URL:jdbc:mysql://localhost:3306/medifast?serverTimezone=America/Lima}
+    # characterEncoding/connectionCollation: la conexión JDBC siempre en utf8mb4 (tildes y ñ)
+    url: ${MEDIFAST_DB_URL:jdbc:mysql://localhost:3306/medifast?serverTimezone=America/Lima&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci}
     username: ${MEDIFAST_DB_USER:medifast_app}
     password: ${MEDIFAST_DB_PASSWORD:medifast_app}
   jpa:
@@ -24,6 +25,11 @@ spring:
 
 server:
   servlet:
+    # Peticiones y respuestas (formularios, HTML, JSON) siempre en UTF-8
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
     session:
       timeout: 30m
       cookie:

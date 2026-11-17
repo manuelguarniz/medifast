@@ -985,8 +985,8 @@ mysql --force -u root -p medifast < docs/sql/03_consultas.sql   # la sección 6 
 ¿Ya tenías la BD creada con una versión anterior del esquema? Actualízala sin perder datos (o recréala con `docker compose down -v && docker compose up -d`):
 
 ```bash
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/04_migracion_auditoria.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/05_evento_vencimiento.sql   # si tu BD no tiene el evento de RF16
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/04_migracion_auditoria.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/05_evento_vencimiento.sql   # si tu BD no tiene el evento de RF16
 ```
 
 **Cuentas de prueba** (contraseña `Medifast2026`):

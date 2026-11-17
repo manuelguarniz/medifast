@@ -25,7 +25,7 @@ docker compose ps
 docker compose down -v && docker compose up -d
 
 # Consola MySQL
-docker exec -it medifast-mysql mysql -uroot -proot medifast
+docker exec -it medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 medifast
 
 
 ------------------------------------------------------------------------------
@@ -42,32 +42,39 @@ docker exec -it medifast-mysql mysql -uroot -proot medifast
 06_citas_historicas.sql    Opcional: ~5 años de citas (>10 000). No re-ejecutable.
 07_citas_volumen.sql       Opcional: completa 100 000 citas. No re-ejecutable.
 08_migracion_rendimiento.sql Solo para bases creadas con un 01 antiguo.
+09_correccion_utf8.sql     Repara textos con doble codificación ("Ã­" en vez
+                           de "í"). Re-ejecutable.
+
+Siempre con --default-character-set=utf8mb4: dentro del contenedor el
+cliente usa latin1 por defecto y graba tildes y ñ con doble codificación.
 
 --- [docker] ---
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/01_schema.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/02_datos_prueba.sql
-docker exec -i medifast-mysql mysql -uroot -proot --force < docs/sql/03_consultas.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/04_migracion_auditoria.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/05_evento_vencimiento.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/06_citas_historicas.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/07_citas_volumen.sql
-docker exec -i medifast-mysql mysql -uroot -proot < docs/sql/08_migracion_rendimiento.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/01_schema.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/02_datos_prueba.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 --force < docs/sql/03_consultas.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/04_migracion_auditoria.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/05_evento_vencimiento.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/06_citas_historicas.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/07_citas_volumen.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/08_migracion_rendimiento.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < docs/sql/09_correccion_utf8.sql
 
 --- [local] ---
-mysql -u root -p < docs/sql/01_schema.sql
-mysql -u root -p < docs/sql/02_datos_prueba.sql
-mysql -u root -p --force medifast < docs/sql/03_consultas.sql
-mysql -u root -p < docs/sql/04_migracion_auditoria.sql
-mysql -u root -p < docs/sql/05_evento_vencimiento.sql
-mysql -u root -p < docs/sql/06_citas_historicas.sql
-mysql -u root -p < docs/sql/07_citas_volumen.sql
-mysql -u root -p < docs/sql/08_migracion_rendimiento.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/01_schema.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/02_datos_prueba.sql
+mysql -u root -p --default-character-set=utf8mb4 --force medifast < docs/sql/03_consultas.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/04_migracion_auditoria.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/05_evento_vencimiento.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/06_citas_historicas.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/07_citas_volumen.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/08_migracion_rendimiento.sql
+mysql -u root -p --default-character-set=utf8mb4 < docs/sql/09_correccion_utf8.sql
 
 # Verificar el evento de vencimiento
-docker exec -it medifast-mysql mysql -uroot -proot -e "SHOW VARIABLES LIKE 'event_scheduler'; SHOW EVENTS FROM medifast;"
+docker exec -it medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 -e "SHOW VARIABLES LIKE 'event_scheduler'; SHOW EVENTS FROM medifast;"
 
 # Contar citas cargadas
-docker exec -it medifast-mysql mysql -uroot -proot -e "SELECT COUNT(*) FROM medifast.cita;"
+docker exec -it medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 -e "SELECT COUNT(*) FROM medifast.cita;"
 
 
 ------------------------------------------------------------------------------
@@ -84,26 +91,26 @@ Opciones usadas:
 
 --- [docker] ---
 mkdir -p backups
-docker exec medifast-mysql mysqldump -uroot -proot \
+docker exec medifast-mysql mysqldump -uroot -proot --default-character-set=utf8mb4 \
   --databases medifast --single-transaction --routines --events --triggers \
   --set-gtid-purged=OFF \
   > backups/medifast_$(date +%Y%m%d_%H%M%S).sql
 
 # Comprimido (recomendado con 100 000 citas)
-docker exec medifast-mysql mysqldump -uroot -proot \
+docker exec medifast-mysql mysqldump -uroot -proot --default-character-set=utf8mb4 \
   --databases medifast --single-transaction --routines --events --triggers \
   --set-gtid-purged=OFF \
   | gzip > backups/medifast_$(date +%Y%m%d_%H%M%S).sql.gz
 
 --- [local] ---
 mkdir -p backups
-mysqldump -u root -p \
+mysqldump -u root -p --default-character-set=utf8mb4 \
   --databases medifast --single-transaction --routines --events --triggers \
   --set-gtid-purged=OFF \
   > backups/medifast_$(date +%Y%m%d_%H%M%S).sql
 
 # Solo estructura (sin datos)
-mysqldump -u root -p --databases medifast --no-data --routines --events \
+mysqldump -u root -p --default-character-set=utf8mb4 --databases medifast --no-data --routines --events \
   --triggers --set-gtid-purged=OFF > backups/medifast_estructura.sql
 
 Nota: no subir la carpeta backups/ al repositorio (contiene datos y hashes de
@@ -118,23 +125,23 @@ El backup reemplaza las tablas existentes de medifast (DROP TABLE + CREATE).
 Cambiar el nombre del archivo por el backup que se quiera restaurar.
 
 --- [docker] ---
-docker exec -i medifast-mysql mysql -uroot -proot < backups/medifast_20261028_120000.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < backups/medifast_20261028_120000.sql
 
 # Desde un .sql.gz
-gunzip -c backups/medifast_20261028_120000.sql.gz | docker exec -i medifast-mysql mysql -uroot -proot
+gunzip -c backups/medifast_20261028_120000.sql.gz | docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4
 
 --- [local] ---
-mysql -u root -p < backups/medifast_20261028_120000.sql
+mysql -u root -p --default-character-set=utf8mb4 < backups/medifast_20261028_120000.sql
 gunzip -c backups/medifast_20261028_120000.sql.gz | mysql -u root -p
 
 # Restaurar en una base limpia (borra la BD actual antes)
-docker exec -i medifast-mysql mysql -uroot -proot -e "DROP DATABASE IF EXISTS medifast;"
-docker exec -i medifast-mysql mysql -uroot -proot < backups/medifast_20261028_120000.sql
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 -e "DROP DATABASE IF EXISTS medifast;"
+docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 < backups/medifast_20261028_120000.sql
 
 Notas:
   - El usuario medifast_app NO va en el backup (los usuarios viven en la BD
     mysql). En un servidor nuevo, crearlo antes de levantar la aplicación:
-      docker exec -i medifast-mysql mysql -uroot -proot -e \
+      docker exec -i medifast-mysql mysql -uroot -proot --default-character-set=utf8mb4 -e \
         "CREATE USER IF NOT EXISTS 'medifast_app'@'%' IDENTIFIED BY 'medifast_app';
          GRANT SELECT, INSERT, UPDATE, DELETE ON medifast.* TO 'medifast_app'@'%';"
   - El evento ev_vencer_reservas se restaura con el backup, pero necesita

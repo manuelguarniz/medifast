@@ -11,6 +11,10 @@
 -- consultorio. El DNI y el CMP del médico son ficticios.
 -- =============================================================================
 
+-- Los literales del script están en UTF-8: fija la conexión aunque el cliente
+-- use otro juego de caracteres por defecto (p. ej. latin1 dentro del contenedor).
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE medifast;
 
 -- Hash bcrypt (coste 10) de "Medifast2026"
